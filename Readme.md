@@ -1,0 +1,1 @@
+# on ecrit l'avancement de check semaine, les notes importantes, les convention choisies etc
