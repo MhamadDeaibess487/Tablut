@@ -1,3 +1,4 @@
+package Model;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -55,17 +56,22 @@ public class Jeu extends BaseJeu{
         catch(IOException e){
             System.err.println("Erreur lors du chargement : "+e.getMessage());
         }
-        
+    }
+    
+    @Override
+    void jeuRedondant(){
+        System.err.println("Jeu redondant non implem");
+        System.exit(0);
     }
     
     public void sauvegarder(Point a, Point b) {
-        int joueur = 0; // A enlever
-        undo.push(new Coup(a, b, joueur));
+        undo.push(new Coup(a, b, Joueur_actif));
         redo.clear();
     }
     
-    public void joue(Point a,Point b){
-        super.joue(a,b);
+    @Override
+    public void deplacer(Point a,Point b){
+        super.deplacer(a,b);
         sauvegarder(a,b);
     }
     
@@ -126,4 +132,6 @@ public class Jeu extends BaseJeu{
             return null;
         }
     }
+    
+    
 }

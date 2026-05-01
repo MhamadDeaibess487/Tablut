@@ -1,3 +1,5 @@
+package Model;
+
 public class Coup{
     Point a,b;
     int joueur;

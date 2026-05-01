@@ -1,4 +1,4 @@
-
+package Model;
 
 public class Point{
     int i,j;
