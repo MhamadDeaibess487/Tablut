@@ -162,7 +162,44 @@ public class BaseJeu {
             System.out.println();
         }
     }
+    public ArrayList<Pion> listeCasesValides(int l, int c) {
+        ArrayList<Pion> cases = new ArrayList<>();
+        int taille = grille.length;
 
+        // bas
+        for (int i = l + 1; i < taille; i++) {
+            if (grille[i][c] != 0) break;
+            if (CoupValide(l, c, i, c)) {
+                cases.add(new Pion(i, c, 0));
+            }
+        }
+
+        // haut
+        for (int i = l - 1; i >= 0; i--) {
+            if (grille[i][c] != 0) break;
+            if (CoupValide(l, c, i, c)) {
+                cases.add(new Pion(i, c, 0));
+            }
+        }
+
+        // droite
+        for (int j = c + 1; j < taille; j++) {
+            if (grille[l][j] != 0) break;
+            if (CoupValide(l, c, l, j)) {
+                cases.add(new Pion(l, j, 0));
+            }
+        }
+
+        // gauche
+        for (int j = c - 1; j >= 0; j--) {
+            if (grille[l][j] != 0) break;
+            if (CoupValide(l, c, l, j)) {
+                cases.add(new Pion(l, j, 0));
+            }
+        }
+
+        return cases;
+    }
     public static void main(String[] args) {
         BaseJeu jeu = new BaseJeu();
         jeu.afficher();

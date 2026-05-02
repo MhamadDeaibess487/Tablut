@@ -8,5 +8,14 @@ public class Pion {
         this.l = ligne;
         this.t = type;
     }
+    public int getLigne() {
+        return l;
+    }
+    public int getColonne() {
+        return c;
+    }
+    public int getType() {
+        return t;
+    }
 
 }
