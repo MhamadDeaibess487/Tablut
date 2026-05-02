@@ -8,34 +8,34 @@ import java.io.PrintWriter;
 import java.util.Stack;
 import java.io.FileNotFoundException;
 
-public class Jeu extends BaseJeu{
+public class Jeu extends BaseJeu {
     Stack<Coup> redo, undo;
-    
-    public Jeu(){
+
+    public Jeu() {
         redo = new Stack<>();
         undo = new Stack<>();
     }
-    
-    public Jeu(String fichier){ // Charge une sauvegarde
+
+    public Jeu(String fichier) { // Charge une sauvegarde
         redo = new Stack<>();
         undo = new Stack<>();
-        try{
+        try {
             BufferedReader br = new BufferedReader(new FileReader(fichier));
             String line;
             boolean inRedo = false;
             boolean inUndo = false;
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 line = line.trim();
-                if(line.isEmpty()){
+                if (line.isEmpty()) {
                     continue;
                 }
-                if(line.equalsIgnoreCase("REDO")){
+                if (line.equalsIgnoreCase("REDO")) {
                     inRedo = true;
                     inUndo = false;
                     continue;
                 }
-                if(line.equalsIgnoreCase("UNDO")){
-                    inRedo= false;
+                if (line.equalsIgnoreCase("UNDO")) {
+                    inRedo = false;
                     inUndo = true;
                     continue;
                 }
@@ -49,89 +49,89 @@ public class Jeu extends BaseJeu{
                 }
             }
             reconstruireJeu();
-        }
-        catch(FileNotFoundException e){
-             System.err.println("Fichier introuvable");
-        }
-        catch(IOException e){
-            System.err.println("Erreur lors du chargement : "+e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.err.println("Fichier introuvable");
+        } catch (IOException e) {
+            System.err.println("Erreur lors du chargement : " + e.getMessage());
         }
     }
-    
+
     @Override
-    void jeuRedondant(){
+    void jeuRedondant() {
         System.err.println("Jeu redondant non implem");
         System.exit(0);
     }
-    
+
     public void sauvegarder(Point a, Point b) {
         undo.push(new Coup(a, b, Joueur_actif));
         redo.clear();
     }
-    
+
     @Override
-    public void deplacer(Point a,Point b){
-        super.deplacer(a,b);
-        sauvegarder(a,b);
+    public boolean deplacer(Point a, Point b) {
+
+        if (!super.deplacer(a, b)) {
+            return false;
+        }
+        sauvegarder(a, b);
+        return true;
     }
-    
-    public void sauvegardeFichier(String fichier){
-        try(PrintWriter pw = new PrintWriter(new FileWriter(fichier))){
+
+    public void sauvegardeFichier(String fichier) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(fichier))) {
             pw.println("REDO");
-            for(Coup c : redo){
-                pw.println(c.a.i+", "+c.a.j+";"+c.b.i+", "+c.b.j+";"+c.joueur);
+            for (Coup c : redo) {
+                pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
                 pw.println();
             }
-            
+
             pw.println("UNDO");
-            for(Coup c : undo){
-                pw.println(c.a.i+", "+c.a.j+";"+c.b.i+", "+c.b.j+";"+c.joueur);
+            for (Coup c : undo) {
+                pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
                 pw.println();
             }
-        } catch (IOException e){
-            System.err.println("Erreur lors de la sauvegarde : "+e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
         }
     }
-    
+
     public void annuler() {
-        if(!undo.isEmpty()){
+        if (!undo.isEmpty()) {
             Coup last = undo.pop();
             redo.push(last);
-            super.joue(last.b,last.a);
+            super.deplacer(last.b, last.a);
         }
     }
-    
+
     public void refaire() {
-        if(!redo.isEmpty()){
+        if (!redo.isEmpty()) {
             Coup last = redo.pop();
             undo.push(last);
-            super.joue(last.a,last.b);
+            super.deplacer(last.a, last.b);
         }
     }
-    
-    
-    private void reconstruireJeu(){
+
+    private void reconstruireJeu() {
         for (Coup c : undo)
-            super.joue(c.a, c.b);
+            super.deplacer(c.a, c.b);
     }
-    
-    private Coup lireCoup(String line){
-        String[] parts = line.split(";");   
+
+    private Coup lireCoup(String line) {
+        String[] parts = line.split(";");
         String[] pa = parts[0].split(",");
         String[] pb = parts[1].split(",");
-        
+
         try {
-            int i1,j1,i2,j2;
+            int i1, j1, i2, j2;
             i1 = Integer.parseInt(pa[0].trim());
             j1 = Integer.parseInt(pa[1].trim());
             i2 = Integer.parseInt(pb[0].trim());
             j2 = Integer.parseInt(pb[1].trim());
             int joueur = Integer.parseInt(parts[2].trim());
-            return new Coup(new Point(i1,j1), new Point(i2,j2), joueur);
+            return new Coup(new Point(i1, j1), new Point(i2, j2), joueur);
         } catch (NumberFormatException e) {
             return null;
         }
     }
-    
-    
+
 }

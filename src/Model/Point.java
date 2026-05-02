@@ -1,9 +1,10 @@
 package Model;
 
-public class Point{
-    int i,j;
-    Point(int i,int j){
-        this.i = i;
-        this.j = j;
+public class Point {
+    int l, c;
+
+    Point(int l, int c) {
+        this.l = l;
+        this.c = c;
     }
 }
