@@ -1,4 +1,5 @@
 package Model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +21,15 @@ public abstract class BaseJeu {
     protected boolean IA_joueur1;
     protected boolean IA_joueur2;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
-//    ListePion Liste_blanc;
-//    ListePion Liste_noir;
+    // ListePion Liste_blanc;
+    // ListePion Liste_noir;
 
     public BaseJeu() {
         Taille_plateau = 9;
         Joueur_actif = 1; // Les noirs commencent
         nbNoir = 16;
         nbBlanc = 9;
-        kingLoc = new Point(4,4);
+        kingLoc = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
         IA_joueur1 = false;
         IA_joueur2 = false;
@@ -45,7 +46,7 @@ public abstract class BaseJeu {
             grille[PN.l][PN.c] = PN.t;
         }
     }
-    
+
     abstract void jeuRedondant();
 
     public int[][] getGrille() {
@@ -113,7 +114,7 @@ public abstract class BaseJeu {
                 min = c1;
                 max = c2;
             }
-            for (int c = min; c < max; c++) {
+            for (int c = min + 1; c < max; c++) {
                 if (grille[l1][c] != 0) {
                     return false;
                 }
@@ -131,7 +132,7 @@ public abstract class BaseJeu {
         return true;
     }
 
-    public boolean deplacer(Point a,Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le
+    public boolean deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le
         // déplacement
         if (!estCaseLibre(b.i, b.j)) {
             return false;
@@ -142,21 +143,21 @@ public abstract class BaseJeu {
         grille[b.i][b.j] = grille[a.i][a.j];
         grille[a.i][a.j] = 0;
 
-        /*A voir si c'est necessaire*/
-//        ListePion init = new ListePion();
-//        if (P.t == 1) {
-//            Liste_noir = init.DeplacerListePion(Liste_noir, P.l, P.c, ligne, colonne);
-//        }
-//        if (P.t == 2 || P.t == 3) {
-//            Liste_blanc = init.DeplacerListePion(Liste_blanc, P.l, P.c, ligne, colonne);
-//        }
-//
-//        if (P.t == 3) {
-//            if (ligne == 0 || ligne == 8 || colonne == 0 || colonne == 8) {
-//                fini = true;
-//            }
-//
-//        }
+        /* A voir si c'est necessaire */
+        // ListePion init = new ListePion();
+        // if (P.t == 1) {
+        // Liste_noir = init.DeplacerListePion(Liste_noir, P.l, P.c, ligne, colonne);
+        // }
+        // if (P.t == 2 || P.t == 3) {
+        // Liste_blanc = init.DeplacerListePion(Liste_blanc, P.l, P.c, ligne, colonne);
+        // }
+        //
+        // if (P.t == 3) {
+        // if (ligne == 0 || ligne == 8 || colonne == 0 || colonne == 8) {
+        // fini = true;
+        // }
+        //
+        // }
 
         // à finir avec manger
 
