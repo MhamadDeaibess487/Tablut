@@ -12,22 +12,22 @@ public abstract class BaseJeu {
     protected int[][] grille; // 0 vide, 1 noir, 2 blanc, 3 roi, 4 trone
     protected int Joueur_actif; // joueur 1(Noir) ou 2(Blanc)
     protected final int Taille_plateau;
-    protected int nbNoir;
-    protected int nbBlanc;
+    // protected int nbNoir;
+    // protected int nbBlanc;
     protected Point kingLoc;
     protected boolean IA_joueur1;
     protected boolean IA_joueur2;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
     // ListePion Liste_blanc;
     // ListePion Liste_noir;
-    ListePoint ListePointB;
-    ListePoint ListePointN;
+    protected ListePoint ListePointB;
+    protected ListePoint ListePointN;
 
     public BaseJeu() {
         Taille_plateau = 9;
         Joueur_actif = 1; // Les noirs commencent
-        nbNoir = 16;
-        nbBlanc = 9;
+        // nbNoir = 16;
+        // nbBlanc = 9;
         kingLoc = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
         IA_joueur1 = false;
@@ -35,6 +35,13 @@ public abstract class BaseJeu {
         ListePoint init = new ListePoint();
         ListePointN = init.ListeBaseNoir();
         ListePointB = init.ListeBaseBlanc();
+
+        if (ListePointB.totale != 9) {
+            System.err.println("error initialisation ListePointB");
+        }
+        if (ListePointN.totale != 16) {
+            System.err.println("error initialisation ListePointN");
+        }
 
         // Liste_blanc = init.ListeBaseBlanc();
         // Liste_noir = init.ListeBaseNoir();
@@ -57,6 +64,14 @@ public abstract class BaseJeu {
 
     public int getJoueur() {
         return this.Joueur_actif;
+    }
+
+    public ListePoint getListePointB() {
+        return this.ListePointB;
+    }
+
+    public ListePoint getListePointN() {
+        return this.ListePointN;
     }
     /*
      * public ListePion getListeBlanc() {
@@ -122,9 +137,6 @@ public abstract class BaseJeu {
         if ((l2 < 0) || (l2 > 8) || (c2 < 0) || (c2 > 8)) { // en dehors du tableau
             return false;
         }
-        // if (grille[l2][c2] != 0) {
-        // return false;
-        // }
 
         if (c1 != c2 && l1 != l2) { // déplacement en diagonale
             return false;
@@ -177,10 +189,10 @@ public abstract class BaseJeu {
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
                     // gagner noir
                 }
-                if (grille[P.l][P.c] == 1) {
+                if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
                     ListePointB = init.SupprimeListePoint(ListePointB, P);
                     grille[P.l][P.c] = 0;
-                    nbBlanc--;
+
                 }
             }
         }
@@ -188,13 +200,11 @@ public abstract class BaseJeu {
             ListePointB = init.DeplacerListePoint(ListePointB, a, b);
             Liste = CaptureNoir(b);
             for (Point P : Liste.LP) {
-                if (grille[P.l][P.c] == 2) {
-                    grille[P.l][P.c] = 0;
-                    ListePointN = init.SupprimeListePoint(ListePointN, P);
-                    nbNoir--;
-                    if (nbNoir == 0) {
-                        // gagner blanc
-                    }
+                grille[P.l][P.c] = 0;
+                ListePointN = init.SupprimeListePoint(ListePointN, P);
+
+                if (ListePointN.totale == 0) {
+                    // gagner blanc
                 }
             }
         }
@@ -366,7 +376,7 @@ public abstract class BaseJeu {
         return true;
     }
 
-    public boolean PlusDeCoup(ListePoint Liste) {
+    public boolean PlusDeCoup(ListePoint Liste) { // renvoie vrai le joueur n'a plus de coup
         for (Point P : Liste.LP) {
             if (!EstBloque(P)) {
                 return false;

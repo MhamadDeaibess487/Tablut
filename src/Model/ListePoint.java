@@ -20,9 +20,12 @@ class ListePoint {
     public ListePoint SupprimeListePoint(ListePoint Liste, Point Supp) {
         ListePoint res = new ListePoint();
         for (Point p : Liste.LP) {
-            if (p.l == Supp.l && p.c == Supp.l)
+            if (p.l != Supp.l && p.c != Supp.l)
                 res.AddListePoint(p);
+            if (p.l == Supp.l && p.c == Supp.c)
+                totale--;
         }
+
         return res;
     }
 
