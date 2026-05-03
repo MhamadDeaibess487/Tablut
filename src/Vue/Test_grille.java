@@ -1,6 +1,7 @@
 package Vue;
 
 import Model.BaseJeu;
+import Model.Jeu;
 import Controleur.Controle;
 
 import javax.swing.JFrame;
@@ -10,7 +11,7 @@ import java.awt.BorderLayout;
 public class Test_grille {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            BaseJeu jeu = new BaseJeu();
+            BaseJeu jeu = new Jeu();
 
             GrilleGraphique grille = new GrilleGraphique(jeu);
             Controle controle = new Controle(jeu, grille);

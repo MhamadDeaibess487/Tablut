@@ -1,8 +1,10 @@
 package Controleur;
 import Model.BaseJeu;
 import Model.Pion;
+import Model.Point;
 import Vue.GrilleGraphique;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Controle {
@@ -60,7 +62,7 @@ public class Controle {
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Pion> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
             Grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
@@ -70,8 +72,9 @@ public class Controle {
             refreshGrid();
         }else{
             int [][] grille = Jeu.getGrille();
-            Pion p = new Pion(ligneSelectee,colonneSelectee,grille[ligneSelectee][colonneSelectee]);
-            Jeu.deplacer(p,row,column);
+            Point p = new Point(ligneSelectee,colonneSelectee);
+            Point p1= new Point(row,column);
+            Jeu.deplacer(p,p1);
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;

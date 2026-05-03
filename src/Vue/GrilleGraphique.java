@@ -2,7 +2,7 @@ package Vue;
 
 import Config.Config;
 import Model.BaseJeu;
-import Model.Pion;
+import Model.Point;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class GrilleGraphique extends JPanel {
     private int tailleCase;
     private int taillePlateau;
     private int taille_grille;
-    private ArrayList<Pion> casesValides;
+    private ArrayList<Point> casesValides;
     public GrilleGraphique(BaseJeu jeu) {
         this.jeu = jeu;
         this.decalageX = 0;
@@ -117,10 +117,10 @@ public class GrilleGraphique extends JPanel {
         if (casesValides == null) {
             return;
         }
-
-        for (Pion p : casesValides) {
-            int x = p.getColonne() * tailleCase + decalageX;
-            int y = p.getLigne() * tailleCase + decalageY;
+        int x,y;
+        for (Point p : casesValides) {
+             x = p.getC() * tailleCase + decalageX;
+             y = p.getL() * tailleCase + decalageY;
 
             g2.drawImage(selected, x, y, tailleCase, tailleCase, null);
         }
@@ -140,7 +140,7 @@ public class GrilleGraphique extends JPanel {
         return (x - decalageX) / tailleCase;
     }
 
-    public void dessiner_valide(ArrayList<Pion> liste_case_valide) {
+    public void dessiner_valide(ArrayList<Point> liste_case_valide) {
         this.casesValides = liste_case_valide;
         repaint();
     }
