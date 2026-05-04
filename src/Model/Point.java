@@ -1,9 +1,16 @@
 package Model;
 
-public class Point{
-    int i,j;
-    Point(int i,int j){
-        this.i = i;
-        this.j = j;
+public class Point {
+    int l, c;
+
+    public Point(int l, int c) {
+        this.l = l;
+        this.c = c;
+    }
+    public int getL() {
+        return l;
+    }
+    public int getC() {
+        return c;
     }
 }

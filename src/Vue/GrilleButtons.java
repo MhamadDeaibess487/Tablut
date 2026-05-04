@@ -1,5 +1,8 @@
 package Vue;
 
+import Model.BaseJeu;
+import Controleur.Controle;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,8 +23,15 @@ public class GrilleButtons extends JPanel {
     private JButton minus;
     private boolean iaMode = false;
 
-    public GrilleButtons() {
-        grille = new GrilleGraphique();
+
+    private BaseJeu jeu;
+    private GrilleGraphique grilleGraphique;
+    private Controle controle;
+
+    public GrilleButtons(BaseJeu jeu , GrilleGraphique grille,Controle controle) {
+        this.jeu = jeu;
+        this.grilleGraphique = grille;
+        this.controle = controle;
 
         toggleIA = new JButton("Toggle IA");
         reset = new JButton("Reset");
@@ -65,7 +75,9 @@ public class GrilleButtons extends JPanel {
         });
 
         quit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {}
+            public void actionPerformed(ActionEvent e) {
+                controle.quit();
+            }
         });
 
         plus.addActionListener(new ActionListener() {
@@ -78,10 +90,20 @@ public class GrilleButtons extends JPanel {
             // Decrease taille grille
         });
 
-        grille.addMouseListener(new MouseAdapter() {
+        grilleGraphique.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // Afficher possibilités en vert
+                int x = e.getX();
+                int y = e.getY();
+
+                if (!grilleGraphique.estDansPlateau(x, y) ) {
+                    return;
+                }
+
+                int ligne = grilleGraphique.getLigneDepuisY(y);
+                int colonne = grilleGraphique.getColonneDepuisX(x);
+
+                controle.handleGridClick(ligne, colonne);
             }
         });
 
@@ -92,6 +114,6 @@ public class GrilleButtons extends JPanel {
         add(quit);
         add(plus);
         add(minus);
-        add(grille);
+
     }
 }

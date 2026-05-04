@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IA{
-    int couleur; // 1 blanc, 2 noir
+    int couleur; // 2 blanc, 1 noir
     Jeu j;
     ListePion noir;
     ListePion blanc;
