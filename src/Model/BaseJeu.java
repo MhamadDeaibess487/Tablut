@@ -159,9 +159,7 @@ public abstract class BaseJeu {
 //        }
 
         // à finir avec manger
-
         return true;
-
     }
 
     public void afficher() {

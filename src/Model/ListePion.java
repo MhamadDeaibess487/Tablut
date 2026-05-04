@@ -23,6 +23,10 @@ class ListePion {
         }
         return res;
     }
+    
+    public Pion getIndex(int i){
+        return LP.get(i);
+    }
 
     public ListePion ListeBaseBlanc() {
         Pion blanc, roi;
