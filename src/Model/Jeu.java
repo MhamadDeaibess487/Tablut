@@ -69,7 +69,6 @@ public class Jeu extends BaseJeu {
 
     @Override
     public boolean deplacer(Point a, Point b) {
-
         if (!super.deplacer(a, b)) {
             return false;
         }

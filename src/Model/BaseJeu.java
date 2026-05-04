@@ -30,6 +30,7 @@ public abstract class BaseJeu {
         // nbBlanc = 9;
         kingLoc = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
+//        int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
         IA_joueur1 = false;
         IA_joueur2 = false;
         ListePoint init = new ListePoint();
@@ -158,10 +159,7 @@ public abstract class BaseJeu {
     }
 
     public boolean estCaseLibre(int l, int c) {
-        if (grille[l][c] != 0) {
-            return false;
-        }
-        return true;
+        return grille[l][c] == 0;
     }
 
     public boolean deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le déplacement
@@ -391,6 +389,7 @@ public abstract class BaseJeu {
             System.out.println();
         }
     }
+    
     public ArrayList<Point> listeCasesValides(int l, int c) {
         ArrayList<Point> cases = new ArrayList<>();
         int taille = grille.length;
@@ -448,7 +447,6 @@ public abstract class BaseJeu {
                 cases.add(arrivee);
             }
         }
-
         return cases;
     }
 }

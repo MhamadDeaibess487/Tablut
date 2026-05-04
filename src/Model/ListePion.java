@@ -6,13 +6,22 @@ class ListePion {
     List<Pion> LP;
     int totale = 0;
 
-    public ListePion() {
+    public ListePion(){
         LP = new ArrayList<>();
     }
 
     public void AddListePion(Pion P) {
         LP.add(P);
         totale += 1;
+    }
+    
+    public int find(Pion p){
+        return LP.indexOf(p);
+    }
+    
+    public void delete(int i){
+        LP.remove(i);
+        totale -= 1;
     }
 
     // copie une liste de coup
