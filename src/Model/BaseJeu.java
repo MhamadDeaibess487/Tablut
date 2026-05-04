@@ -1,4 +1,5 @@
 package Model;
+
 import Model.Point;
 
 import java.util.ArrayList;
@@ -173,7 +174,11 @@ public abstract class BaseJeu {
             return false;
         }
         grille[b.l][b.c] = grille[a.l][a.c];
-        grille[a.l][a.c] = 0;
+        if (grille[b.l][b.c] == 3) {
+            grille[a.l][a.c] = 4;
+
+        } else
+            grille[a.l][a.c] = 0;
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
@@ -391,6 +396,7 @@ public abstract class BaseJeu {
             System.out.println();
         }
     }
+
     public ArrayList<Point> listeCasesValides(int l, int c) {
         ArrayList<Point> cases = new ArrayList<>();
         int taille = grille.length;
