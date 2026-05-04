@@ -1,4 +1,5 @@
 package Model;
+
 import Model.Point;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public abstract class BaseJeu {
     // protected int nbNoir;
     // protected int nbBlanc;
     protected Point kingLoc;
+//        int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
     protected boolean IA_joueur1;
     protected boolean IA_joueur2;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
@@ -30,7 +32,6 @@ public abstract class BaseJeu {
         // nbBlanc = 9;
         kingLoc = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
-//        int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
         IA_joueur1 = false;
         IA_joueur2 = false;
         ListePoint init = new ListePoint();
@@ -171,7 +172,11 @@ public abstract class BaseJeu {
             return false;
         }
         grille[b.l][b.c] = grille[a.l][a.c];
-        grille[a.l][a.c] = 0;
+        if (grille[b.l][b.c] == 3) {
+            grille[a.l][a.c] = 4;
+
+        } else
+            grille[a.l][a.c] = 0;
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
