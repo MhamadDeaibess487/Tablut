@@ -172,7 +172,7 @@ public abstract class BaseJeu {
             return false;
         }
         grille[b.l][b.c] = grille[a.l][a.c];
-        if (grille[b.l][b.c] == 3) {
+        if (grille[b.l][b.c] == 3 && a.l==4 && a.c ==4) {
             grille[a.l][a.c] = 4;
 
         } else
@@ -181,6 +181,7 @@ public abstract class BaseJeu {
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
                 // gagner blanc
+                System.out.println("blanc ganger");
             }
         }
 
@@ -191,6 +192,7 @@ public abstract class BaseJeu {
             for (Point P : Liste.LP) {
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
                     // gagner noir
+                    System.out.println("noir ganger");
                 }
                 if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
                     ListePointB = init.SupprimeListePoint(ListePointB, P);

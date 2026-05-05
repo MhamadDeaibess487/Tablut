@@ -107,6 +107,10 @@ public class GrilleGraphique extends JPanel {
                     case 3:
                         g2.drawImage(kingImage, x, y, tailleCase, tailleCase, null);
                         break;
+                    case 4:
+                        g2.drawImage(throneImage, x, y, tailleCase, tailleCase, null);
+                    default:
+                        break;
                 }
             }
         }
