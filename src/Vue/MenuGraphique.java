@@ -48,6 +48,7 @@ public class MenuGraphique extends JFrame {
         nouvellePartie.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                dispose();
                 FenetreJeu fenetreJeu = new FenetreJeu();
                 fenetreJeu.setVisible(true);
             } 

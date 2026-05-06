@@ -19,12 +19,16 @@ public class FenetreJeu extends JFrame {
         BaseJeu jeu = new Jeu();
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
-        Controle controle = new Controle(jeu, grille);
+        Controle controle = new Controle(jeu, grille,this);
         GrilleButtons buttons = new GrilleButtons(jeu, grille, controle);
 
         add(grille, BorderLayout.CENTER);
         add(buttons, BorderLayout.SOUTH);
 
         setVisible(true);
+    }
+    public void retourMenu() {
+        dispose();
+        new MenuGraphique();
     }
 }

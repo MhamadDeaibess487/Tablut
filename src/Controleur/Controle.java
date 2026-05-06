@@ -2,22 +2,34 @@ package Controleur;
 import Model.BaseJeu;
 import Model.Pion;
 import Model.Point;
+import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
+import Config.Config;
+import Vue.MenuGraphique;
 
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+
+import static Config.Config.CHEMIN_SAUVEGARDES;
 
 public class Controle {
     BaseJeu Jeu;
     GrilleGraphique Grille;
     int ligneSelectee;
     int colonneSelectee;
-
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille) {
+    String fichier;
+    FenetreJeu fenetreJeu;
+    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
         this.Jeu = Jeu;
         this.Grille = Grille;
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
+        this.fenetreJeu = fenetreJeu;
+        String date = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+        this.fichier =  CHEMIN_SAUVEGARDES +  date + ".txt";
 
     }
 
@@ -40,8 +52,8 @@ public class Controle {
     }
 
     public void quit() {
-        //((Model.Jeu)Jeu).sauvegardeFichier(fichier);
-        System.exit(0);
+        ((Model.Jeu)Jeu).sauvegardeFichier(fichier);
+        fenetreJeu.retourMenu();
     }
 
     public void harder() {
