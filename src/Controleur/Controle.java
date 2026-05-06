@@ -40,7 +40,7 @@ public class Controle {
     }
 
     public void quit() {
-        //sauvegarder si possible
+        //((Model.Jeu)Jeu).sauvegardeFichier(fichier);
         System.exit(0);
     }
 
