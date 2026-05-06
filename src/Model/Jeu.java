@@ -1,12 +1,7 @@
 package Model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Stack;
-import java.io.FileNotFoundException;
 
 public class Jeu extends BaseJeu {
     Stack<Coup> redo, undo;
@@ -77,17 +72,25 @@ public class Jeu extends BaseJeu {
     }
 
     public void sauvegardeFichier(String fichier) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(fichier))) {
-            pw.println("REDO");
-            for (Coup c : redo) {
-                pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
-                pw.println();
+        try {
+            File file = new File(fichier);
+
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
             }
 
-            pw.println("UNDO");
-            for (Coup c : undo) {
-                pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
-                pw.println();
+            try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
+                pw.println("REDO");
+                for (Coup c : redo) {
+                    pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
+                    pw.println();
+                }
+
+                pw.println("UNDO");
+                for (Coup c : undo) {
+                    pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
+                    pw.println();
+                }
             }
         } catch (IOException e) {
             System.err.println("Erreur lors de la sauvegarde : " + e.getMessage());
