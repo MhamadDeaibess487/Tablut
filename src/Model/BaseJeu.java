@@ -368,17 +368,25 @@ public abstract class BaseJeu {
     }
 
     public boolean EstBloque(Point P) { // Regarde si un Point est bloqué
-        if (grille[P.l + 1][P.c] == 0) {
-            return false;
+        if (P.l + 1 <= 8) {
+            if (grille[P.l + 1][P.c] == 0) {
+                return false;
+            }
         }
-        if (grille[P.l - 1][P.c] == 0) {
-            return false;
+        if (P.l - 1 >= 0) {
+            if (grille[P.l - 1][P.c] == 0) {
+                return false;
+            }
         }
-        if (grille[P.l][P.c + 1] == 0) {
-            return false;
+        if (P.c + 1 >= 8) {
+            if (grille[P.l][P.c + 1] == 0) {
+                return false;
+            }
         }
-        if (grille[P.l][P.c - 1] == 0) {
-            return false;
+        if (P.c - 1 >= 0) {
+            if (grille[P.l][P.c - 1] == 0) {
+                return false;
+            }
         }
         return true;
     }
