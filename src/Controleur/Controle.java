@@ -62,7 +62,19 @@ public class Controle {
         int [][]grille_case = Jeu.getGrille();
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
-            if (grille_case[row][column] == 0) {//pas case vide
+            int contenu = grille_case[row][column];
+
+            if (contenu == 0 || contenu == 4) {
+                return;
+            }
+
+            // joueur 1 = noir, il ne peut sélectionner que les noirs
+            if (Jeu.getJoueur() == 1 && contenu != 1) {
+                return;
+            }
+
+            // joueur 2 = blanc, il peut sélectionner blancs + roi
+            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
@@ -76,7 +88,7 @@ public class Controle {
             Grille.effacerCasesValides();
             refreshGrid();
         }else{
-            int [][] grille = Jeu.getGrille();
+
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Jeu.deplacer(p,p1);
