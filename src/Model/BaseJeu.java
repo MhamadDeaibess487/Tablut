@@ -67,7 +67,13 @@ public abstract class BaseJeu {
     public int getJoueur() {
         return this.Joueur_actif;
     }
-
+    public void changerJoueur(){
+        if(Joueur_actif==1){
+            Joueur_actif =2;
+        }else{
+            Joueur_actif = 1;
+        }
+    }
     public ListePoint getListePointB() {
         return this.ListePointB;
     }
@@ -217,6 +223,7 @@ public abstract class BaseJeu {
                 }
             }
         }
+        changerJoueur();
         return true;
     }
 
