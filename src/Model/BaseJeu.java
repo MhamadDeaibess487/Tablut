@@ -18,7 +18,7 @@ public abstract class BaseJeu {
     // protected int nbNoir;
     // protected int nbBlanc;
     protected Point kingLoc;
-//        int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
+    // int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
     protected boolean IA_joueur1;
     protected boolean IA_joueur2;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
@@ -140,6 +140,10 @@ public abstract class BaseJeu {
             return false;
         }
 
+        if (grille[a.l][a.c] == 4) { // le trone ne se déplace pas
+            return false;
+        }
+
         if (c1 != c2 && l1 != l2) { // déplacement en diagonale
             return false;
         }
@@ -172,7 +176,7 @@ public abstract class BaseJeu {
             return false;
         }
         grille[b.l][b.c] = grille[a.l][a.c];
-        if (grille[b.l][b.c] == 3 && a.l==4 && a.c ==4) {
+        if (grille[b.l][b.c] == 3 && a.l == 4 && a.c == 4) {
             grille[a.l][a.c] = 4;
 
         } else
@@ -396,7 +400,7 @@ public abstract class BaseJeu {
             System.out.println();
         }
     }
-    
+
     public ArrayList<Point> listeCasesValides(int l, int c) {
         ArrayList<Point> cases = new ArrayList<>();
         int taille = grille.length;
