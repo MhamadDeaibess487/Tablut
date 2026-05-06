@@ -25,12 +25,18 @@ public class Controle {
     }
 
     public void reset() {
+        ((Model.Jeu)Jeu).nouvellePartie();
+        refreshGrid();
     }
 
     public void undo() {
+        ((Model.Jeu)Jeu).annuler();
+        refreshGrid();
     }
 
     public void redo() {
+        ((Model.Jeu)Jeu).refaire();
+        refreshGrid();
     }
 
     public void quit() {
@@ -50,7 +56,6 @@ public class Controle {
     public void decreaseGridSize() {
     }
     public void refreshGrid() {
-
         Grille.repaint();
     }
     public void handleGridClick(int row, int column) {

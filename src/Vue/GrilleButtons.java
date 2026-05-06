@@ -41,7 +41,9 @@ public class GrilleButtons extends JPanel {
         plus = new JButton("+");
         minus = new JButton("-");
 
-        toggleIA.addActionListener(e -> {
+        toggleIA.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
             iaMode = !iaMode;
             if (iaMode) {
                 harder = new JButton("Harder");
@@ -59,19 +61,25 @@ public class GrilleButtons extends JPanel {
                     repaint();
                 }
             }
-        });
+        }});
 
         reset.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {}
+            public void actionPerformed(ActionEvent e) {
+                controle.reset();
+            }
         });
 
         undo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {}
+            public void actionPerformed(ActionEvent e) {
+                controle.undo();
+            }
         });
 
         redo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {}
+            public void actionPerformed(ActionEvent e) {
+                controle.redo();
+            }
         });
 
         quit.addActionListener(new ActionListener() {

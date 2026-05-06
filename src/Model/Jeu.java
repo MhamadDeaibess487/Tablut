@@ -133,4 +133,25 @@ public class Jeu extends BaseJeu {
         }
     }
 
+        public void nouvellePartie() {
+            this.Joueur_actif = 1;
+            this.kingLoc = new Point(4, 4);
+            this.grille = new int[Taille_plateau][Taille_plateau];
+            this.IA_joueur1 = false;
+            this.IA_joueur2 = false;
+            ListePoint init = new ListePoint();
+            this.ListePointN = init.ListeBaseNoir();
+            this.ListePointB = init.ListeBaseBlanc();
+            for (Point PB : ListePointB.LP) {
+                grille[PB.l][PB.c] = 2;
+            }
+            grille[4][4] = 3;
+            for (Point PN : ListePointN.LP) {
+                grille[PN.l][PN.c] = 1;
+            }
+            // Clear undo/redo stacks
+            this.redo.clear();
+            this.undo.clear();
+        }
+
 }
