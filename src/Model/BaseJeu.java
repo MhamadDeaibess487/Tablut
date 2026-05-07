@@ -15,12 +15,7 @@ public abstract class BaseJeu {
     protected int[][] grille; // 0 vide, 1 noir, 2 blanc, 3 roi, 4 trone
     protected int Joueur_actif; // joueur 1(Noir) ou 2(Blanc)
     protected final int Taille_plateau;
-    // protected int nbNoir;
-    // protected int nbBlanc;
     protected Point kingLoc;
-    // int selectIA; // 1 pour 1 IA, 2 pour IA vs IA
-    protected boolean IA_joueur1;
-    protected boolean IA_joueur2;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
     protected ListePoint ListePointB;
     protected ListePoint ListePointN;
@@ -28,12 +23,8 @@ public abstract class BaseJeu {
     public BaseJeu() {
         Taille_plateau = 9;
         Joueur_actif = 1; // Les noirs commencent
-        // nbNoir = 16;
-        // nbBlanc = 9;
         kingLoc = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
-        IA_joueur1 = false;
-        IA_joueur2 = false;
         ListePoint init = new ListePoint();
         ListePointN = init.ListeBaseNoir();
         ListePointB = init.ListeBaseBlanc();

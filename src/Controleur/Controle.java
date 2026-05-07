@@ -1,6 +1,5 @@
 package Controleur;
 import Model.BaseJeu;
-import Model.Pion;
 import Model.Point;
 import Vue.GrilleGraphique;
 
@@ -18,9 +17,9 @@ public class Controle {
         this.Grille = Grille;
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
-
     }
-
+    
+    //Diviser en deux fonctions ia_blanc, ia_noir
     public void toggleIA() {
     }
 
@@ -59,32 +58,26 @@ public class Controle {
         Grille.repaint();
     }
     public void handleGridClick(int row, int column) {
-        int [][]grille_case = Jeu.getGrille();
-
         if(ligneSelectee == -1  && colonneSelectee == -1) {
-            if (grille_case[row][column] == 0) {//pas case vide
+            if (Jeu.estCaseLibre(row,column)) {//pas case vide
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
             ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
             Grille.dessiner_valide(liste);
-            refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
             Grille.effacerCasesValides();
-            refreshGrid();
         }else{
-            int [][] grille = Jeu.getGrille();
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Jeu.deplacer(p,p1);
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
-            refreshGrid();
         }
-
+        refreshGrid();
     }
 }

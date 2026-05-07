@@ -6,7 +6,7 @@ class IAeasy extends IA{
     Random r;
     ListePoint l;
     
-    public IAeasy(){
+    public IAeasy(Jeu j,int couleur){
         r = new Random();
         if(couleur == 1)
             l = j.ListePointN;
@@ -15,20 +15,21 @@ class IAeasy extends IA{
     }
     
     Coup calculCoup(){
-        int i,l2=-1,c2=-1;
-        Pion p = new Pion(-1,-1,0);
-        while(!j.CoupValide(p.l,p.c,l2,c2)){
+        int i;
+        Point a = new Point(-1,-1);
+        Point b = new Point(-1,-1);
+        while(!j.CoupValide(a,b)){
             i = r.nextInt(l.totale);
-            p = l.getIndex(i);
+            a = l.getPoint(i);
             if(r.nextInt(2) == 0){
-                l2 = p.l;
-                c2 = r.nextInt(j.Taille_plateau);
+                b.l = a.l;
+                b.c = r.nextInt(j.Taille_plateau);
             }
             else{
-                c2 = p.c;
-                l2 = r.nextInt(j.Taille_plateau);
+                b.c = a.c;
+                b.l = r.nextInt(j.Taille_plateau);
             }
         }
-        return new Coup(p.l,p.c,l2,c2);
+        return new Coup(a,b,couleur);
     }
 }
