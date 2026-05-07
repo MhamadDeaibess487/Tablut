@@ -9,18 +9,19 @@ public class MenuGraphique extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel mainPanel;
-
+    public boolean sauvegarde;
     public MenuGraphique() {
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 400);
         setLocationRelativeTo(null);
-
+        this.sauvegarde = false;
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
         mainPanel.add(creerMenuPrincipal(), "MENU");
         mainPanel.add(creerMenuOptions(), "OPTIONS");
+
 
         add(mainPanel);
 
@@ -49,7 +50,7 @@ public class MenuGraphique extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                FenetreJeu fenetreJeu = new FenetreJeu();
+                FenetreJeu fenetreJeu = new FenetreJeu(sauvegarde);
                 fenetreJeu.setVisible(true);
             } 
         });
@@ -120,6 +121,7 @@ public class MenuGraphique extends JFrame {
         adapterMenu(titre, modeTut, theme, retour);
         return panel;
     }
+
 
     private void adapterMenu(JLabel titre, JButton... boutons) { // pour adapter full screen/ windowed / different ordi etc 
         addComponentListener(new java.awt.event.ComponentAdapter() {

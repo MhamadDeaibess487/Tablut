@@ -1,12 +1,12 @@
 package Controleur;
 import Model.BaseJeu;
-import Model.Pion;
 import Model.Point;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
-import Config.Config;
 import Vue.MenuGraphique;
 
+
+import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,15 +21,19 @@ public class Controle {
     int colonneSelectee;
     String fichier;
     FenetreJeu fenetreJeu;
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
+    public boolean sauvegarde;
+
+    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu,boolean sauvegarde) {
+        this.sauvegarde = sauvegarde;
         this.Jeu = Jeu;
         this.Grille = Grille;
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
+
         String date = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-        this.fichier =  CHEMIN_SAUVEGARDES +  date + ".txt";
+        this.fichier = "";
 
     }
 
@@ -51,10 +55,7 @@ public class Controle {
         refreshGrid();
     }
 
-    public void quit() {
-        ((Model.Jeu)Jeu).sauvegardeFichier(fichier);
-        fenetreJeu.retourMenu();
-    }
+
 
     public void harder() {
     }
@@ -111,4 +112,35 @@ public class Controle {
         }
 
     }
+    public boolean choisir_nom(){
+        String nom = JOptionPane.showInputDialog(fenetreJeu,"Entrez le nom du fichier");
+
+        if (nom == null) {
+            return false;
+        }
+        fichier = CHEMIN_SAUVEGARDES+nom+".txt";
+        return true;
+    }
+    public void demanderSauvegardeEtQuitter() {
+        int choix = JOptionPane.showConfirmDialog(
+                fenetreJeu,
+                "Voulez-vous sauvegarder la partie ?",
+                "Sauvegarde",
+                JOptionPane.YES_NO_CANCEL_OPTION
+        );
+
+        if (choix == JOptionPane.CANCEL_OPTION ) {
+            return;
+        }
+
+        if (choix == JOptionPane.YES_OPTION) {
+            if(!choisir_nom()){
+             return;
+            }
+            ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
+        }
+
+        fenetreJeu.retourMenu();
+    }
+
 }

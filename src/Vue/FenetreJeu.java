@@ -8,8 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class FenetreJeu extends JFrame {
-
-    public FenetreJeu() {
+    public boolean sauvegarde = false;
+    public FenetreJeu(boolean sauvegarde) {
+        this.sauvegarde = sauvegarde;
         setTitle("Tablut");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 800);
@@ -19,7 +20,8 @@ public class FenetreJeu extends JFrame {
         BaseJeu jeu = new Jeu();
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
-        Controle controle = new Controle(jeu, grille,this);
+
+        Controle controle = new Controle(jeu, grille,this,sauvegarde);
         GrilleButtons buttons = new GrilleButtons(jeu, grille, controle);
 
         add(grille, BorderLayout.CENTER);

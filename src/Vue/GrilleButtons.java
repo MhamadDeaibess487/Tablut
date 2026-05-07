@@ -84,7 +84,8 @@ public class GrilleButtons extends JPanel {
 
         quit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                controle.quit();
+                controle.demanderSauvegardeEtQuitter();
+
             }
         });
 
