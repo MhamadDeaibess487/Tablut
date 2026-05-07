@@ -1,10 +1,14 @@
+import Model.BaseJeu;
+import Model.Jeu;
 import Vue.MenuGraphique;
-import javax.swing.SwingUtilities;
- 
 
+import javax.swing.SwingUtilities;
 
 public class Tablut {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MenuGraphique::new);
+        SwingUtilities.invokeLater(() -> {
+            BaseJeu jeu = new Jeu();
+            new MenuGraphique(jeu);
+        });
     }
 }

@@ -8,20 +8,20 @@ import javax.swing.*;
 import java.awt.*;
 
 public class FenetreJeu extends JFrame {
-    public boolean sauvegarde = false;
-    public FenetreJeu(boolean sauvegarde) {
-        this.sauvegarde = sauvegarde;
+    BaseJeu jeu;
+    public FenetreJeu(BaseJeu jeu) {
+
         setTitle("Tablut");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 800);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        BaseJeu jeu = new Jeu();
+        this.jeu= jeu;
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
 
-        Controle controle = new Controle(jeu, grille,this,sauvegarde);
+        Controle controle = new Controle(jeu, grille,this);
         GrilleButtons buttons = new GrilleButtons(jeu, grille, controle);
 
         add(grille, BorderLayout.CENTER);
@@ -31,6 +31,6 @@ public class FenetreJeu extends JFrame {
     }
     public void retourMenu() {
         dispose();
-        new MenuGraphique();
+        new MenuGraphique(jeu);
     }
 }

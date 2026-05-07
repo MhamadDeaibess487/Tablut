@@ -21,18 +21,16 @@ public class Controle {
     int colonneSelectee;
     String fichier;
     FenetreJeu fenetreJeu;
-    public boolean sauvegarde;
 
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu,boolean sauvegarde) {
-        this.sauvegarde = sauvegarde;
+
+    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
+
         this.Jeu = Jeu;
         this.Grille = Grille;
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
 
-        String date = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
         this.fichier = "";
 
     }
@@ -118,7 +116,7 @@ public class Controle {
         if (nom == null) {
             return false;
         }
-        fichier = CHEMIN_SAUVEGARDES+nom+".txt";
+        fichier = CHEMIN_SAUVEGARDES+nom;
         return true;
     }
     public void demanderSauvegardeEtQuitter() {
