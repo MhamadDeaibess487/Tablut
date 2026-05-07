@@ -58,13 +58,15 @@ public abstract class BaseJeu {
     public int getJoueur() {
         return this.Joueur_actif;
     }
-    public void changerJoueur(){
-        if(Joueur_actif==1){
-            Joueur_actif =2;
-        }else{
+
+    public void changerJoueur() {
+        if (Joueur_actif == 1) {
+            Joueur_actif = 2;
+        } else {
             Joueur_actif = 1;
         }
     }
+
     public ListePoint getListePointB() {
         return this.ListePointB;
     }
@@ -220,16 +222,16 @@ public abstract class BaseJeu {
 
     public boolean CaptureRoi(int L, int C) { // roi bloqué des 4 cotés par des pions noirs
 
-        if (grille[L + 1][C] != 1 || grille[L + 1][C] != 4) { // je regarde si le roi peut s'échapper
+        if (grille[L + 1][C] != 1 && grille[L + 1][C] != 4) { // je regarde si le roi peut s'échapper
             return false;
         }
-        if (grille[L - 1][C] != 1 || grille[L - 1][C] != 4) {
+        if (grille[L - 1][C] != 1 && grille[L - 1][C] != 4) {
             return false;
         }
-        if (grille[L][C + 1] != 1 || grille[L][C + 1] != 4) {
+        if (grille[L][C + 1] != 1 && grille[L][C + 1] != 4) {
             return false;
         }
-        if (grille[L][C - 1] != 1 || grille[L][C - 1] != 4) {
+        if (grille[L][C - 1] != 1 && grille[L][C - 1] != 4) {
             return false;
         }
         return true;
