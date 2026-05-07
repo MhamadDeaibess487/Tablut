@@ -1,21 +1,10 @@
 package Model;
 public class Pion {
-    int c, l;
+    Point p;
     int t; //1 noir, 2 blanc, 3 roi , 4 trone
 
-    public Pion(int ligne, int colonne, int type) {
-        this.c = colonne;
-        this.l = ligne;
+    public Pion(Point p, int type) {
+        this.p = p;
         this.t = type;
-    }
-    
-    public int getLigne() {
-        return l;
-    }
-    public int getColonne() {
-        return c;
-    }
-    public int getType() {
-        return t;
     }
 }

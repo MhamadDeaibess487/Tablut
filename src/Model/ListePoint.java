@@ -11,22 +11,31 @@ class ListePoint {
         LP = new ArrayList<>();
         totale = 0;
     }
+    
+    public boolean isEmpty(){
+        return totale == 0;
+    }
+    
+    public Point getPoint(int i){
+        return LP.get(i);
+    }
 
     public void AddListePoint(Point P) {
         LP.add(P);
         totale++;
     }
 
-    public ListePoint SupprimeListePoint(ListePoint Liste, Point Supp) {
-        ListePoint res = new ListePoint();
-        for (Point p : Liste.LP) {
-            if (p.l != Supp.l && p.c != Supp.l)
-                res.AddListePoint(p);
-            if (p.l == Supp.l && p.c == Supp.c)
-                totale--;
-        }
-
-        return res;
+    public void SupprimeListePoint(Point Supp) {
+        LP.remove(Supp);
+//        List<Point> res = new ListePoint();
+//        for (Point p : LP) {
+//            if (p.l != Supp.l && p.c != Supp.l)
+//                res.AddListePoint(p);
+//            if (p.l == Supp.l && p.c == Supp.c)
+//                totale--;
+//        }
+//
+//        return res;
     }
 
     public ListePoint ListeBaseBlanc() {
@@ -85,19 +94,19 @@ class ListePoint {
         return LP;
     }
 
-    public ListePoint DeplacerListePoint(ListePoint Liste, Point a, Point b) {
+    public List<Point> DeplacerListePoint(Point a, Point b) {
         int l1 = a.l;
         int c1 = a.c;
         int l2 = b.l;
         int c2 = b.c;
-        for (Point P : Liste.LP) {
+        for (Point P : LP) {
             if (P.l == l1 && P.c == c1) {
                 P.l = l2;
                 P.c = c2;
                 break;
             }
         }
-        return Liste;
+        return LP;
 
     }
 }

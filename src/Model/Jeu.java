@@ -2,20 +2,25 @@ package Model;
 
 import java.io.*;
 import java.util.Stack;
+import Config.Config;
+
+/*BUG DUPPLICATION QUAND NOIR MANGE BLANC PUIS UNDO*/
 
 public class Jeu extends BaseJeu {
     Stack<Coup> redo, undo;
-
+    Stack<Historique> pionMange;
     public Jeu() {
         redo = new Stack<>();
         undo = new Stack<>();
+        pionMange = new Stack<>();
     }
 
     public Jeu(String fichier) { // Charge une sauvegarde
         redo = new Stack<>();
         undo = new Stack<>();
+        pionMange = new Stack<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(fichier));
+            BufferedReader br = new BufferedReader(new FileReader(Config.CHEMIN_SAUVEGARDES+fichier));
             String line;
             boolean inRedo = false;
             boolean inUndo = false;
@@ -56,24 +61,34 @@ public class Jeu extends BaseJeu {
         System.err.println("Jeu redondant non implem");
         System.exit(0);
     }
+    
+    public void sauveHistorique(ListePion l){
+        if(!l.isEmpty()){
+            Pion p = l.getPion(0);
+            pionMange.push(new Historique(l,p.t,undo.size())); 
+        }
+    }
 
-    public void sauvegarder(Point a, Point b) {
+    public void sauvegarder(Point a, Point b,ListePion l){
         undo.push(new Coup(a, b, Joueur_actif));
         redo.clear();
+        sauveHistorique(l);
     }
 
     @Override
-    public boolean deplacer(Point a, Point b) {
-        if (!super.deplacer(a, b)) {
-            return false;
+    public ListePion deplacer(Point a, Point b){
+        ListePion l = super.deplacer(a, b);
+        if (l == null) {
+            return null;
         }
-        sauvegarder(a, b);
-        return true;
+        sauvegarder(a, b,l);
+        changerJoueur();
+        return l;
     }
 
     public void sauvegardeFichier(String fichier) {
         try {
-            File file = new File(fichier);
+            File file = new File(Config.CHEMIN_SAUVEGARDES+fichier);
 
             if (file.getParentFile() != null) {
                 file.getParentFile().mkdirs();
@@ -97,19 +112,40 @@ public class Jeu extends BaseJeu {
         }
     }
 
+    // Roi  doit retourner sur son throne => impossible si on utilise deplacer
     public void annuler() {
         if (!undo.isEmpty()) {
+            if(!pionMange.isEmpty()){
+                if(pionMange.peek().numCoup == undo.size()){
+                    Historique h = pionMange.pop();
+                    Pion p;
+                    for(int i = 0;i<h.l.totale;i++){
+                        p = h.l.getPion(i);
+                        grille[p.p.l][p.p.c] = h.couleur;
+                    }
+                }
+            }
             Coup last = undo.pop();
             redo.push(last);
-            super.deplacer(last.b, last.a);
+            Point a = last.a;
+            Point b = last.b;
+            if(grille[b.l][b.c] == 3 && a.l == trone.l && a.c == trone.c){
+                grille[a.l][a.c] = 3;
+                grille[b.l][b.c] = 0;
+            }
+            else
+                super.deplacer(last.b, last.a);
+            changerJoueur();
         }
     }
 
-    public void refaire() {
+    public void refaire(){
         if (!redo.isEmpty()) {
             Coup last = redo.pop();
             undo.push(last);
-            super.deplacer(last.a, last.b);
+            ListePion l = super.deplacer(last.a, last.b);
+            changerJoueur();
+            sauveHistorique(l);
         }
     }
 
@@ -138,10 +174,7 @@ public class Jeu extends BaseJeu {
 
         public void nouvellePartie() {
             this.Joueur_actif = 1;
-            this.kingLoc = new Point(4, 4);
             this.grille = new int[Taille_plateau][Taille_plateau];
-            this.IA_joueur1 = false;
-            this.IA_joueur2 = false;
             ListePoint init = new ListePoint();
             this.ListePointN = init.ListeBaseNoir();
             this.ListePointB = init.ListeBaseBlanc();

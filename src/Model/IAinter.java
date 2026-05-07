@@ -17,6 +17,6 @@ class IAinter extends IA{
     
     //Calcul et renvoie un coup à jouer par l'ia (fonction appelé dans IA.java)
     Coup calculCoup(){
-        
+        return null;
     }
 }
