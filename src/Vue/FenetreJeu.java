@@ -30,7 +30,7 @@ public class FenetreJeu extends JFrame {
 
         Controle controle = new Controle(jeu, grille, this);
         GrilleButtons buttons = new GrilleButtons(jeu, grille, controle);
-        joueurActifPanel.setAiControlsPanel(buttons.getAiControlsPanel());
+        //joueurActifPanel.setAiControlsPanel(buttons.getAiControlsPanel());
 
         add(grille, BorderLayout.CENTER);
         add(joueurActifPanel, BorderLayout.WEST);
