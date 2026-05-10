@@ -3,9 +3,10 @@ package Vue;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class JoueurActifPanel extends JPanel {
-    private static final Dimension SIDEBAR_SIZE = new Dimension(260, 0);
+    private static final Dimension SIDEBAR_SIZE = new Dimension(300, 0);
     private static final Color BG_DARK = new Color(18, 22, 32);
     private static final Color CARD_ACTIVE_BG = new Color(28, 34, 52);
     private static final Color CARD_INACTIVE_BG = new Color(16, 18, 26);
@@ -13,7 +14,13 @@ public class JoueurActifPanel extends JPanel {
     private static final Color GOLD_DIM = new Color(80, 65, 35);
     private static final Color TEXT_ACTIVE = new Color(230, 220, 200);
     private static final Color TEXT_INACTIVE = new Color(90, 85, 75);
+    // IA désactivée → rouge bordeaux (danger)
+    private static final Color IA_OFF = new Color(120, 30, 30);   // rouge foncé
+    private static final Color IA_OFF_TEXT = new Color(255, 120, 120); // rouge clair
 
+    // IA activée → vert foncé (actif)
+    private static final Color IA_ON  = new Color(30, 90, 50);    // vert foncé
+    private static final Color IA_ON_TEXT = new Color(100, 220, 130); // vert clair
     private JPanel joueur1Card;
     private JPanel joueur2Card;
     private JLabel joueur1Image;
@@ -32,6 +39,9 @@ public class JoueurActifPanel extends JPanel {
     private ImageIcon joueur2Highlight;
     private JButton joueur1Button;
     private JButton joueur2Button;
+    private boolean joueur1_IA;
+    private boolean joueur2_IA;
+
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
                              String j2NormalPath, String j2HighlightPath) {
         setOpaque(true);
@@ -39,8 +49,9 @@ public class JoueurActifPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(24, 14, 24, 14));
         setPreferredSize(SIDEBAR_SIZE);
-
-        int imgW = 80, imgH = 80;
+        this.joueur1_IA = false;
+        this.joueur2_IA = false;
+        int imgW = 68, imgH = 68;
         joueur1Normal    = scaleIcon(new ImageIcon(j1NormalPath),    imgW, imgH);
         joueur1Highlight = scaleIcon(new ImageIcon(j1HighlightPath), imgW, imgH);
         joueur2Normal    = scaleIcon(new ImageIcon(j2NormalPath),    imgW, imgH);
@@ -55,10 +66,10 @@ public class JoueurActifPanel extends JPanel {
 
         joueur1Image = new JLabel(joueur1Highlight); // starts active
         joueur2Image = new JLabel(joueur2Normal);
-        joueur1Button = new JButton("IA_off");
-        joueur2Button =  new JButton("IA_off");
-        joueur1Card = buildCard("JOUEUR 1", "Blancs", joueur1Image, true, joueur1Button);
-        joueur2Card = buildCard("JOUEUR 2", "Noirs",  joueur2Image, false,joueur2Button);
+        joueur1Button = new JButton("IA/OFF");
+        joueur2Button =  new JButton("IA/OFF");
+        joueur1Card = buildCard("JOUEUR 1", "Blancs", joueur1Image, true, joueur1Button,joueur1_IA);
+        joueur2Card = buildCard("JOUEUR 2", "Noirs",  joueur2Image, false,joueur2Button,joueur2_IA);
 
         // grab the text labels from cards for later updates
         joueur1Titre = findTitre(joueur1Card);
@@ -68,11 +79,28 @@ public class JoueurActifPanel extends JPanel {
         joueur2Camp  = findCamp(joueur2Card);
         joueur2Pion  = findPion(joueur2Card);
         joueur1Button.addActionListener(e -> {
-
-            // toggle IA joueur 1
+            joueur1_IA = !joueur1_IA;
+            if (joueur1_IA) {
+                joueur1Button.setText("IA/ON");
+                joueur1Button.setBackground(IA_ON);
+                joueur1Button.setForeground(IA_ON_TEXT);
+            } else {
+                joueur1Button.setText("IA/OFF");
+                joueur1Button.setBackground(IA_OFF);
+                joueur1Button.setForeground(IA_OFF_TEXT);
+            }
         });
         joueur2Button.addActionListener(e -> {
-            // toggle IA joueur 1
+            joueur2_IA = !joueur2_IA;
+            if (joueur2_IA) {
+                joueur2Button.setText("IA/ON");
+                joueur2Button.setBackground(IA_ON);
+                joueur2Button.setForeground(IA_ON_TEXT);
+            } else {
+                joueur2Button.setText("IA/OFF");
+                joueur2Button.setBackground(IA_OFF);
+                joueur2Button.setForeground(IA_OFF_TEXT);
+            }
         });
         add(activeHeader);
         add(Box.createVerticalStrut(8));
@@ -133,12 +161,12 @@ public class JoueurActifPanel extends JPanel {
 
     // ── private helpers ────────────────────────────────────────────────
 
-    private JPanel buildCard(String titre, String camp, JLabel imgLabel, boolean active,JButton IA) {
+    private JPanel buildCard(String titre, String camp, JLabel imgLabel, boolean active,JButton IA,boolean Ia_active) {
         // Circular image wrapper
         JPanel imgWrapper = new CircleImagePanel(imgLabel, active);
-        imgWrapper.setPreferredSize(new Dimension(88, 88));
-        imgWrapper.setMinimumSize(new Dimension(88, 88));
-        imgWrapper.setMaximumSize(new Dimension(88, 88));
+        imgWrapper.setPreferredSize(new Dimension(76, 76));
+        imgWrapper.setMinimumSize(new Dimension(76, 76));
+        imgWrapper.setMaximumSize(new Dimension(76, 76));
 
         JLabel titreLabel = new JLabel(titre);
         titreLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
@@ -171,18 +199,31 @@ public class JoueurActifPanel extends JPanel {
         textPanel.add(Box.createVerticalStrut(6));
         textPanel.add(campRow);
         textPanel.add(Box.createVerticalGlue());
-        textPanel.add(IA);
+
         JPanel card = new JPanel(new BorderLayout(14, 0));
         card.setOpaque(true);
         card.setBackground(active ? CARD_ACTIVE_BG : CARD_INACTIVE_BG);
         card.setBorder(buildCardBorder(active));
-        card.setPreferredSize(new Dimension(232, 150));
-        card.setMinimumSize(new Dimension(232, 110));
-        card.setMaximumSize(new Dimension(232, 110));
+        card.setPreferredSize(new Dimension(272, 120));
+        card.setMinimumSize(new Dimension(272, 120));
+        card.setMaximumSize(new Dimension(272, 120));
         card.setAlignmentX(Component.CENTER_ALIGNMENT);
         JButton IA_button = IA;
+        IA_button.setBackground(Ia_active ? IA_ON : IA_OFF);
+        IA_button.setForeground(Ia_active ? IA_ON_TEXT : IA_OFF_TEXT);
+        IA_button.setFont(new Font("SansSerif", Font.BOLD, 12));
+        IA_button.setOpaque(true);
+        IA_button.setContentAreaFilled(true);  // ajouter juste après setFont
+        IA_button.setPreferredSize(new Dimension(100, 28));
+        IA_button.setMaximumSize(new Dimension(200, 28));
+        IA_button.setMinimumSize(new Dimension(80, 28));
+        IA.setAlignmentX(Component.LEFT_ALIGNMENT);  // aligne à gauche comme les labels
+        textPanel.add(Box.createVerticalStrut(6));    // petit espace avant le bouton
+        textPanel.add(IA);
+
         JPanel imgPad = new JPanel(new GridBagLayout());
         imgPad.setOpaque(false);
+        imgPad.setBorder(BorderFactory.createEmptyBorder(6, 4, 6, 0)); // ← marge
         imgPad.add(imgWrapper);
         card.add(imgPad, BorderLayout.WEST);
         card.add(textPanel, BorderLayout.CENTER);
@@ -298,9 +339,14 @@ public class JoueurActifPanel extends JPanel {
             // Draw image clipped to circle
             Icon icon = imgLabel.getIcon();
             if (icon != null) {
+                int iw = icon.getIconWidth();
+                int ih = icon.getIconHeight();
+                int ix = (getWidth() - iw) / 2;   // ← centré horizontalement
+                int iy = (getHeight() - ih) / 2;  // ← centré verticalement
+
                 Shape clip = new java.awt.geom.Ellipse2D.Float(x + 3, y + 3, d - 6, d - 6);
                 g2.setClip(clip);
-                icon.paintIcon(this, g2, x + 3, y + 3);
+                icon.paintIcon(this, g2, ix, iy);  // ← ix, iy au lieu de x+3, y+3
                 g2.setClip(null);
             }
 
@@ -313,7 +359,7 @@ public class JoueurActifPanel extends JPanel {
         }
 
         @Override
-        public Dimension getPreferredSize() { return new Dimension(88, 88); }
+        public Dimension getPreferredSize() { return new Dimension(76, 76); }
     }
 
 

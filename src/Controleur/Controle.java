@@ -4,7 +4,7 @@ import Model.Point;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
 import Vue.MenuGraphique;
-
+import Vue.JoueurActifPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,9 @@ public class Controle {
 
     }
 
-    public void toggleIA() {
+    public void toggleIA_blanc() {
+    }
+    public void toggleIA_noir() {
     }
 
     public void reset() {
@@ -140,5 +142,6 @@ public class Controle {
 
         fenetreJeu.retourMenu();
     }
+
 
 }

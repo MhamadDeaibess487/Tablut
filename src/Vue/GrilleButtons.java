@@ -13,14 +13,15 @@ import java.awt.event.ActionEvent;
 public class GrilleButtons extends JPanel {
 
     private JButton toggleIA;
-    private JButton reset;
+
     private JButton undo;
     private JButton redo;
-    private JButton quit;
+
     private JButton harder;
     private JButton easier;
     private JButton plus;
     private JButton minus;
+    private JButton parametres;
     private boolean iaMode = false;
 
     private JPanel aiControlsPanel;
@@ -48,14 +49,30 @@ public class GrilleButtons extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(40, 15, 40, 25));
 
         toggleIA = new JButton("Toggle IA");
-        reset = new JButton("Reset");
+
         undo = new JButton("Undo");
         redo = new JButton("Redo");
-        quit = new JButton("Quit");
+
         plus = new JButton("+");
         minus = new JButton("-");
         harder = new JButton("Harder");
         easier = new JButton("Easier");
+        parametres = new JButton("Paramètres");
+
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem resetItem = new JMenuItem("Reset");
+        JMenuItem quitItem = new JMenuItem("Quitter");
+
+        resetItem.addActionListener(e -> controle.reset());
+        quitItem.addActionListener(e -> controle.demanderSauvegardeEtQuitter());
+
+        menu.add(resetItem);
+        menu.add(quitItem);
+
+        parametres.addActionListener(e -> {
+            menu.show(parametres, 0, parametres.getHeight());
+        });
 
         aiControlsPanel = new JPanel();
         aiControlsPanel.setOpaque(true);
@@ -82,7 +99,7 @@ public class GrilleButtons extends JPanel {
         aiOptionsPanel.add(easier);
         aiControlsPanel.add(aiOptionsPanel);
 
-        JButton[] boutons = { reset, undo, redo, plus, minus, quit };
+        JButton[] boutons = {parametres,undo, redo, plus, minus};
 
         for (JButton b : boutons) {
             styleButton(b, new Dimension(150, 55));
@@ -118,12 +135,6 @@ public class GrilleButtons extends JPanel {
             }
         });
 
-        reset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                controle.reset();
-            }
-        });
 
         undo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -137,11 +148,7 @@ public class GrilleButtons extends JPanel {
             }
         });
 
-        quit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                controle.demanderSauvegardeEtQuitter();
-            }
-        });
+
 
         plus.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {}

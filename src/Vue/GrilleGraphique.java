@@ -44,7 +44,7 @@ public class GrilleGraphique extends JPanel {
         try {
             whiteImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/white.png"));
             selected = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/selected.png"));
-            nap_on = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne+nap.png"));
+            nap_on = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne+king.png"));
             blackImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/black.png"));
             kingImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/king.png"));
             throneImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne.png"));
@@ -80,7 +80,7 @@ public class GrilleGraphique extends JPanel {
         taille_grille = grille.length;
         int x,y;//coordonnees pour dessiner
         // Dessiner
-        int marge = tailleCase / 8;
+        int marge = 0;
         taillePlateau = Math.min(width, height)-250;//pour ajuster l'espace autour c'est juste pour l'instant a ameliore apres
         tailleCase = taillePlateau / taille_grille;
 
@@ -114,7 +114,7 @@ public class GrilleGraphique extends JPanel {
                 switch (grille[i][j]) {
                     case 1:
 
-                        dessinerImageCase(g2,blackImage,x-tailleCase/10,y,marge);
+                        dessinerImageCase(g2,blackImage,x,y,marge);
                         break;
                     case 2:
                         dessinerImageCase(g2,whiteImage,x,y,marge);
