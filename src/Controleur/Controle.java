@@ -29,10 +29,15 @@ public class Controle {
         this.Grille = Grille;
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
+        this.fenetreJeu = fenetreJeu;
+
+        this.fichier = "";
+
     }
-    
-    //Diviser en deux fonctions ia_blanc, ia_noir
-    public void toggleIA() {
+
+    public void toggleIA_blanc() {
+    }
+    public void toggleIA_noir() {
     }
 
     public void reset() {
@@ -67,26 +72,76 @@ public class Controle {
         Grille.repaint();
     }
     public void handleGridClick(int row, int column) {
+        int [][]grille_case = Jeu.getGrille();
+
         if(ligneSelectee == -1  && colonneSelectee == -1) {
-            if (Jeu.estCaseLibre(row,column)) {//pas case vide
+            int contenu = grille_case[row][column];
+
+            if (contenu == 0 || contenu == 4) {
+                return;
+            }
+
+            // joueur 1 = noir, il ne peut sélectionner que les noirs
+            if (Jeu.getJoueur() == 1 && contenu != 1) {
+                return;
+            }
+
+            // joueur 2 = blanc, il peut sélectionner blancs + roi
+            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
             ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
             Grille.dessiner_valide(liste);
+            refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
             Grille.effacerCasesValides();
+            refreshGrid();
         }else{
+
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Jeu.deplacer(p,p1);
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
+            refreshGrid();
         }
-        refreshGrid();
+
     }
+    public boolean choisir_nom(){
+        String nom = JOptionPane.showInputDialog(fenetreJeu,"Entrez le nom du fichier");
+
+        if (nom == null) {
+            return false;
+        }
+        fichier = CHEMIN_SAUVEGARDES+nom;
+        return true;
+    }
+    public void demanderSauvegardeEtQuitter() {
+        int choix = JOptionPane.showConfirmDialog(
+                fenetreJeu,
+                "Voulez-vous sauvegarder la partie ?",
+                "Sauvegarde",
+                JOptionPane.YES_NO_CANCEL_OPTION
+        );
+
+        if (choix == JOptionPane.CANCEL_OPTION ) {
+            return;
+        }
+
+        if (choix == JOptionPane.YES_OPTION) {
+            if(!choisir_nom()){
+             return;
+            }
+            ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
+        }
+
+        fenetreJeu.retourMenu();
+    }
+
+
 }
