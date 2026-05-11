@@ -460,4 +460,36 @@ public abstract class BaseJeu {
         }
         return cases;
     }
+
+    public TableauBit transformerGrilleEnLong() {
+    TableauBit b = new TableauBit();
+
+    for (int i = 0; i < Taille_plateau; i++) {
+        for (int j = 0; j < Taille_plateau; j++) {
+            int index = i * Taille_plateau + j; // 0 to 80
+            boolean partie1 = index < 64;
+            int bitIndex;
+            if (partie1){
+                bitIndex = index;
+            } else bitIndex = index - 64;
+
+            long masque = 1 << bitIndex;
+
+            if (grille[i][j] == 1) { // noir
+                if (partie1) b.noir1 |= masque;
+                else b.noir2 |= masque;
+            }
+            else if (grille[i][j] == 2) { // blanc
+                if (partie1) b.blanc1 |= masque;
+                else b.blanc2 |= masque;
+            }
+            else if (grille[i][j] == 3) { // roi
+                if (partie1) b.roi1 |= masque;
+                else b.roi2 |= masque;
+            }
+        }
+    }
+
+    return b;
 }
+    }

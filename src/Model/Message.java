@@ -4,8 +4,7 @@ public class Message {
 
     private String type;
     private String content;
-    long blanc1,noir1,roi1;
-    long blanc2,noir2,roi2;
+    TableauBit tableauBit;
     //taille offset etc? 
 
     public Message(String type, String content) {
