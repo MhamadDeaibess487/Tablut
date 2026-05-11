@@ -1,18 +1,30 @@
 package Controleur;
 import Model.BaseJeu;
 import Model.Point;
+import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
+import Vue.MenuGraphique;
+import Vue.JoueurActifPanel;
 
+import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+
+import static Config.Config.CHEMIN_SAUVEGARDES;
 
 public class Controle {
     BaseJeu Jeu;
     GrilleGraphique Grille;
     int ligneSelectee;
     int colonneSelectee;
+    String fichier;
+    FenetreJeu fenetreJeu;
 
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille) {
+
+    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
+
         this.Jeu = Jeu;
         this.Grille = Grille;
         this.ligneSelectee = -1;
@@ -38,10 +50,7 @@ public class Controle {
         refreshGrid();
     }
 
-    public void quit() {
-        //sauvegarder si possible
-        System.exit(0);
-    }
+
 
     public void harder() {
     }
