@@ -1,7 +1,7 @@
 package Model;
 
 public class Point {
-    int l, c;
+    public int l, c;
 
     public Point(int l, int c) {
         this.l = l;

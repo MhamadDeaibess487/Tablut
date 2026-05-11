@@ -49,6 +49,10 @@ public abstract class BaseJeu {
     public int[][] getGrille() {
         return this.grille;
     }
+    
+    public boolean estFini(){
+        return fini;
+    }
 
     public int getJoueur() {
         return this.Joueur_actif;
