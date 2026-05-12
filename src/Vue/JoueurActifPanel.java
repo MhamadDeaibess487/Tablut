@@ -71,8 +71,8 @@ public class JoueurActifPanel extends JPanel {
         joueur2Image = new JLabel(joueur2Normal);
         joueur1Button = new JButton("IA/OFF");
         joueur2Button =  new JButton("IA/OFF");
-        joueur1Card = buildCard("JOUEUR 1", "Blancs", joueur1Image, true, joueur1Button,joueur1_IA);
-        joueur2Card = buildCard("JOUEUR 2", "Noirs",  joueur2Image, false,joueur2Button,joueur2_IA);
+        joueur1Card = buildCard("JOUEUR 1", "Noirs", joueur1Image, true, joueur1Button,joueur1_IA);
+        joueur2Card = buildCard("JOUEUR 2", "Blancs",  joueur2Image, false,joueur2Button,joueur2_IA);
 
         // grab the text labels from cards for later updates
         joueur1Titre = findTitre(joueur1Card);
@@ -100,7 +100,7 @@ public class JoueurActifPanel extends JPanel {
                 joueur1Button.setForeground(IA_OFF_TEXT);
 
             }
-            controle.set_IA_blanc(joueur1_IA);
+            controle.set_IA_noir(joueur1_IA);
         });
         joueur2Button.addActionListener(e -> {
             joueur2_IA = !joueur2_IA;
@@ -116,7 +116,7 @@ public class JoueurActifPanel extends JPanel {
                 joueur2Button.setForeground(IA_OFF_TEXT);
 
             }
-            controle.set_IA_noir(joueur2_IA);
+            controle.set_IA_blanc(joueur2_IA);
         });
         add(activeHeader);
         add(Box.createVerticalStrut(8));

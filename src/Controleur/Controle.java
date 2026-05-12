@@ -26,7 +26,8 @@ public class Controle {
     IA IA_blanc;
     IA IA_noir;
     int level;
-    Timer timer;
+    Timer timer_IA;
+    Timer timer_joueur;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
 
         this.Jeu = Jeu;
@@ -40,13 +41,21 @@ public class Controle {
         this.joueur1_IA = false;
         this.joueur2_IA = false;
 
-        timer = new Timer(500, new ActionListener() {
+        timer_joueur = new Timer(10, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fenetreJeu.setJoueurActif(Jeu.getJoueur());
+            }
+        });
+        timer_joueur.start();
+        timer_IA = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 verifierTourIA();
             }
         });
-        timer.start();
+        timer_IA.start();
+
     }
 
     public void set_IA_blanc(boolean active) {
@@ -63,7 +72,8 @@ public class Controle {
     }
     public void verifierTourIA() {
         if (Jeu.getFini()) {
-            timer.stop();
+            System.out.println(Jeu.getFini());
+            timer_IA.stop();
             return;
         }
 
