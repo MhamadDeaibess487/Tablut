@@ -1,6 +1,6 @@
 package Vue;
 
-import Model.BaseJeu;
+
 import Controleur.Controle;
 
 import javax.swing.*;
@@ -30,7 +30,7 @@ public class GrilleButtons extends JPanel {
     private GrilleGraphique grilleGraphique;
     private Controle controle;
 
-    public GrilleButtons(BaseJeu jeu, GrilleGraphique grille, Controle controle) {
+    public GrilleButtons(GrilleGraphique grille, Controle controle) {
         this.grilleGraphique = grille;
         this.controle = controle;
         aiControlsPanel = new JPanel();

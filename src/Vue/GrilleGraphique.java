@@ -133,7 +133,7 @@ public class GrilleGraphique extends JPanel {
                 }
             }
         }
-        affichergrille(grille);
+        //affichergrille(grille);
         peindreCasesValides(g2);
 
     }

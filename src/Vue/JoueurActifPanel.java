@@ -3,8 +3,8 @@ package Vue;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import Controleur.Controle;
+import Model.BaseJeu;
 public class JoueurActifPanel extends JPanel {
     private static final Dimension SIDEBAR_SIZE = new Dimension(300, 0);
     private static final Color BG_DARK = new Color(18, 22, 32);
@@ -41,9 +41,12 @@ public class JoueurActifPanel extends JPanel {
     private JButton joueur2Button;
     private boolean joueur1_IA;
     private boolean joueur2_IA;
-
+    private int joueur_actif;
+    Controle controle;
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
-                             String j2NormalPath, String j2HighlightPath) {
+                             String j2NormalPath, String j2HighlightPath,Controle controle) {
+        this.controle = controle;
+        this.joueur_actif= BaseJeu.getJoueur();
         setOpaque(true);
         setBackground(BG_DARK);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -78,29 +81,42 @@ public class JoueurActifPanel extends JPanel {
         joueur2Titre = findTitre(joueur2Card);
         joueur2Camp  = findCamp(joueur2Card);
         joueur2Pion  = findPion(joueur2Card);
+        joueur_actif= BaseJeu.getJoueur();
+        System.out.println("Joueur actif: " + joueur_actif);
+        System.out.println(controle.joueur1_IA);
+        System.out.println(controle.joueur2_IA);
+
         joueur1Button.addActionListener(e -> {
             joueur1_IA = !joueur1_IA;
+            System.out.println("Joueur panel: " + joueur1_IA);
             if (joueur1_IA) {
                 joueur1Button.setText("IA/ON");
                 joueur1Button.setBackground(IA_ON);
                 joueur1Button.setForeground(IA_ON_TEXT);
+
             } else {
                 joueur1Button.setText("IA/OFF");
                 joueur1Button.setBackground(IA_OFF);
                 joueur1Button.setForeground(IA_OFF_TEXT);
+
             }
+            controle.set_IA_blanc(joueur1_IA);
         });
         joueur2Button.addActionListener(e -> {
             joueur2_IA = !joueur2_IA;
+            System.out.println("joueur panel:"+joueur2_IA);
             if (joueur2_IA) {
                 joueur2Button.setText("IA/ON");
                 joueur2Button.setBackground(IA_ON);
                 joueur2Button.setForeground(IA_ON_TEXT);
+
             } else {
                 joueur2Button.setText("IA/OFF");
                 joueur2Button.setBackground(IA_OFF);
                 joueur2Button.setForeground(IA_OFF_TEXT);
+
             }
+            controle.set_IA_noir(joueur2_IA);
         });
         add(activeHeader);
         add(Box.createVerticalStrut(8));
@@ -361,7 +377,6 @@ public class JoueurActifPanel extends JPanel {
         @Override
         public Dimension getPreferredSize() { return new Dimension(76, 76); }
     }
-
 
 
 }

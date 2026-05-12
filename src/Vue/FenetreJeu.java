@@ -19,18 +19,19 @@ public class FenetreJeu extends JFrame {
 
         this.jeu = jeu;
 
-        joueurActifPanel = new JoueurActifPanel(
-            Config.CHEMIN_IMAGES + "/nap_on.png",
-            Config.CHEMIN_IMAGES + "/nap_on.png",
-            Config.CHEMIN_IMAGES + "/julien.png",
-            Config.CHEMIN_IMAGES + "/julien.png"
-        );
+
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
 
         Controle controle = new Controle(jeu, grille, this);
-        GrilleButtons buttons = new GrilleButtons(jeu, grille, controle);
+        GrilleButtons buttons = new GrilleButtons(grille, controle);
         //joueurActifPanel.setAiControlsPanel(buttons.getAiControlsPanel());
+        joueurActifPanel = new JoueurActifPanel(
+                Config.CHEMIN_IMAGES + "/nap_on.png",
+                Config.CHEMIN_IMAGES + "/nap_on.png",
+                Config.CHEMIN_IMAGES + "/julien.png",
+                Config.CHEMIN_IMAGES + "/julien.png"
+                ,controle);
 
         add(grille, BorderLayout.CENTER);
         add(joueurActifPanel, BorderLayout.WEST);

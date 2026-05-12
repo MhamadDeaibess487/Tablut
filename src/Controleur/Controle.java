@@ -3,16 +3,15 @@ import Model.BaseJeu;
 import Model.Point;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
-import Vue.MenuGraphique;
 import Vue.JoueurActifPanel;
-
+import Model.IA;
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import static Config.Config.CHEMIN_SAUVEGARDES;
+
 
 public class Controle {
     BaseJeu Jeu;
@@ -22,7 +21,12 @@ public class Controle {
     String fichier;
     FenetreJeu fenetreJeu;
 
-
+    public boolean joueur1_IA;
+    public boolean joueur2_IA;
+    IA IA_blanc;
+    IA IA_noir;
+    int level;
+    Timer timer;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
 
         this.Jeu = Jeu;
@@ -30,21 +34,52 @@ public class Controle {
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-
+        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),0,2);
+        this.IA_noir = IA.creer(((Model.Jeu)Jeu),0,1);
         this.fichier = "";
+        this.joueur1_IA = false;
+        this.joueur2_IA = false;
 
+        timer = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                verifierTourIA();
+            }
+        });
+        timer.start();
     }
 
-    public void toggleIA_blanc() {
+    public void set_IA_blanc(boolean active) {
+        joueur1_IA = active;
     }
-    public void toggleIA_noir() {
+    public void set_IA_noir(boolean active) {
+        joueur2_IA = active;
     }
+
 
     public void reset() {
         ((Model.Jeu)Jeu).nouvellePartie();
         refreshGrid();
     }
+    public void verifierTourIA() {
+        if (Jeu.getFini()) {
+            timer.stop();
+            return;
+        }
 
+        if (Jeu.getJoueur() == 2 && joueur1_IA) {
+            IA_blanc.joue();
+            System.out.println("joueur control :"+joueur1_IA);
+            refreshGrid();
+            return;
+        }
+
+        if (Jeu.getJoueur() == 1 && joueur2_IA) {
+            System.out.println("joueur control :"+joueur2_IA);
+            IA_noir.joue();
+            refreshGrid();
+        }
+    }
     public void undo() {
         ((Model.Jeu)Jeu).annuler();
         refreshGrid();
@@ -105,6 +140,7 @@ public class Controle {
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Jeu.deplacer(p,p1);
+
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
@@ -118,7 +154,7 @@ public class Controle {
         if (nom == null) {
             return false;
         }
-        fichier = CHEMIN_SAUVEGARDES+nom;
+        fichier = nom;
         return true;
     }
     public void demanderSauvegardeEtQuitter() {
