@@ -473,7 +473,7 @@ public abstract class BaseJeu {
                     bitIndex = index;
                 } else bitIndex = index - 64;
 
-                long masque = 1 << bitIndex;
+                long masque = 1L << bitIndex;
 
                 if (grille[i][j] == 1) { // noir
                     if (partie1) b.noir1 |= masque;
@@ -491,5 +491,43 @@ public abstract class BaseJeu {
         }
 
         return b;
+    }
+
+    private boolean hasBit(long value, int bitIndex) {
+        return (value & (1L << bitIndex)) != 0;
+    }
+
+    public void transformeLongEnGrille(TableauBit b) { // l'inverse 
+        grille = new int[Taille_plateau][Taille_plateau];
+
+        for (int index = 0; index < Taille_plateau * Taille_plateau; index++) {
+            boolean partie1 = index < 64;
+            int bitIndex = partie1 ? index : index - 64;
+
+            int l = index / Taille_plateau;
+            int c = index % Taille_plateau;
+
+            if (partie1) {
+                if (hasBit(b.noir1, bitIndex)) {
+                    grille[l][c] = 1;
+                } else if (hasBit(b.blanc1, bitIndex)) {
+                    grille[l][c] = 2;
+                } else if (hasBit(b.roi1, bitIndex)) {
+                    grille[l][c] = 3;
+                }
+            } else {
+                if (hasBit(b.noir2, bitIndex)) {
+                    grille[l][c] = 1;
+                } else if (hasBit(b.blanc2, bitIndex)) {
+                    grille[l][c] = 2;
+                } else if (hasBit(b.roi2, bitIndex)) {
+                    grille[l][c] = 3;
+                }
+            }
+        }
+
+        if (grille[4][4] == 0) {
+            grille[4][4] = 4;
+        }
     }
 }

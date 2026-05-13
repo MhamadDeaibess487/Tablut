@@ -7,13 +7,13 @@ import Model.Coup;
 import Model.Point;
 import Model.TableauBit;
 
-public class Communication{
-    BufferedReader in;
-    PrintWriter out;
-    
-    public Communication(BufferedReader buf,PrintWriter wrt){
-        in = buf;
-        out = wrt;
+public class Communication {
+    private BufferedReader in;
+    private PrintWriter out;
+
+    public Communication(BufferedReader in, PrintWriter out) {
+        this.in = in;
+        this.out = out;
     }
     
     public void sndInt(int i){
@@ -25,7 +25,7 @@ public class Communication{
     }
            
     public int rcvInt() throws IOException{
-       return Integer.parseInt(in.readLine());
+       return Integer.parseInt(in .readLine());
     }
     
     public long rcvLong() throws IOException{
@@ -42,11 +42,11 @@ public class Communication{
         if(c == null){
             return Integer.MAX_VALUE;
         }
-        
+
         serialz = c.joueur | c.a.l << 13 | c.a.c << 9 | c.b.l << 5 | c.b.c << 1; 
         return serialz;
     }
-    
+
     public Coup deserializedCoup(int coup){
         if(coup == Integer.MAX_VALUE)
             return null;
@@ -55,7 +55,7 @@ public class Communication{
         Point b = new Point((coup >> 5) & 0xFF,(coup >> 1) & 0xFF);
         return new Coup(a,b,j);
     }
-    
+
     public boolean sndReq(Request r){
         if(r.reqType < 1 && r.reqType > 4){
             System.err.println("Bad request");
