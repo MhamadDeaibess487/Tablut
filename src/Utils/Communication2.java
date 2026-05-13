@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import Model.Coup;
 import Model.Point;
+import Model.TableauBit;
 
 public class Communication{
     BufferedReader in;
@@ -15,12 +16,25 @@ public class Communication{
         out = wrt;
     }
     
-    public void sndAck(){
-        out.write(0);
+    public void sndInt(int i){
+        out.println(i);
     }
     
-    public void rcvAck() throws IOException{
-       in.read();
+    public void sndLong(long i){
+        out.println(i);
+    }
+           
+    public int rcvInt() throws IOException{
+       return Integer.parseInt(in.readLine());
+    }
+    
+    public long rcvLong() throws IOException{
+       return Long.parseLong(in.readLine());
+    }
+    
+    public void hndlError(String s){
+        System.err.println(s);
+        sndInt(-1);
     }
     
     public int serializedCoup(Coup c){
@@ -47,12 +61,13 @@ public class Communication{
             System.err.println("Bad request");
             return false;
         }
-        out.write(r.reqType);
+        sndInt(r.reqType);
         int coup = serializedCoup(r.c);
-        out.write(coup + "\n");
+        out.println(coup);
         return true;
     }
     
+    /*Effet de bord sur coup pour stocker la serialization*/
     public Request rcvReq() throws IOException{
         int reqType = in.read();
         if(reqType < 1 && reqType > 4){
@@ -61,5 +76,25 @@ public class Communication{
         }
         int coup = Integer.parseInt(in.readLine());
         return new Request(reqType,deserializedCoup(coup));
+    }
+    
+    public void sndTabBit(TableauBit tabB){
+        sndLong(tabB.noir1);
+        sndLong(tabB.noir2);
+        sndLong(tabB.blanc1);
+        sndLong(tabB.blanc2);
+        sndLong(tabB.roi1);
+        sndLong(tabB.roi2);
+    }
+    
+    public TableauBit rcvTabBit() throws IOException {
+        long n1,n2,b1,b2,r1,r2;
+        n1 = rcvLong();
+        n2 = rcvLong();
+        b1 = rcvLong();
+        b2 = rcvLong();
+        r1 = rcvLong();
+        r2 = rcvLong();
+        return new TableauBit(n1,n2,b1,b2,r1,r2);
     }
 }

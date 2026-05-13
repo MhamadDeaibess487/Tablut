@@ -11,19 +11,11 @@ Request type :
 */
 
 public class Request{
-    int reqType;
-    Coup c;
+    public int reqType;
+    public Coup coup;
     
     public Request(int type,Coup coup){
         reqType = type;
-        c = coup;
-    }
-    
-    public int getType(){
-        return reqType;
-    }
-    
-    public Coup getCoup(){
-        return c;
+        this.coup = coup;
     }
 }
