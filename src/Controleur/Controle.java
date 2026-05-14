@@ -35,7 +35,7 @@ public class Controle {
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),0,2);
+        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),1,2);
         this.IA_noir = IA.creer(((Model.Jeu)Jeu),0,1);
         this.fichier = "";
         this.joueur1_IA = false;
@@ -63,6 +63,10 @@ public class Controle {
     }
     public void set_IA_noir(boolean active) {
         joueur2_IA = active;
+    }
+
+    public BaseJeu getJeu() {
+        return Jeu;
     }
 
 

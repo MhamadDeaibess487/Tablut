@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import Controleur.Controle;
-import Model.BaseJeu;
 public class JoueurActifPanel extends JPanel {
     private static final Dimension SIDEBAR_SIZE = new Dimension(300, 0);
     private static final Color BG_DARK = new Color(18, 22, 32);
@@ -46,7 +45,7 @@ public class JoueurActifPanel extends JPanel {
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
                              String j2NormalPath, String j2HighlightPath,Controle controle) {
         this.controle = controle;
-        this.joueur_actif= BaseJeu.getJoueur();
+        this.joueur_actif= (controle.getJeu()).getJoueur();
         setOpaque(true);
         setBackground(BG_DARK);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -81,7 +80,7 @@ public class JoueurActifPanel extends JPanel {
         joueur2Titre = findTitre(joueur2Card);
         joueur2Camp  = findCamp(joueur2Card);
         joueur2Pion  = findPion(joueur2Card);
-        joueur_actif= BaseJeu.getJoueur();
+        joueur_actif= (controle.getJeu()).getJoueur();
         System.out.println("Joueur actif: " + joueur_actif);
         System.out.println(controle.joueur1_IA);
         System.out.println(controle.joueur2_IA);

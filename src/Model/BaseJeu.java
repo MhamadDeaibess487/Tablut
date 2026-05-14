@@ -51,7 +51,11 @@ public abstract class BaseJeu {
     }
 
     public int getJoueur() {
-        return this.Joueur_actif;
+        return Joueur_actif;
+    }
+
+    public boolean getFini(){
+        return fini;
     }
 
     public void changerJoueur() {
@@ -171,6 +175,7 @@ public abstract class BaseJeu {
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
                 // gagner blanc
+                fini = true;
                 System.out.println("blanc ganger");
             }
         }
@@ -183,6 +188,7 @@ public abstract class BaseJeu {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
                     // gagner noir
+                    fini = true;
                     System.out.println("noir ganger");
                 }
                 if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
@@ -201,6 +207,7 @@ public abstract class BaseJeu {
                 ListePointN.SupprimeListePoint(P);
                 if (ListePointN.totale == 0) {
                     // gagner blanc
+                    fini = true;
                 }
             }
         }
@@ -455,5 +462,21 @@ public abstract class BaseJeu {
             }
         }
         return cases;
+    }
+
+    public ListeCoup CoupJouable(int couleur){
+        ListeCoup Lcoup = new ListeCoup();
+        ArrayList<Point> L = new ArrayList<>();
+        ListePoint Lpoint = new ListePoint();
+        if (couleur ==1) Lpoint = ListePointN;
+        else Lpoint = ListePointB;
+        for (Point p: Lpoint.LP){
+            L = listeCasesValides(p.l, p.c);
+            for (Point pcases: L){
+                Coup c = new Coup(p, pcases, Joueur_actif);
+                Lcoup.AddListeCoup(c);
+            }
+        }
+        return Lcoup;
     }
 }

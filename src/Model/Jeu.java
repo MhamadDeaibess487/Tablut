@@ -15,6 +15,33 @@ public class Jeu extends BaseJeu {
         pionMange = new Stack<>();
     }
 
+    // fonction pour faire copie du jeu pour l'ia
+    public Jeu(Jeu autre) {
+        redo = new Stack<>();
+        undo = new Stack<>();
+        pionMange = new Stack<>();
+        
+        this.grille = new int[autre.grille.length][autre.grille[0].length];
+        for (int i = 0; i < autre.grille.length; i++) {
+            for (int j = 0; j < autre.grille[i].length; j++) {
+                this.grille[i][j] = autre.grille[i][j];
+            }
+        }
+        
+        this.ListePointB = new ListePoint();
+        for (Point p : autre.ListePointB.LP) {
+            this.ListePointB.AddListePoint(new Point(p.l, p.c));
+        }
+        this.ListePointN = new ListePoint();
+        for (Point p : autre.ListePointN.LP) {
+            this.ListePointN.AddListePoint(new Point(p.l, p.c));
+        }
+        
+        this.Joueur_actif = autre.Joueur_actif;
+        this.fini = autre.fini;
+        this.trone = new Point(autre.trone.l, autre.trone.c);
+    }
+
     public Jeu(String fichier) { // Charge une sauvegarde
         redo = new Stack<>();
         undo = new Stack<>();
