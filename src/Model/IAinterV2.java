@@ -157,11 +157,21 @@ class IAinterV2 extends IA{
 
         // route menant au bord libre
         boolean routeN = true, routeS = true, routeE = true, routeO = true;
-        for (int i = king.l-1; i>=0; i--){
-            if (copie.grille[king.l-i][king.c] != 0) routeN = false;
-            if (copie.grille[king.l+i][king.c] != 0) routeS = false;
-            if (copie.grille[king.l][king.c+i] != 0) routeE = false;
-            if (copie.grille[king.l][king.c-i] != 0) routeO = false;
+        // Route nord
+        for (int i = king.l - 1; i >= 0; i--) {
+            if (copie.grille[i][king.c] != 0) { routeN = false; break; }
+        }
+        // Route sud
+        for (int i = king.l + 1; i <= 8; i++) {
+            if (copie.grille[i][king.c] != 0) { routeS = false; break; }
+        }
+        // Route est
+        for (int i = king.c + 1; i <= 8; i++) {
+            if (copie.grille[king.l][i] != 0) { routeE = false; break; }
+        }
+        // Route ouest
+        for (int i = king.c - 1; i >= 0; i--) {
+            if (copie.grille[king.l][i] != 0) { routeO = false; break; }
         }
         // si deux route opposé libre, alors l'adversaire ne peut pas bloquer les deux en même temps donc victoire assurée pour les blancs
         if ((routeN && routeS) || (routeE && routeO)){
