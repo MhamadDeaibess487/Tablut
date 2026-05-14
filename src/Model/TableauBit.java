@@ -4,6 +4,8 @@ public class TableauBit {
     public long blanc1, blanc2;
     public long roi1, roi2;
     
+    public TableauBit(){}
+    
     public TableauBit(long n1,long n2,long b1,long b2,long r1,long r2){
         noir1 = n1;
         noir2 = n2;

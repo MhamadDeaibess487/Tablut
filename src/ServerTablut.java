@@ -6,27 +6,27 @@ import Utils.*;
 public class ServerTablut{
     
     /*Traite une request r et renvoie un code de retour au client (Ack or -1)*/
-    public void traitementReq(Communication[] com,Request r,Jeu j, int joueur){
+    public static void traitementReq(Communication2[] com, Request r, Jeu j, int joueur){
         switch(r.reqType){
             case 1: /*Joue un coup*/
                 if(r.coup != null){
-                    com[joueur].sndInt((j.deplacer(r.coup.a, r.coup.b) != null) - 1); /*Envoie au client 0 si coupValide, -1 sinon*/
-                    int jAdverse = (joueur % 2) + 1;
-//                    int grille_updt = ;
-                    /*Propagation du deplacement au joueur adverse*/
-//                    com[jAdverse].
+                    if(j.deplacer(r.coup.a, r.coup.b) != null){ /*Si le deplacement à eu lieu*/
+                        com[joueur].sndInt(0); // Ack send to client
+                        int jAdverse = (joueur % 2) + 1;
+                        /*Propagation du deplacement au joueur adverse*/
+                        TableauBit grille_updt = j.transformerGrilleEnLong();
+                        com[jAdverse].sndTabBit(grille_updt);
+                        return;
+                    }
                 }
-                else{
-                    com.hndlError("Coup invalid from client");
-                }
+                com[joueur].hndlError("Coup invalid from client");
                 break;
             case 2: /*Annule un coup*/
-                
                 break;
             case 3: /*Quit*/
                 break;
             default:
-                com.hndlError("Unknown request");
+                com[joueur].hndlError("Unknown request");
                 break;
         }
     }
@@ -36,14 +36,14 @@ public class ServerTablut{
             /*Connexion des joueurs*/
             ServerSocket serverfd = new ServerSocket(2121);
             Socket[] clientfd = new Socket[2];
-            Communication[] comIO = new Communication[2];
+            Communication2[] comIO = new Communication2[2];
             for(int i = 0;i<2;i++){
                 clientfd[i] = serverfd.accept();
-                comIO[i] = new Communication(
-                    new InputStreamReader(clientfd[i].getInputStream()),
+                comIO[i] = new Communication2(
+                    new BufferedReader(new InputStreamReader(clientfd[i].getInputStream())),
                     new PrintWriter(clientfd[i].getOutputStream(),true));
                 /*bit ACK*/
-                comIO[i].sndAck();
+                comIO[i].sndInt(0);
             }
             /*Fin connexion*/
             
@@ -54,7 +54,7 @@ public class ServerTablut{
             while(!jeu.estFini()){
                 int joueur = jeu.getJoueur();
                 Request r = comIO[joueur].rcvReq();
-                traitementReq(comIO[joueur],r,jeu);
+                traitementReq(comIO,r,jeu,joueur);
             }
         }
         catch(IOException e){

@@ -7,11 +7,11 @@ import Model.Coup;
 import Model.Point;
 import Model.TableauBit;
 
-public class Communication {
+public class Communication2{
     private BufferedReader in;
     private PrintWriter out;
 
-    public Communication(BufferedReader in, PrintWriter out) {
+    public Communication2(BufferedReader in, PrintWriter out) {
         this.in = in;
         this.out = out;
     }
@@ -42,17 +42,18 @@ public class Communication {
         if(c == null){
             return Integer.MAX_VALUE;
         }
-
-        serialz = c.joueur | c.a.l << 13 | c.a.c << 9 | c.b.l << 5 | c.b.c << 1; 
+        int joueur = c.joueur - 1; // 0 ou 1
+        serialz = (int) joueur | (int) c.a.l << 13 | (int) c.a.c << 9 | 
+                (int) c.b.l << 5 | (int) c.b.c << 1;
         return serialz;
     }
 
     public Coup deserializedCoup(int coup){
         if(coup == Integer.MAX_VALUE)
             return null;
-        int j = coup & 1;
-        Point a = new Point((coup >> 13) & 0xFF,(coup >> 9) & 0xFF);
-        Point b = new Point((coup >> 5) & 0xFF,(coup >> 1) & 0xFF);
+        int j = (coup & 1) + 1;
+        Point a = new Point((coup >> 13) & 0xF,(coup >> 9) & 0xF);
+        Point b = new Point((coup >> 5) & 0xF,(coup >> 1) & 0xF);
         return new Coup(a,b,j);
     }
 
@@ -62,7 +63,7 @@ public class Communication {
             return false;
         }
         sndInt(r.reqType);
-        int coup = serializedCoup(r.c);
+        int coup = serializedCoup(r.coup);
         out.println(coup);
         return true;
     }
