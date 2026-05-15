@@ -10,6 +10,7 @@ import Model.TableauBit;
 public class Communication2{
     private BufferedReader in;
     private PrintWriter out;
+    //Peut etre mettre une instance de reponse et request ici, et des fonctions permettant d'edit leurs vars
 
     public Communication2(BufferedReader in, PrintWriter out) {
         this.in = in;
@@ -32,11 +33,6 @@ public class Communication2{
        return Long.parseLong(in.readLine());
     }
     
-    public void hndlError(String s){
-        System.err.println(s);
-        sndInt(-1);
-    }
-    
     public int serializedCoup(Coup c){
         int serialz = 0;
         if(c == null){
@@ -57,29 +53,32 @@ public class Communication2{
         return new Coup(a,b,j);
     }
 
-    public boolean sndReq(Request r){
+    public void sndReq(Request r){
         if(r.reqType < 1 && r.reqType > 4){
             System.err.println("Bad request");
-            return false;
+            return;
         }
         sndInt(r.reqType);
         int coup = serializedCoup(r.coup);
-        out.println(coup);
-        return true;
+        sndInt(coup);
     }
     
     /*Effet de bord sur coup pour stocker la serialization*/
     public Request rcvReq() throws IOException{
-        int reqType = in.read();
+        int reqType = rcvInt();
         if(reqType < 1 && reqType > 4){
             System.err.println("Bad request");
             return null;
         }
-        int coup = Integer.parseInt(in.readLine());
+        int coup = rcvInt();
         return new Request(reqType,deserializedCoup(coup));
     }
     
     public void sndTabBit(TableauBit tabB){
+        if(tabB == null){
+            sndLong(Long.MAX_VALUE);
+            return;
+        }
         sndLong(tabB.noir1);
         sndLong(tabB.noir2);
         sndLong(tabB.blanc1);
@@ -91,11 +90,33 @@ public class Communication2{
     public TableauBit rcvTabBit() throws IOException {
         long n1,n2,b1,b2,r1,r2;
         n1 = rcvLong();
+        if(n1 == Long.MAX_VALUE){
+            return null;
+        }
         n2 = rcvLong();
         b1 = rcvLong();
         b2 = rcvLong();
         r1 = rcvLong();
         r2 = rcvLong();
         return new TableauBit(n1,n2,b1,b2,r1,r2);
+    }
+    
+    public void sndRep(Reponse r){
+        if(r.repType < -1 && r.reqType > 4){
+            System.err.println("Bad reponse");
+            return;
+        }
+        sndInt(r.repType);
+        sndTabBit(r.grille);
+    }
+    
+    public Reponse rcvRep() throws IOException {
+        int type = rcvInt();
+        if(type < -1 && type > 4){
+            System.err.println("Bad reponse");
+            return null;
+        }
+        TableauBit tabB =rcvTabBit();
+        return new Reponse(type,tabB);
     }
 }
