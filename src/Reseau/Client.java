@@ -1,31 +1,28 @@
 package Reseau;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import javax.swing.JOptionPane;
 
 import Model.BaseJeu;
 import Model.Coup;
-import Model.Message;
 import Model.TableauBit;
+import Utils.Communication;
+import Utils.Request;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
 
 public class Client {
 
     private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
+    private Communication communication;
 
     private BaseJeu jeu;
     private GrilleGraphique grilleGraphique;
     private JoueurActifPanel joueurActifPanel;
 
-    private int joueur; 
+    private int joueur; // 1 = noir, 2 = blanc
     private boolean monTour;
 
     public Client(String adresseServeur, int port,
@@ -34,10 +31,9 @@ public class Client {
                   JoueurActifPanel joueurActifPanel) throws IOException {
 
         this.socket = new Socket(adresseServeur, port);
-
-        this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.in = new BufferedReader(
-                new InputStreamReader(socket.getInputStream())
+        this.communication = new Communication(
+                socket.getInputStream(),
+                socket.getOutputStream()
         );
 
         this.jeu = jeu;
@@ -52,36 +48,35 @@ public class Client {
 
     public void ecouterServeur() {
         try {
-            String ligne;
-
-            while ((ligne = in.readLine()) != null) {
-                Message message = Message.parseFromString(ligne);
-                traiterMessage(message);
+            while (true) {
+                int type = communication.rcvInt();
+                traiterMessage(type);
             }
 
         } catch (IOException e) {
             System.err.println("Connexion perdue avec le serveur.");
+        } catch (NumberFormatException e) {
+            System.err.println("Message serveur invalide.");
         }
     }
 
-    private void traiterMessage(Message message) {
-        String type = message.getType();
+    private void traiterMessage(int type) throws IOException {
 
-        if (type.equals("ASSIGN_PLAYER")) {
-            joueur = Integer.parseInt(message.getContent());
+        if (type == Communication.MSG_ASSIGN_PLAYER) {
+            joueur = communication.rcvAssignPlayer();
             System.out.println("Je suis le joueur " + joueur);
         }
 
-        else if (type.equals("BOARD_UPDATE")) {
-            TableauBit tableauBit = message.getTableauBit();
+        else if (type == Communication.MSG_BOARD_UPDATE) {
+            TableauBit tableauBit = communication.rcvBoardUpdate();
 
             jeu.transformeLongEnGrille(tableauBit);
             grilleGraphique.effacerCasesValides();
             grilleGraphique.repaint();
         }
 
-        else if (type.equals("TURN")) {
-            int joueurActif = Integer.parseInt(message.getContent());
+        else if (type == Communication.MSG_TURN_UPDATE) {
+            int joueurActif = communication.rcvTurnUpdate();
 
             monTour = (joueurActif == joueur);
 
@@ -95,19 +90,12 @@ public class Client {
             }
         }
 
-        else if (type.equals("INVALID_MOVE")) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    message.getContent(),
-                    "Coup invalide",
-                    JOptionPane.WARNING_MESSAGE
-            );
-        }
+        else if (type == Communication.MSG_GAME_OVER) {
+            int winner = communication.rcvGameOver();
 
-        else if (type.equals("GAME_OVER")) {
             JOptionPane.showMessageDialog(
                     null,
-                    message.getContent(),
+                    "Partie terminée. Gagnant : joueur " + winner,
                     "Fin de partie",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -115,8 +103,21 @@ public class Client {
             grilleGraphique.setEnabled(false);
         }
 
+        else if (type == Communication.ACK) {
+            System.out.println("Action acceptée par le serveur.");
+        }
+
+        else if (type == Communication.ERROR) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Action refusée par le serveur.",
+                    "Erreur",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        }
+
         else {
-            System.err.println("Message inconnu : " + type);
+            System.err.println("Message inconnu reçu : " + type);
         }
     }
 
@@ -126,17 +127,31 @@ public class Client {
             return;
         }
 
-        Message message = Message.move(coup);
-        out.println(message.toNetworkString());
+        Request request = new Request(Communication.REQ_JOUE, coup);
+        communication.sndReq(request);
+    }
+
+    public void demanderAnnulation() {
+        Request request = new Request(Communication.REQ_ANNULE, null);
+        communication.sndReq(request);
+    }
+
+    public void abandonner() {
+        Request request = new Request(Communication.REQ_ABANDONNE, null);
+        communication.sndReq(request);
+    }
+
+    public void demanderNul() {
+        Request request = new Request(Communication.REQ_NUL, null);
+        communication.sndReq(request);
     }
 
     public void deconnecter() {
         try {
-            Message message = new Message("DISCONNECT", "");
-            out.println(message.toNetworkString());
+            Request request = new Request(Communication.REQ_QUIT, null);
+            communication.sndReq(request);
 
-            in.close();
-            out.close();
+            communication.close();
             socket.close();
 
         } catch (IOException e) {
