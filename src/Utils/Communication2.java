@@ -102,7 +102,7 @@ public class Communication2{
     }
     
     public void sndRep(Reponse r){
-        if(r.repType < -1 && r.reqType > 4){
+        if(r.repType < -1 && r.repType > 4){
             System.err.println("Bad reponse");
             return;
         }

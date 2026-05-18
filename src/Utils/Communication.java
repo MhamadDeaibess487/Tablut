@@ -19,10 +19,12 @@ public class Communication {
     public static final int REQ_ABANDONNE = 4;
     public static final int REQ_NUL = 5;
 
-    public static final int MSG_BOARD_UPDATE = 10;
-    public static final int MSG_TURN_UPDATE = 11;
-    public static final int MSG_GAME_OVER = 12;
-    public static final int MSG_ASSIGN_PLAYER = 13;
+    public static final int REP_BOARD_UPDATE = 10;
+    public static final int REP_TURN_UPDATE = 11;
+    public static final int REP_GAME_OVER = 12;
+    public static final int REP_ASSIGN_PLAYER = 13;
+    public static final int REP_ANNULE = 14;
+
 
     public Communication(BufferedReader in, PrintWriter out) {
         this.in = in;
@@ -125,7 +127,11 @@ public class Communication {
         return new Request(reqType, deserializeCoup(coup));
     }
 
-    public void sndTabBit(TableauBit tabB) {
+    public void sndTabBit(TableauBit tabB){
+        if(tabB == null){
+            sndLong(Long.MAX_VALUE);
+            return;
+        }
         sndLong(tabB.noir1);
         sndLong(tabB.noir2);
         sndLong(tabB.blanc1);
@@ -133,20 +139,42 @@ public class Communication {
         sndLong(tabB.roi1);
         sndLong(tabB.roi2);
     }
-
+    
     public TableauBit rcvTabBit() throws IOException {
-        long noir1 = rcvLong();
-        long noir2 = rcvLong();
-        long blanc1 = rcvLong();
-        long blanc2 = rcvLong();
-        long roi1 = rcvLong();
-        long roi2 = rcvLong();
-
-        return new TableauBit(noir1, noir2, blanc1, blanc2, roi1, roi2);
+        long n1,n2,b1,b2,r1,r2;
+        n1 = rcvLong();
+        if(n1 == Long.MAX_VALUE){
+            return null;
+        }
+        n2 = rcvLong();
+        b1 = rcvLong();
+        b2 = rcvLong();
+        r1 = rcvLong();
+        r2 = rcvLong();
+        return new TableauBit(n1,n2,b1,b2,r1,r2);
+    }
+    
+    public void sndRep(Reponse r){
+        if(r.repType < -1 && r.repType > 4){
+            System.err.println("Bad reponse");
+            return;
+        }
+        sndInt(r.repType);
+        sndTabBit(r.grille);
+    }
+    
+    public Reponse rcvRep() throws IOException {
+        int type = rcvInt();
+        if(type < -1 && type > 4){
+            System.err.println("Bad reponse");
+            return null;
+        }
+        TableauBit tabB =rcvTabBit();
+        return new Reponse(type,tabB);
     }
 
     public void sndBoardUpdate(TableauBit tabB) {
-        sndInt(MSG_BOARD_UPDATE);
+        sndInt(REP_BOARD_UPDATE);
         sndTabBit(tabB);
     }
 
@@ -155,7 +183,7 @@ public class Communication {
     }
 
     public void sndTurnUpdate(int joueur) {
-        sndInt(MSG_TURN_UPDATE);
+        sndInt(REP_TURN_UPDATE);
         sndInt(joueur);
     }
 
@@ -164,7 +192,7 @@ public class Communication {
     }
 
     public void sndAssignPlayer(int joueur) {
-        sndInt(MSG_ASSIGN_PLAYER);
+        sndInt(REP_ASSIGN_PLAYER);
         sndInt(joueur);
     }
 
@@ -173,7 +201,7 @@ public class Communication {
     }
 
     public void sndGameOver(int winner) {
-        sndInt(MSG_GAME_OVER);
+        sndInt(REP_GAME_OVER);
         sndInt(winner);
     }
 
