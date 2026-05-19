@@ -35,8 +35,8 @@ public class Controle {
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),1,2);
-        this.IA_noir = IA.creer(((Model.Jeu)Jeu),0,1);
+        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),2,2);
+        this.IA_noir = IA.creer(((Model.Jeu)Jeu),2,1);
         this.fichier = "";
         this.joueur1_IA = false;
         this.joueur2_IA = false;
