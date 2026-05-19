@@ -17,7 +17,52 @@ class IAinterV2 extends IA{
 
         return null;
     }
+
+    // a faire, tri des coups pour explorer en priorité les coups les plus prometteurs (ex: menace roi, bloquer menace, eloigne roi ...)
     
+    private int alphabeta(Jeu copie, int profondeur, int alpha, int beta, boolean estmax){
+        if (profondeur == 0 || copie.getFini()){
+            return heuristique(copie);
+        }
+        int joueurActuel = estmax ? 1 : 2;
+
+        ListeCoup coups = copie.CoupJouable(joueurActuel);
+
+        if(coups.Liste.isEmpty()){
+            return heuristique(copie);
+        }
+        
+        if(estmax){ // NOIR cherche à maximiser
+            int maxEval = Integer.MIN_VALUE;
+            for(Coup c : coups.Liste){
+                Jeu souscopie = new Jeu(copie);
+                souscopie.deplacer(c.a, c.b);
+                int eval = alphabeta(souscopie, profondeur - 1, alpha, beta, false);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, maxEval);
+                if(beta <= alpha){
+                    break; // coupure beta, on arrête d'explorer les autres coups
+                }
+
+            }
+            return maxEval;
+        }else{ //BLANC cherche a minimiser
+            int minEval = Integer.MAX_VALUE;
+            for(Coup c : coups.Liste){
+                Jeu souscopie = new Jeu(copie);
+                souscopie.deplacer(c.a,c.b);
+                int eval = alphabeta(souscopie, profondeur - 1, alpha, beta, true);
+                minEval = Math.min(eval, minEval);
+                beta = Math.min(minEval, beta);
+                if(beta <= alpha){
+                    break; // coupure alpha, on arrête d'explorer les autres coups
+                }
+            }
+            return minEval;
+
+        }
+    }
+
     //Calcul et renvoie un coup à jouer par l'ia (fonction appelé dans IA.java)
     public Coup calculCoup(){
         Coup bestCoup = null;
@@ -29,7 +74,9 @@ class IAinterV2 extends IA{
         for (Coup c : coups.Liste) {
             Jeu copie = new Jeu(j); // Utilise le constructeur de copie profonde
             copie.deplacer(c.a, c.b);
-            int score = minimax(copie, 2, couleur!=1);
+            
+            //int score = minimax(copie, 2, couleur!=1);
+            int score = alphabeta(copie, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, couleur!=1);
 
             
             //copie.annuler(); // pas besoin d'annuler si on utilise une copie profonde à chaque fois
@@ -57,6 +104,8 @@ class IAinterV2 extends IA{
     }
     
     private int minimax(Jeu copie, int profondeur, boolean estmax) {
+        // ajout de la methode alpha-beta pour éviter de parcourir tout l'arbre de recherche
+
         if (profondeur == 0 || copie.getFini()) {
             return heuristique(copie);
         }
@@ -130,7 +179,7 @@ class IAinterV2 extends IA{
         score -= (8 - kingDist) * 20;
 
         // avantage numérique
-        score += (noir - blanc)*5;
+        score += (noir - blanc) * 5;
 
         //menace au roi (pion noir à coté du roi)
         // 1 noir = petite menace, 2 noir = menace importante, 3 noir = capture assurée au prochain tour
