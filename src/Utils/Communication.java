@@ -154,60 +154,39 @@ public class Communication {
         return new TableauBit(n1,n2,b1,b2,r1,r2);
     }
     
-    public void sndRep(Reponse r){
-        if(r.repType < -1 && r.repType > 4){
-            System.err.println("Bad reponse");
+    private boolean repTypeValide(int type) {
+        return type == ERROR
+            || type == ACK
+            || type == REP_BOARD_UPDATE
+            || type == REP_TURN_UPDATE
+            || type == REP_GAME_OVER
+            || type == REP_ASSIGN_PLAYER
+            || type == REP_ANNULE;
+    }
+
+    public void sndRep(Reponse r) {
+        if (r == null || !repTypeValide(r.repType)) {
+            System.err.println("Bad response");
             return;
         }
+
         sndInt(r.repType);
         sndTabBit(r.grille);
     }
-    
+
     public Reponse rcvRep() throws IOException {
         int type = rcvInt();
-        if(type < -1 && type > 4){
-            System.err.println("Bad reponse");
+
+        if (!repTypeValide(type)) {
+            System.err.println("Bad response");
             return null;
         }
-        TableauBit tabB =rcvTabBit();
-        return new Reponse(type,tabB);
+
+        TableauBit tabB = rcvTabBit();
+        return new Reponse(type, tabB);
     }
 
-    public void sndBoardUpdate(TableauBit tabB) {
-        sndInt(REP_BOARD_UPDATE);
-        sndTabBit(tabB);
-    }
-
-    public TableauBit rcvBoardUpdate() throws IOException {
-        return rcvTabBit();
-    }
-
-    public void sndTurnUpdate(int joueur) {
-        sndInt(REP_TURN_UPDATE);
-        sndInt(joueur);
-    }
-
-    public int rcvTurnUpdate() throws IOException {
-        return rcvInt();
-    }
-
-    public void sndAssignPlayer(int joueur) {
-        sndInt(REP_ASSIGN_PLAYER);
-        sndInt(joueur);
-    }
-
-    public int rcvAssignPlayer() throws IOException {
-        return rcvInt();
-    }
-
-    public void sndGameOver(int winner) {
-        sndInt(REP_GAME_OVER);
-        sndInt(winner);
-    }
-
-    public int rcvGameOver() throws IOException {
-        return rcvInt();
-    }
+    
 
     public void close() throws IOException {
         in.close();
