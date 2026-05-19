@@ -67,7 +67,7 @@ public class ServerTablut{
             comIO = io;
             this.j = j;
             joueur = couleur - 1;
-            jAdverse = couleur; // 1 ou 2 = index error ?
+            jAdverse = couleur % 2;
         }
         
         public void initJoueur(){
@@ -78,6 +78,7 @@ public class ServerTablut{
             /*Envoie joueur actif*/
             rep.repType = comIO[joueur].REP_TURN_UPDATE;
             TableauBit g = new TableauBit(1,0,0,0,0,0);
+            rep.grille = g;
             comIO[joueur].sndRep(rep);
             
             /*Envoie du plateau initiale*/
@@ -139,7 +140,7 @@ public class ServerTablut{
         }
         
         @Override
-        public void run(){ // Catch exception ?
+        public void run(){
             try{
                 initJoueur();
                 /*Boucle d'ecoute des requetes*/

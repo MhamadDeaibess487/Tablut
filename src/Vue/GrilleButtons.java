@@ -30,6 +30,8 @@ public class GrilleButtons extends JPanel {
     private GrilleGraphique grilleGraphique;
     private Controle controle;
 
+    
+    // Instance de jeu necessaire ?
     public GrilleButtons(BaseJeu jeu, GrilleGraphique grille, Controle controle) {
         this.grilleGraphique = grille;
         this.controle = controle;

@@ -8,15 +8,14 @@ import javax.swing.JOptionPane;
 import Model.BaseJeu;
 import Model.Coup;
 import Model.TableauBit;
-import Utils.Communication;
-import Utils.Request;
+import Utils.*;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
 
 public class Client {
 
     private Socket socket;
-    private Communication communication;
+    private Communication comIO;
 
     private BaseJeu jeu;
     private GrilleGraphique grilleGraphique;
@@ -31,7 +30,7 @@ public class Client {
                   JoueurActifPanel joueurActifPanel) throws IOException {
 
         this.socket = new Socket(adresseServeur, port);
-        this.communication = new Communication(
+        this.comIO = new Communication(
                 socket.getInputStream(),
                 socket.getOutputStream()
         );
@@ -49,7 +48,7 @@ public class Client {
     public void ecouterServeur() {
         try {
             while (true) {
-                int type = communication.rcvInt();
+                int type = comIO.rcvInt();
                 traiterMessage(type);
             }
 
@@ -60,73 +59,15 @@ public class Client {
         }
     }
 
-    private void traiterMessage(int type) throws IOException {
-
-        if (type == Communication.MSG_ASSIGN_PLAYER) {
-            joueur = communication.rcvAssignPlayer();
-            System.out.println("Je suis le joueur " + joueur);
-        }
-
-        else if (type == Communication.MSG_BOARD_UPDATE) {
-            TableauBit tableauBit = communication.rcvBoardUpdate();
-
-            jeu.transformeLongEnGrille(tableauBit);
-            grilleGraphique.effacerCasesValides();
-            grilleGraphique.repaint();
-        }
-
-        else if (type == Communication.MSG_TURN_UPDATE) {
-            int joueurActif = communication.rcvTurnUpdate();
-
-            monTour = (joueurActif == joueur);
-
-            joueurActifPanel.setJoueurActif(joueurActif);
-            grilleGraphique.setEnabled(monTour);
-
-            if (monTour) {
-                System.out.println("C'est mon tour.");
-            } else {
-                System.out.println("J'attends l'autre joueur.");
-            }
-        }
-
-        else if (type == Communication.MSG_GAME_OVER) {
-            int winner = communication.rcvGameOver();
-
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Partie terminée. Gagnant : joueur " + winner,
-                    "Fin de partie",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            grilleGraphique.setEnabled(false);
-        }
-
-        else if (type == Communication.ACK) {
-            System.out.println("Action acceptée par le serveur.");
-        }
-
-        else if (type == Communication.ERROR) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Action refusée par le serveur.",
-                    "Erreur",
-                    JOptionPane.WARNING_MESSAGE
-            );
-        }
-
-        else {
-            System.err.println("Message inconnu reçu : " + type);
-        }
+    private void traitementRep(Reponse r) throws IOException {
+        
     }
-
+    
     public void envoyerCoup(Coup coup) {
         if (!monTour) {
             System.out.println("Ce n'est pas ton tour.");
             return;
         }
-
         Request request = new Request(Communication.REQ_JOUE, coup);
         communication.sndReq(request);
     }
@@ -165,5 +106,9 @@ public class Client {
 
     public int getJoueur() {
         return joueur;
+    }
+    
+    public void runClient(){
+        
     }
 }

@@ -37,6 +37,7 @@ public class Controle {
 
     public void toggleIA_blanc() {
     }
+    
     public void toggleIA_noir() {
     }
 
@@ -55,22 +56,16 @@ public class Controle {
         refreshGrid();
     }
 
-
-
     public void harder() {
     }
 
     public void easier() {
     }
 
-    public void increaseGridSize() {
-    }
-
-    public void decreaseGridSize() {
-    }
     public void refreshGrid() {
         Grille.repaint();
     }
+    
     public void handleGridClick(int row, int column) {
         int [][]grille_case = Jeu.getGrille();
 
