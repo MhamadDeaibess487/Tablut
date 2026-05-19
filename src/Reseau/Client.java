@@ -2,7 +2,6 @@ package Reseau;
 
 import java.io.IOException;
 import java.net.Socket;
-
 import javax.swing.JOptionPane;
 
 import Model.BaseJeu;
@@ -21,7 +20,7 @@ public class Client {
     private GrilleGraphique grilleGraphique;
     private JoueurActifPanel joueurActifPanel;
 
-    private int joueur; // 1 = noir, 2 = blanc
+    private int joueur;      // 1 = noir, 2 = blanc
     private boolean monTour;
 
     public Client(String adresseServeur, int port,
@@ -29,8 +28,8 @@ public class Client {
                   GrilleGraphique grilleGraphique,
                   JoueurActifPanel joueurActifPanel) throws IOException {
 
-        this.socket = new Socket(adresseServeur, port);
-        this.comIO = new Communication(
+        socket = new Socket(adresseServeur, port);
+        communication = new Communication(
                 socket.getInputStream(),
                 socket.getOutputStream()
         );
@@ -39,8 +38,8 @@ public class Client {
         this.grilleGraphique = grilleGraphique;
         this.joueurActifPanel = joueurActifPanel;
 
-        this.joueur = -1;
-        this.monTour = false;
+        joueur = -1;
+        monTour = false;
 
         System.out.println("Connecté au serveur.");
     }
@@ -48,45 +47,133 @@ public class Client {
     public void ecouterServeur() {
         try {
             while (true) {
-                int type = comIO.rcvInt();
-                traiterMessage(type);
+                Reponse rep = communication.rcvRep();
+                traitementReponse(rep);
             }
-
         } catch (IOException e) {
             System.err.println("Connexion perdue avec le serveur.");
-        } catch (NumberFormatException e) {
-            System.err.println("Message serveur invalide.");
         }
     }
-    
+
+
+    private void traitementReponse(Reponse rep) {
+        if (rep == null) {
+            System.err.println("Réponse nulle reçue.");
+            return;
+        }
+
+        switch (rep.repType) {
+
+            case Communication.ERROR:
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Action refusée par le serveur.",
+                        "Erreur",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                break;
+
+            case Communication.ACK:
+                System.out.println("Requête acceptée.");
+                break;
+
+            case Communication.REP_BOARD_UPDATE:
+                appliquerNouvelleGrille(rep);
+                break;
+
+            case Communication.REP_ANNULE:
+                traiterDemandeAnnulation();
+                break;
+
+            // case Communication.REP_VICTORY:
+            //     terminerPartie("Victoire !");
+            //     break;
+
+            // case Communication.REP_DEFEAT:
+            //     terminerPartie("Défaite.");
+            //     break;
+
+            case Communication.REP_ASSIGN_PLAYER:
+                if (rep.grille != null) {
+                    joueur = (int) rep.grille.noir1;
+                    System.out.println("Je suis le joueur " + joueur);
+                }
+                break;
+
+            case Communication.REP_TURN_UPDATE:
+                if (rep.grille != null) {
+                    int joueurActif = (int) rep.grille.noir1;
+                    monTour = (joueurActif == joueur);
+
+                    joueurActifPanel.setJoueurActif(joueurActif);
+                    grilleGraphique.setEnabled(monTour);
+
+                    if (monTour) {
+                        System.out.println("C'est mon tour.");
+                    } else {
+                        System.out.println("J'attends l'autre joueur.");
+                    }
+                }
+                break;
+
+            default:
+                System.err.println("Réponse inconnue : " + rep.repType);
+                break;
+        }
+    }
+
+    private void appliquerNouvelleGrille(Reponse rep) {
+        if (rep.grille == null) {
+            return;
+        }
+        jeu.transformeLongEnGrille(rep.grille);
+        grilleGraphique.effacerCasesValides();
+        grilleGraphique.repaint();
+    }
+
     public void envoyerCoup(Coup coup) {
         if (!monTour) {
             System.out.println("Ce n'est pas ton tour.");
             return;
         }
-        Request request = new Request(Communication.REQ_JOUE, coup);
-        communication.sndReq(request);
+        Request req = new Request(Communication.REQ_JOUE, coup);
+        communication.sndReq(req);
     }
 
     public void demanderAnnulation() {
-        Request request = new Request(Communication.REQ_ANNULE, null);
-        communication.sndReq(request);
+        Request req = new Request(Communication.REQ_ANNULE, null);
+        communication.sndReq(req);
+    }
+
+    private void traiterDemandeAnnulation() {
+        int choix = JOptionPane.showConfirmDialog(
+                null,
+                "L'autre joueur demande une annulation. Accepter ?",
+                "Demande d'annulation",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choix == JOptionPane.YES_OPTION) {
+            communication.sndInt(Communication.ACK);
+        } else {
+            communication.sndInt(Communication.ERROR);
+        }
     }
 
     public void abandonner() {
-        Request request = new Request(Communication.REQ_ABANDONNE, null);
-        communication.sndReq(request);
+        Request req = new Request(Communication.REQ_ABANDONNE, null);
+        communication.sndReq(req);
     }
 
     public void demanderNul() {
-        Request request = new Request(Communication.REQ_NUL, null);
-        communication.sndReq(request);
+        Request req = new Request(Communication.REQ_NUL, null);
+        communication.sndReq(req);
     }
 
     public void deconnecter() {
         try {
-            Request request = new Request(Communication.REQ_QUIT, null);
-            communication.sndReq(request);
+            Request req = new Request(Communication.REQ_QUIT, null);
+            communication.sndReq(req);
 
             communication.close();
             socket.close();
@@ -95,6 +182,17 @@ public class Client {
             System.err.println("Erreur pendant la déconnexion.");
         }
     }
+
+    // private void terminerPartie(String message) {
+    //     JOptionPane.showMessageDialog(
+    //             null,
+    //             message,
+    //             "Fin de partie",
+    //             JOptionPane.INFORMATION_MESSAGE
+    //     );
+
+    //     grilleGraphique.setEnabled(false);
+    // }
 
     public boolean estMonTour() {
         return monTour;
@@ -105,6 +203,15 @@ public class Client {
     }
     
     public void runClient(){
-        
+    }
+
+    public BaseJeu getGrille() {
+        return jeu;
+    }
+
+    // Méthode de test pour envoyer un coup arbitraire
+    public void testEnvoyerCoup(int a, int b, int c, int d) {
+        Request req = new Request(Communication.REQ_JOUE, new Coup(new Model.Point(a, b), new Model.Point(c, d), joueur));
+        communication.sndReq(req);
     }
 }

@@ -1,16 +1,14 @@
 package Utils;
-
 import Model.TableauBit;
+
 /*
 Reponse type :
 - -1 = Error
 - 0 = Ok (Ack)
-- 10 = Update
-- 11 = Turn Update
-- 14 = Annule
-- 12 = Game Over
-- 13 = Assign Player
-- 14 = Rep Annule
+- 1 = Update
+- 2 = Annule
+- 3 = Victory
+- 4 = Defeat
 */
 
 public class Reponse{

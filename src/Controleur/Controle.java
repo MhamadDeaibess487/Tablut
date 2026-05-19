@@ -1,6 +1,8 @@
 package Controleur;
 import Model.BaseJeu;
+import Model.Coup;
 import Model.Point;
+import Reseau.Client;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
 import Vue.MenuGraphique;
@@ -11,6 +13,7 @@ import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import Reseau.Client;
 
 import static Config.Config.CHEMIN_SAUVEGARDES;
 
@@ -21,6 +24,8 @@ public class Controle {
     int colonneSelectee;
     String fichier;
     FenetreJeu fenetreJeu;
+    private Client client;
+
 
 
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
@@ -99,7 +104,8 @@ public class Controle {
 
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
-            Jeu.deplacer(p,p1);
+            Coup coup = new Coup(p, p1, client.getJoueur());
+            client.envoyerCoup(coup);
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
@@ -136,6 +142,10 @@ public class Controle {
         }
 
         fenetreJeu.retourMenu();
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
 
