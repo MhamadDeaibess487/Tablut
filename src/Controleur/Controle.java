@@ -25,7 +25,8 @@ public class Controle {
     public boolean joueur2_IA;
     IA IA_blanc;
     IA IA_noir;
-    int level;
+    int levelIANoir;
+    int levelIABlanc;
     Timer timer_IA;
     Timer timer_joueur;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
@@ -35,8 +36,10 @@ public class Controle {
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),2,2);
-        this.IA_noir = IA.creer(((Model.Jeu)Jeu),2,1);
+        levelIANoir = 0;
+        levelIABlanc = 0;
+        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
+        this.IA_noir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
         this.fichier = "";
         this.joueur1_IA = false;
         this.joueur2_IA = false;
@@ -68,30 +71,39 @@ public class Controle {
     public BaseJeu getJeu() {
         return Jeu;
     }
-
+    public void  setNiveauIANoir(int niveau){
+        levelIANoir = niveau;
+    }
+    public void setNiveauIABlanc(int niveau){
+        levelIABlanc = niveau;
+    }
 
     public void reset() {
         ((Model.Jeu)Jeu).nouvellePartie();
         refreshGrid();
     }
+
     public void verifierTourIA() {
         if (Jeu.getFini()) {
-            System.out.println(Jeu.getFini());
             timer_IA.stop();
             return;
         }
-
+        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
+        this.IA_noir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
         if (Jeu.getJoueur() == 2 && joueur1_IA) {
             IA_blanc.joue();
-            System.out.println("joueur control :"+joueur1_IA);
             refreshGrid();
+            //ajouter l'affichage des coup possible
+
             return;
         }
 
         if (Jeu.getJoueur() == 1 && joueur2_IA) {
-            System.out.println("joueur control :"+joueur2_IA);
+
             IA_noir.joue();
             refreshGrid();
+            //ajouter l'affichage des coup possible
+
         }
     }
     public void undo() {
@@ -106,17 +118,7 @@ public class Controle {
 
 
 
-    public void harder() {
-    }
 
-    public void easier() {
-    }
-
-    public void increaseGridSize() {
-    }
-
-    public void decreaseGridSize() {
-    }
     public void refreshGrid() {
         Grille.repaint();
     }

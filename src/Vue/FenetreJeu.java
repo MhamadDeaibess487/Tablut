@@ -18,25 +18,46 @@ public class FenetreJeu extends JFrame {
         setLayout(new BorderLayout());
 
         this.jeu = jeu;
-
-
-
         GrilleGraphique grille = new GrilleGraphique(jeu);
-
         Controle controle = new Controle(jeu, grille, this);
         GrilleButtons buttons = new GrilleButtons(grille, controle);
-        //joueurActifPanel.setAiControlsPanel(buttons.getAiControlsPanel());
+
         joueurActifPanel = new JoueurActifPanel(
                 Config.CHEMIN_IMAGES + "/nap_on.png",
                 Config.CHEMIN_IMAGES + "/nap_on.png",
                 Config.CHEMIN_IMAGES + "/julien.png",
-                Config.CHEMIN_IMAGES + "/julien.png"
-                ,controle);
+                Config.CHEMIN_IMAGES + "/julien.png",
+                controle);
 
-        add(grille, BorderLayout.CENTER);
+
+
+// CENTER — grille + boutons autour
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setOpaque(false);
+
+        JPanel southBox = new JPanel();
+        southBox.setLayout(new BoxLayout(southBox, BoxLayout.X_AXIS));
+        southBox.setOpaque(false);
+        southBox.add(Box.createHorizontalGlue());
+        southBox.add(buttons.undo);
+        southBox.add(Box.createHorizontalStrut(10));
+        southBox.add(buttons.redo);
+        southBox.add(Box.createHorizontalGlue());
+
+        JPanel northBox = new JPanel();
+        northBox.setLayout(new BoxLayout(northBox, BoxLayout.X_AXIS));
+        northBox.setOpaque(false);
+        northBox.add(Box.createHorizontalGlue());
+        northBox.add(buttons.parametres);
+
+        centerPanel.add(grille, BorderLayout.CENTER);
+        centerPanel.add(southBox, BorderLayout.SOUTH);
+        centerPanel.add(northBox, BorderLayout.NORTH);
+
         add(joueurActifPanel, BorderLayout.WEST);
-        add(buttons, BorderLayout.EAST);
+        add(centerPanel, BorderLayout.CENTER);
         getContentPane().setBackground(new Color(18, 22, 32));
+
 
         setVisible(true);
     }

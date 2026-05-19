@@ -2,7 +2,7 @@ package Vue;
 
 
 import Controleur.Controle;
-
+import Config.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -12,20 +12,16 @@ import java.awt.event.ActionEvent;
 
 public class GrilleButtons extends JPanel {
 
-    private JButton toggleIA;
 
-    private JButton undo;
-    private JButton redo;
 
-    private JButton harder;
-    private JButton easier;
-    private JButton plus;
-    private JButton minus;
-    private JButton parametres;
-    private boolean iaMode = false;
+    public JButton undo;
+    public JButton redo;
 
-    private JPanel aiControlsPanel;
-    private JPanel aiOptionsPanel;
+
+    public JButton parametres;
+
+
+
 
     private GrilleGraphique grilleGraphique;
     private Controle controle;
@@ -33,31 +29,17 @@ public class GrilleButtons extends JPanel {
     public GrilleButtons(GrilleGraphique grille, Controle controle) {
         this.grilleGraphique = grille;
         this.controle = controle;
-        aiControlsPanel = new JPanel();
-        aiControlsPanel.setOpaque(true);
-        aiControlsPanel.setBackground(new Color(22, 26, 38));
-        aiControlsPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(80, 65, 35), 1),
-            BorderFactory.createEmptyBorder(12, 10, 12, 10)
-        ));
-        aiControlsPanel.setLayout(new BoxLayout(aiControlsPanel, BoxLayout.Y_AXIS));
-
 
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(180, 0));
         setBorder(BorderFactory.createEmptyBorder(40, 15, 40, 25));
 
-        toggleIA = new JButton("Toggle IA");
 
-        undo = new JButton("Undo");
-        redo = new JButton("Redo");
 
-        plus = new JButton("+");
-        minus = new JButton("-");
-        harder = new JButton("Harder");
-        easier = new JButton("Easier");
-        parametres = new JButton("Paramètres");
+        this.undo = new RoundedButton(Config.CHEMIN_IMAGES + "/undo.png", 100);
+        this.redo = new RoundedButton(Config.CHEMIN_IMAGES + "/redo.png", 100);
+        this.parametres = new RoundedButton(Config.CHEMIN_IMAGES + "/parametres.png", 120);
 
         JPopupMenu menu = new JPopupMenu();
 
@@ -74,35 +56,13 @@ public class GrilleButtons extends JPanel {
             menu.show(parametres, 0, parametres.getHeight());
         });
 
-        aiControlsPanel = new JPanel();
-        aiControlsPanel.setOpaque(true);
-        aiControlsPanel.setBackground(new Color(251, 251, 251));
-        aiControlsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(218, 218, 218), 1),
-                BorderFactory.createEmptyBorder(12, 10, 12, 10)
-        ));
-        aiControlsPanel.setLayout(new BoxLayout(aiControlsPanel, BoxLayout.Y_AXIS));
 
-        aiOptionsPanel = new JPanel();
-        aiOptionsPanel.setOpaque(false);
-        aiOptionsPanel.setLayout(new BoxLayout(aiOptionsPanel, BoxLayout.Y_AXIS));
-        aiOptionsPanel.setVisible(false);
 
-        styleButton(toggleIA, new Dimension(118, 48));
-        styleButton(harder, new Dimension(118, 40));
-        styleButton(easier, new Dimension(118, 40));
 
-        aiControlsPanel.add(toggleIA);
-        aiControlsPanel.add(Box.createVerticalStrut(10));
-        aiOptionsPanel.add(harder);
-        aiOptionsPanel.add(Box.createVerticalStrut(8));
-        aiOptionsPanel.add(easier);
-        aiControlsPanel.add(aiOptionsPanel);
-
-        JButton[] boutons = {parametres,undo, redo, plus, minus};
+        JButton[] boutons = {parametres,undo, redo};
 
         for (JButton b : boutons) {
-            styleButton(b, new Dimension(150, 55));
+            styleButton(b, new Dimension(125, 125));
             add(b);
             add(Box.createVerticalStrut(15));
         }
@@ -110,30 +70,7 @@ public class GrilleButtons extends JPanel {
             remove(getComponentCount() - 1);
         }
 
-        toggleIA.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                iaMode = !iaMode;
-                aiOptionsPanel.setVisible(iaMode);
-                toggleIA.setText(iaMode ? "Hide IA" : "Toggle IA");
-                aiControlsPanel.revalidate();
-                aiControlsPanel.repaint();
-            }
-        });
 
-        harder.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // IA difficulty increase hook
-            }
-        });
-
-        easier.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // IA difficulty decrease hook
-            }
-        });
 
 
         undo.addActionListener(new ActionListener() {
@@ -150,15 +87,7 @@ public class GrilleButtons extends JPanel {
 
 
 
-        plus.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {}
-            // Increase taille grille
-        });
 
-        minus.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {}
-            // Decrease taille grille
-        });
 
         grilleGraphique.addMouseListener(new MouseAdapter() {
             @Override
@@ -183,11 +112,9 @@ public class GrilleButtons extends JPanel {
         button.setPreferredSize(size);
         button.setMaximumSize(size);
         button.setMinimumSize(size);
-        button.setFocusPainted(false);
-        button.setFont(new Font("SansSerif", Font.BOLD, 16));
+
     }
 
-    public JPanel getAiControlsPanel() {
-        return aiControlsPanel;
-    }
+
+
 }

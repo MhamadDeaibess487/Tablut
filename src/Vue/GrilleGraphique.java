@@ -81,7 +81,7 @@ public class GrilleGraphique extends JPanel {
         int x,y;//coordonnees pour dessiner
         // Dessiner
         int marge = 0;
-        taillePlateau = Math.min(width, height)-250;//pour ajuster l'espace autour c'est juste pour l'instant a ameliore apres
+        taillePlateau = Math.min(width, height);//pour ajuster l'espace autour c'est juste pour l'instant a ameliore apres
         tailleCase = taillePlateau / taille_grille;
 
         decalageX = (width - taillePlateau) / 2;
