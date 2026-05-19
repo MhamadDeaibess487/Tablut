@@ -58,10 +58,6 @@ public class Client {
             System.err.println("Message serveur invalide.");
         }
     }
-
-    private void traitementRep(Reponse r) throws IOException {
-        
-    }
     
     public void envoyerCoup(Coup coup) {
         if (!monTour) {
