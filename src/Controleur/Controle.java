@@ -54,6 +54,7 @@ public class Controle extends ControleAbstract{
     @Override
     public void handleGridClick(int row, int column){
         int [][]grille_case = Jeu.getGrille();
+        int joueurActifLocal = (client != null) ? client.getJoueur() : Jeu.getJoueur();
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
@@ -63,12 +64,12 @@ public class Controle extends ControleAbstract{
             }
 
             // joueur 1 = noir, il ne peut sélectionner que les noirs
-            if (Jeu.getJoueur() == 1 && contenu != 1) {
+            if (joueurActifLocal == 1 && contenu != 1) {
                 return;
             }
 
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (joueurActifLocal == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;

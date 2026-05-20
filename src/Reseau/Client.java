@@ -7,7 +7,9 @@ import javax.swing.JOptionPane;
 import Model.BaseJeu;
 import Model.Coup;
 import Model.TableauBit;
-import Utils.*;
+import Utils.Communication;
+import Utils.Request;
+import Utils.Reponse;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
 
@@ -63,7 +65,6 @@ public class Client {
         }
 
         switch (rep.repType) {
-
             case Communication.ERROR:
                 JOptionPane.showMessageDialog(
                         null,
@@ -85,25 +86,15 @@ public class Client {
                 traiterDemandeAnnulation();
                 break;
             case Communication.REP_ASSIGN_PLAYER:
-                if (rep.grille != null) {
-                    joueur = (int) rep.grille.noir1;
-                    System.out.println("Je suis le joueur " + joueur);
-                }
+                joueur = (int) rep.grille.noir1;
+                System.out.println("ASSIGN joueur = " + joueur);
                 break;
             case Communication.REP_TURN_UPDATE:
-                if (rep.grille != null) {
-                    int joueurActif = (int) rep.grille.noir1;
-                    monTour = (joueurActif == joueur);
-
-                    joueurActifPanel.setJoueurActif(joueurActif);
-                    grilleGraphique.setEnabled(monTour);
-
-                    if (monTour) {
-                        System.out.println("C'est mon tour.");
-                    } else {
-                        System.out.println("J'attends l'autre joueur.");
-                    }
-                }
+                int joueurActif = (int) rep.grille.noir1;
+                monTour = (joueurActif == joueur);
+                System.out.println("TURN joueurActif = " + joueurActif 
+                    + ", moi = " + joueur 
+                    + ", monTour = " + monTour);
                 break;
             case Communication.REP_GAME_OVER:
                 /*Lecture r.grille.n1*/
