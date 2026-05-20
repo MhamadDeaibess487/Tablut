@@ -8,14 +8,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import Reseau.Client;
 
-public class Controle {
+public class ControleReseau extends ControleAbstract{
     int ligneSelectee;
     int colonneSelectee;
     private Client client;
 
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille) {
-        this.Jeu = Jeu;
-        this.Grille = Grille;
+    public ControleReseau(BaseJeu Jeu, GrilleGraphique Grille) {
+        super(Jeu,Grille);
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
     }
@@ -34,41 +33,37 @@ public class Controle {
         client.demanderNul();
     }
 
-    public void refreshGrid() {
-        Grille.repaint();
-    }
-    
     @Override
     public void handleGridClick(int row, int column) {
-        int [][]grille_case = Jeu.getGrille();
+        int [][]grille_case = jeu.getGrille();
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
 
-            if (contenu == 0 || contenu == 4 || (Jeu.getJoueur() == 1 && contenu != 1)) {
+            if (contenu == 0 || contenu == 4 || (jeu.getJoueur() == 1 && contenu != 1)) {
                 return;
             }
             
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
-            Grille.dessiner_valide(liste);
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
-            Grille.effacerCasesValides();
+            grille.effacerCasesValides();
             refreshGrid();
         }else{  
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Coup coup = new Coup(p, p1, client.getJoueur());
             client.envoyerCoup(coup);
-            Grille.effacerCasesValides();
+            grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
             refreshGrid();

@@ -189,15 +189,7 @@ public class Client {
     public BaseJeu getGrille() {
         return jeu;
     }
-    
-    public void runClient(){
-        while(!gameOver){ /*ou true si besoin arret part deconnexion() ou fermeture du jeu*/
-            Reponse rep = communication.rcvRep();
-            traitementReponse(rep);
-        }
-        /*Fermeture socket*/
-    }
-
+   
     // Méthode de test pour envoyer un coup arbitraire
     public void testEnvoyerCoup(int a, int b, int c, int d) {
         Request req = new Request(Communication.REQ_JOUE, new Coup(new Model.Point(a, b), new Model.Point(c, d), joueur));

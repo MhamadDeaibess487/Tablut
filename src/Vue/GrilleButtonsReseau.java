@@ -1,7 +1,6 @@
 package Vue;
 
-import Controleur.Controle;
-
+import Controleur.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -15,7 +14,7 @@ public class GrilleButtonsReseau extends JPanel {
     private GrilleGraphique grilleGraphique;
 
 
-    public GrilleButtonsReseau(GrilleGraphique grille,Controle controle) {
+    public GrilleButtonsReseau(GrilleGraphique grille,ControleReseau controle) {
         this.controle = controle;
         grilleGraphique = grille;
 

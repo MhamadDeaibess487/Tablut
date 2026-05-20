@@ -3,7 +3,7 @@ import Reseau.Client;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
 import Vue.GrilleButtonsReseau;
-import Controleur.Controle;
+import Controleur.*;
 import Config.Config;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class TestReseauGUI {
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
 
-        Controle controle = new Controle(jeu, grille, null);
+        ControleReseau controle = new ControleReseau(jeu, grille);
 
         Client client = new Client("localhost", 2121, jeu, grille, panel);
         controle.setClient(client);
