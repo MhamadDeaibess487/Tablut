@@ -62,6 +62,13 @@ public class MenuGraphique extends JFrame {
                 fenetreJeu.setVisible(true);
             } 
         });
+        
+        online.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               /*A Faire*/
+            } 
+        });
 
         chargerPartie.addActionListener(new ActionListener() {
             @Override
