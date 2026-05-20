@@ -1,43 +1,26 @@
 package Controleur;
-import Model.BaseJeu;
-import Model.Coup;
+
 import Model.Point;
-import Reseau.Client;
+import Model.BaseJeu;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
-import Vue.MenuGraphique;
-import Vue.JoueurActifPanel;
-
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import Reseau.Client;
-
 import static Config.Config.CHEMIN_SAUVEGARDES;
 
-public class Controle {
-    BaseJeu Jeu;
-    GrilleGraphique Grille;
-    int ligneSelectee;
-    int colonneSelectee;
+public class Controle extends ControleAbstract{
     String fichier;
     FenetreJeu fenetreJeu;
-    private Client client;
-
-
+    int ligneSelectee;
+    int colonneSelectee;
 
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
-
-        this.Jeu = Jeu;
-        this.Grille = Grille;
+        super(Jeu,Grille);
+        this.fenetreJeu = fenetreJeu;
+        this.fichier = "";
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
-        this.fenetreJeu = fenetreJeu;
-
-        this.fichier = "";
-
     }
 
     public void toggleIA_blanc() {
@@ -51,6 +34,7 @@ public class Controle {
         refreshGrid();
     }
 
+    @Override
     public void undo() {
         ((Model.Jeu)Jeu).annuler();
         refreshGrid();
@@ -60,18 +44,15 @@ public class Controle {
         ((Model.Jeu)Jeu).refaire();
         refreshGrid();
     }
-
+    
     public void harder() {
     }
 
     public void easier() {
     }
-
-    public void refreshGrid() {
-        Grille.repaint();
-    }
     
-    public void handleGridClick(int row, int column) {
+    @Override
+    public void handleGridClick(int row, int column){
         int [][]grille_case = Jeu.getGrille();
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
@@ -101,18 +82,16 @@ public class Controle {
             Grille.effacerCasesValides();
             refreshGrid();
         }else{
-
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
-            Coup coup = new Coup(p, p1, client.getJoueur());
-            client.envoyerCoup(coup);
+            Jeu.deplacer(p,p1);
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
             refreshGrid();
         }
-
     }
+    
     public boolean choisir_nom(){
         String nom = JOptionPane.showInputDialog(fenetreJeu,"Entrez le nom du fichier");
 
@@ -122,6 +101,7 @@ public class Controle {
         fichier = CHEMIN_SAUVEGARDES+nom;
         return true;
     }
+    
     public void demanderSauvegardeEtQuitter() {
         int choix = JOptionPane.showConfirmDialog(
                 fenetreJeu,
@@ -140,13 +120,6 @@ public class Controle {
             }
             ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
         }
-
         fenetreJeu.retourMenu();
     }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-
 }

@@ -71,7 +71,7 @@ public class ServerTablut{
         }
         
         public void initJoueur(){
-            Reponse rep = new Reponse(comIO[joueur].REP_ASSIGN_PLAYER,null);
+            Reponse rep = new Reponse(Communication.REP_ASSIGN_PLAYER,null);
             /*Envoie de la couleur a joueur*/
             comIO[joueur].sndRep(rep);
             
@@ -90,8 +90,8 @@ public class ServerTablut{
         /*Traite une request r et envoie une reponse aux clients*/
         public synchronized void traitementReq(Request r) throws IOException{
             Reponse jMoi = new Reponse(-1,null);
-            if((jAdverse == j.getJoueur() && r.reqType == comIO[joueur].REQ_JOUE)// Si joueur (non actif) envoie une requete joue
-                    || (joueur == j.getJoueur() && r.reqType == comIO[joueur].REQ_ANNULE)){ // ou Si joueur (est actif) alors peut pas annuler
+            if((jAdverse == j.getJoueur() && r.reqType == Communication.REQ_JOUE)// Si joueur (non actif) envoie une requete joue
+                    || (joueur == j.getJoueur() && r.reqType == Communication.REQ_ANNULE)){ // ou Si joueur (est actif) alors peut pas annuler
                 comIO[joueur].sndRep(jMoi); 
                 return;
             }
@@ -101,10 +101,10 @@ public class ServerTablut{
                 case 1: /*Joue un coup*/
                     if(r.coup != null){
                         if(j.deplacer(r.coup.a, r.coup.b) != null){ /*Si le deplacement à eu lieu*/
-                            jMoi.repType = comIO.ACK; // Ack
+                            jMoi.repType = Communication.ACK; // Ack
 
                             /*Propagation du deplacement au joueur adverse*/
-                            jAdvrs.repType = comIO.REP_BOARD_UPDATE; // Update
+                            jAdvrs.repType = Communication.REP_BOARD_UPDATE; // Update
                             jAdvrs.grille = j.transformerGrilleEnLong();
                             break;
                         }
@@ -112,27 +112,27 @@ public class ServerTablut{
                     System.err.println("Coup invalid from client");
                     break;
                 case 2: /*Annule un coup*/
-                    jAdvrs.repType = comIO.REP_ANNULE;
+                    jAdvrs.repType = Communication.REP_ANNULE;
                     comIO[jAdverse].sndRep(jAdvrs);
                     int repAdvrs = comIO[jAdverse].rcvInt();
-                    if(repAdvrs == comIO[joueur].ACK){//Accept annulation
+                    if(repAdvrs == Communication[joueur].ACK){//Accept annulation
                         j.annuler();
                         TableauBit g = j.transformerGrilleEnLong();
-                        jAdvrs.repType = comIO.REP_BOARD_UPDATE;
+                        jAdvrs.repType = Communication.REP_BOARD_UPDATE;
                         jAdvrs.grille = g;
-                        jMoi.repType = comIO.REP_BOARD_UPDATE;
+                        jMoi.repType = Communication.REP_BOARD_UPDATE;
                         jMoi.grille = g;
                     }
                     else{
-                        jMoi.repType = comIO.ERROR; // Pas d'annulation
+                        jMoi.repType = Communication.ERROR; // Pas d'annulation
                     }
                     break;
                 case 3: /*Quit*/
-                    jAdvrs.repType = comIO.REP_GAME_OVER; // send victory to jAdverse
+                    jAdvrs.repType = Communication.REP_GAME_OVER; // send victory to jAdverse
                     jAdvrs.grille = new TableauBit(j.getJoueur(),0,0,0,0,0);
                     break;
                 default:
-                    System.err.println("Unknown request");
+                    System.err.println("Unknown request" + r.reqType);
                     break;
             }
             comIO[jAdverse].sndRep(jAdvrs);
@@ -149,7 +149,7 @@ public class ServerTablut{
                     traitementReq(r);
                 }
                 TableauBit tab = new TableauBit(j.getJoueur(),0,0,0,0,0);
-                Reponse result = new Reponse(comIO.REP_GAME_OVER,tab);
+                Reponse result = new Reponse(Communication.REP_GAME_OVER,tab);
                 comIO[joueur].sndRep(result);
                 
             }

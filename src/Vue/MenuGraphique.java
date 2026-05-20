@@ -35,7 +35,6 @@ public class MenuGraphique extends JFrame {
     }
 
 
-
     private JPanel creerMenuPrincipal() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -50,6 +49,7 @@ public class MenuGraphique extends JFrame {
         titre.setForeground(Color.WHITE);
 
         JButton nouvellePartie = new JButton("Nouvelle Partie");
+        JButton online = new JButton("Online");
         JButton chargerPartie = new JButton("Charger Partie");
         JButton options = new JButton("Options");
         JButton quitter = new JButton("Quitter");

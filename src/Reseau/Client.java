@@ -14,14 +14,14 @@ import Vue.JoueurActifPanel;
 public class Client {
 
     private Socket socket;
-    private Communication comIO;
+    private Communication communication;
 
     private BaseJeu jeu;
     private GrilleGraphique grilleGraphique;
     private JoueurActifPanel joueurActifPanel;
 
     private int joueur;      // 1 = noir, 2 = blanc
-    private boolean monTour;
+    private boolean monTour,gameOver;
 
     public Client(String adresseServeur, int port,
                   BaseJeu jeu,
@@ -39,7 +39,7 @@ public class Client {
         this.joueurActifPanel = joueurActifPanel;
 
         joueur = -1;
-        monTour = false;
+        gameOver = monTour = false;
 
         System.out.println("Connecté au serveur.");
     }
@@ -84,22 +84,12 @@ public class Client {
             case Communication.REP_ANNULE:
                 traiterDemandeAnnulation();
                 break;
-
-            // case Communication.REP_VICTORY:
-            //     terminerPartie("Victoire !");
-            //     break;
-
-            // case Communication.REP_DEFEAT:
-            //     terminerPartie("Défaite.");
-            //     break;
-
             case Communication.REP_ASSIGN_PLAYER:
                 if (rep.grille != null) {
                     joueur = (int) rep.grille.noir1;
                     System.out.println("Je suis le joueur " + joueur);
                 }
                 break;
-
             case Communication.REP_TURN_UPDATE:
                 if (rep.grille != null) {
                     int joueurActif = (int) rep.grille.noir1;
@@ -115,7 +105,10 @@ public class Client {
                     }
                 }
                 break;
-
+            case Communication.REP_GAME_OVER:
+                /*Lecture r.grille.n1*/
+                gameOver = true;
+                break;
             default:
                 System.err.println("Réponse inconnue : " + rep.repType);
                 break;
@@ -202,11 +195,16 @@ public class Client {
         return joueur;
     }
     
-    public void runClient(){
-    }
-
     public BaseJeu getGrille() {
         return jeu;
+    }
+    
+    public void runClient(){
+        while(!gameOver){ /*ou true si besoin arret part deconnexion() ou fermeture du jeu*/
+            Reponse rep = communication.rcvRep();
+            traitementReponse(rep);
+        }
+        /*Fermeture socket*/
     }
 
     // Méthode de test pour envoyer un coup arbitraire

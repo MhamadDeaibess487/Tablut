@@ -9,10 +9,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 
 public class GrilleButtonsReseau extends JPanel {
-    private JButton undo;
-    private JButton parametres;
+    private JButton undo,abandonne,nulle;
     
-    private Controle controle;
+    private ControleReseau controle;
     private GrilleGraphique grilleGraphique;
 
 
@@ -25,27 +24,11 @@ public class GrilleButtonsReseau extends JPanel {
         setPreferredSize(new Dimension(180, 0));
         setBorder(BorderFactory.createEmptyBorder(40, 15, 40, 25));
 
-
         undo = new JButton("Undo");
-        parametres = new JButton("Paramètres");
-
-        JPopupMenu menu = new JPopupMenu();
-
-        JMenuItem surrendItem = new JMenuItem("Abandonner");
-//        JMenuItem quitItem = new JMenuItem("Quitter"); = abandonner ?
-
-        surrendItem.addActionListener(e -> controle.reset());
-//        quitItem.addActionListener(e -> controle.demanderSauvegardeEtQuitter());
-
-        menu.add(surrendItem);
-//        menu.add(quitItem);
-
-        parametres.addActionListener(e -> {
-            menu.show(parametres, 0, parametres.getHeight());
-        });
-
-
-        JButton[] boutons = {parametres,undo};
+        abandonne = new JButton("Surrend");
+        nulle = new JButton("Draw");
+        
+        JButton[] boutons = {undo,abandonne,nulle};
 
         for (JButton b : boutons) {
             styleButton(b, new Dimension(150, 55));
@@ -55,13 +38,21 @@ public class GrilleButtonsReseau extends JPanel {
         if (getComponentCount() > 0) {
             remove(getComponentCount() - 1);
         }
-
-        undo.addActionListener((ActionEvent e) -> {
-            /*Passe par le controle qui redirige vers une fonction de
+        
+        /*Passe par le controle qui redirige vers une fonction de
             creation de request dans client.java*/
-            controle.undoReseau(); // Not Implemented
+        undo.addActionListener((ActionEvent e) -> {
+            controle.undo();
         });
-
+        
+        abandonne.addActionListener((ActionEvent e) -> {
+           controle.abandonne(); 
+        });
+        
+        nulle.addActionListener((ActionEvent e) -> {
+           controle.demandeNul(); 
+        });
+        
 
         grilleGraphique.addMouseListener(new MouseAdapter() {
             @Override
