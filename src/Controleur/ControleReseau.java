@@ -40,12 +40,12 @@ public class ControleReseau extends ControleAbstract{
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
 
-            if (contenu == 0 || contenu == 4 || (jeu.getJoueur() == 1 && contenu != 1)) {
+            if (contenu == 0 || contenu == 4 || (client.getJoueur() == 1 && contenu != 1)) {
                 return;
             }
             
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (client.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;

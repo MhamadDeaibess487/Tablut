@@ -49,7 +49,7 @@ public class MenuGraphique extends JFrame {
         titre.setForeground(Color.WHITE);
 
         JButton nouvellePartie = new JButton("Nouvelle Partie");
-        JButton online = new JButton("Online");
+        JButton multiplayer = new JButton("Multiplayer");
         JButton chargerPartie = new JButton("Charger Partie");
         JButton options = new JButton("Options");
         JButton quitter = new JButton("Quitter");
@@ -63,7 +63,7 @@ public class MenuGraphique extends JFrame {
             } 
         });
         
-        online.addActionListener(new ActionListener() {
+        multiplayer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                /*A Faire*/
