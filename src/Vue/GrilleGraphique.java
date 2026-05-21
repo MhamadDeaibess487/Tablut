@@ -15,6 +15,9 @@ public class GrilleGraphique extends JPanel {
 
     private Image whiteImage;
     private Image nap_on;
+    private Image ImageVictoire;
+    private Image blackWinImage;
+    private Image whiteWinImage;
 
     private Image blackImage;
     private Image kingImage;
@@ -42,6 +45,8 @@ public class GrilleGraphique extends JPanel {
         this.taille_grille = 0;
         this.casesValides = new ArrayList<>();
         try {
+            blackWinImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/blackWin.png"));
+            whiteWinImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/whiteWin.png"));
             whiteImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/white.png"));
             selected = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/selected.png"));
             nap_on = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne+king.png"));
@@ -132,9 +137,41 @@ public class GrilleGraphique extends JPanel {
                         break;
                 }
             }
+
         }
-        //affichergrille(grille);
+
+        //cases valides
         peindreCasesValides(g2);
+
+        //gagnant
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY);
+
+
+
+        double pourcentage = 0.85;
+
+        int tailleVict = (int) (taillePlateau * pourcentage);
+        int joueur_actif = jeu.getJoueur();
+        if(jeu.getFini()){
+            if(joueur_actif==2){
+
+                    ImageVictoire = blackWinImage;
+
+
+            }else{
+
+                    ImageVictoire = whiteWinImage;
+
+            }
+            int xVict = (width - tailleVict) / 2;
+            int yVict = (height - tailleVict) / 2;
+
+            g2.drawImage(ImageVictoire, xVict, yVict, tailleVict, tailleVict, null);
+        }
+
 
     }
 
@@ -178,6 +215,7 @@ public class GrilleGraphique extends JPanel {
         this.casesValides.clear();
         repaint();
     }
+
     public void affichergrille(int [][]grillle){
         for(int i=0;i<taille_grille;i++){
             for(int j=0;j<taille_grille;j++){

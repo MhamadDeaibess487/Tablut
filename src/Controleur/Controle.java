@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
+import java.lang.Thread;
 
 
 public class Controle {
@@ -54,7 +54,11 @@ public class Controle {
         timer_IA = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                verifierTourIA();
+                try {
+                    verifierTourIA();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         timer_IA.start();
@@ -83,7 +87,7 @@ public class Controle {
         refreshGrid();
     }
 
-    public void verifierTourIA() {
+    public void verifierTourIA() throws InterruptedException {
         if (Jeu.getFini()) {
             timer_IA.stop();
             return;
@@ -91,6 +95,11 @@ public class Controle {
         this.IA_blanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
         this.IA_noir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
         if (Jeu.getJoueur() == 2 && joueur1_IA) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             IA_blanc.joue();
             refreshGrid();
             //ajouter l'affichage des coup possible
@@ -99,7 +108,11 @@ public class Controle {
         }
 
         if (Jeu.getJoueur() == 1 && joueur2_IA) {
-
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             IA_noir.joue();
             refreshGrid();
             //ajouter l'affichage des coup possible
@@ -128,7 +141,7 @@ public class Controle {
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
 
-            if (contenu == 0 || contenu == 4) {
+            if (contenu == 0 || contenu == 4 || getJeu().getFini()) {
                 return;
             }
 

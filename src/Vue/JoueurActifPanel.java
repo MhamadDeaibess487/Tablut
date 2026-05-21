@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.Hashtable;
 
 import Controleur.Controle;
+
 public class JoueurActifPanel extends JPanel {
     private static final Dimension SIDEBAR_SIZE = new Dimension(300, 0);
     private static final Color BG_DARK = new Color(18, 22, 32);
@@ -35,6 +36,14 @@ public class JoueurActifPanel extends JPanel {
     private JLabel activeHeader1; // "JOUEUR ACTIF" label
     private JLabel activeHeader2; // "JOUEUR ACTIF" label
 
+    private String j1NormalPath;
+    private String j1HighlightPath;
+    private String j2NormalPath;
+    private String j2HighlightPath;
+
+    private CustomSlider slider1;
+    private CustomSlider slider2;
+
     private ImageIcon joueur1Normal;
     private ImageIcon joueur1Highlight;
     private ImageIcon joueur2Normal;
@@ -49,7 +58,10 @@ public class JoueurActifPanel extends JPanel {
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
                              String j2NormalPath, String j2HighlightPath,Controle controle) {
         this.controle = controle;
-
+        this.j1NormalPath = j1NormalPath;
+        this.j1HighlightPath = j1HighlightPath;
+        this.j2NormalPath = j2NormalPath;
+        this.j2HighlightPath = j2HighlightPath;
         this.joueur_actif= (controle.getJeu()).getJoueur();
         setOpaque(true);
         setBackground(BG_DARK);
@@ -79,8 +91,8 @@ public class JoueurActifPanel extends JPanel {
         joueur1Image = new JLabel(joueur1Highlight); // starts active
         joueur2Image = new JLabel(joueur2Normal);
         joueur1Button = new JButton("IA/OFF");
-        CustomSlider slider1 = new CustomSlider(0, 2, 1);
-        CustomSlider slider2 = new CustomSlider(0, 2, 1);
+        this.slider1 = new CustomSlider(0, 2, 1);
+        this.slider2 = new CustomSlider(0, 2, 1);
 
 
 
@@ -347,8 +359,6 @@ public class JoueurActifPanel extends JPanel {
             this.imgLabel = imgLabel;
             this.active = active;
             setOpaque(false);
-            setLayout(new GridBagLayout());
-            add(imgLabel);
         }
 
         public void setActive(boolean active) {
@@ -358,42 +368,163 @@ public class JoueurActifPanel extends JPanel {
 
         @Override
         protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-            int d = Math.min(getWidth(), getHeight()) - 4;
+            int marge = 4;
+            int d = Math.min(getWidth(), getHeight()) - 2 * marge;
             int x = (getWidth() - d) / 2;
             int y = (getHeight() - d) / 2;
 
-            // Dark circle background
+            // fond rond
             g2.setColor(active ? new Color(30, 36, 55) : new Color(14, 16, 22));
             g2.fillOval(x, y, d, d);
 
-            // Draw image clipped to circle
+            // image dans le cercle
             Icon icon = imgLabel.getIcon();
-            if (icon != null) {
-                int iw = icon.getIconWidth();
-                int ih = icon.getIconHeight();
-                int ix = (getWidth() - iw) / 2;   // ← centré horizontalement
-                int iy = (getHeight() - ih) / 2;  // ← centré verticalement
 
-                Shape clip = new java.awt.geom.Ellipse2D.Float(x + 3, y + 3, d - 6, d - 6);
+            if (icon instanceof ImageIcon) {
+                Image image = ((ImageIcon) icon).getImage();
+
+                int imageMargin = 4;
+                int imgD = d - 2 * imageMargin;
+                int imgX = x + imageMargin;
+                int imgY = y + imageMargin;
+
+                Shape oldClip = g2.getClip();
+
+                Shape clip = new java.awt.geom.Ellipse2D.Float(
+                        x + 3,
+                        y + 3,
+                        d - 6,
+                        d - 6
+                );
+
                 g2.setClip(clip);
-                icon.paintIcon(this, g2, ix, iy);  // ← ix, iy au lieu de x+3, y+3
-                g2.setClip(null);
+
+                drawImageCover(g2, image, imgX, imgY, imgD, imgD);
+
+                g2.setClip(oldClip);
             }
 
-            // Gold ring
+            // contour doré
             g2.setColor(active ? new Color(200, 160, 80) : new Color(70, 58, 30));
             g2.setStroke(new BasicStroke(active ? 2.5f : 1.5f));
             g2.drawOval(x, y, d, d);
 
             g2.dispose();
         }
+        private void drawImageCover(Graphics2D g2, Image image, int x, int y, int w, int h) {
+            int imgW = image.getWidth(null);
+            int imgH = image.getHeight(null);
 
-        @Override
-        public Dimension getPreferredSize() { return new Dimension(76, 76); }
+            if (imgW <= 0 || imgH <= 0) {
+                return;
+            }
+
+            double scale = Math.max((double) w / imgW, (double) h / imgH);
+
+            int newW = (int) (imgW * scale);
+            int newH = (int) (imgH * scale);
+
+            int drawX = x + (w - newW) / 2;
+            int drawY = y + (h - newH) / 2;
+
+            g2.drawImage(image, drawX, drawY, newW, newH, null);
+        }
+    }
+
+    public void resizePanel(int width, int height) {
+        int sidebarWidth = (int)(0.25 * width);
+
+        if (sidebarWidth > 300) {
+            sidebarWidth = 300;
+        }
+
+        setPreferredSize(new Dimension(sidebarWidth, height));
+        setMinimumSize(new Dimension(sidebarWidth, 0));
+        setMaximumSize(new Dimension(sidebarWidth, Integer.MAX_VALUE));
+
+        double drawnWidth = 0.90 * sidebarWidth;
+        double drawnHeight = 0.15 * height;
+
+        resizeCard(joueur1Card, (int) drawnWidth, (int) drawnHeight);
+        resizeCard(joueur2Card, (int) drawnWidth, (int) drawnHeight);
+
+        int circleSize = (int)(0.35 * drawnWidth);
+        resizePlayerImage(joueur1Card, circleSize);
+        resizePlayerImage(joueur2Card, circleSize);
+
+        resizeButton(joueur1Button, (int) drawnWidth, (int) drawnHeight);
+        resizeButton(joueur2Button, (int) drawnWidth, (int) drawnHeight);
+
+        resizeLabels((int) drawnHeight);
+
+        resizeSlider(slider1, (int) drawnWidth, (int) drawnHeight);
+        resizeSlider(slider2, (int) drawnWidth, (int) drawnHeight);
+
+        revalidate();
+        repaint();
+    }
+    private void resizeCard(JPanel card, int w, int h) {
+        Dimension d = new Dimension(w, h);
+        card.setPreferredSize(d);
+        card.setMinimumSize(d);
+        card.setMaximumSize(d);
     }
 
 
+    private void resizePlayerImage(JPanel card, int imgSize) {
+        Component west = ((BorderLayout) card.getLayout()).getLayoutComponent(BorderLayout.WEST);
+
+        if (west instanceof JPanel) {
+            for (Component c : ((JPanel) west).getComponents()) {
+                if (c instanceof CircleImagePanel) {
+                    Dimension d = new Dimension(imgSize, imgSize);
+                    c.setPreferredSize(d);
+                    c.setMinimumSize(d);
+                    c.setMaximumSize(d);
+                }
+            }
+        }
+    }
+
+    private void resizeButton(JButton button, int cardWidth, int cardHeight) {
+        int buttonW = (int)(0.42 * cardWidth);
+        int buttonH = (int)(0.18 * cardHeight);
+
+        button.setPreferredSize(new Dimension(buttonW, buttonH));
+        button.setMinimumSize(new Dimension(buttonW, buttonH));
+        button.setMaximumSize(new Dimension(buttonW, buttonH));
+
+        int fontSize = Math.max(9, (int)(0.08 * cardHeight));
+        button.setFont(new Font("SansSerif", Font.BOLD, fontSize));
+    }
+
+    private void resizeLabels(int cardHeight) {
+        int titreSize = Math.max(10, (int)(0.10 * cardHeight));
+        int campSize = Math.max(9, (int)(0.085 * cardHeight));
+        int headerSize = Math.max(9, (int)(0.075 * cardHeight));
+
+        joueur1Titre.setFont(new Font("SansSerif", Font.BOLD, titreSize));
+        joueur2Titre.setFont(new Font("SansSerif", Font.BOLD, titreSize));
+
+        joueur1Camp.setFont(new Font("SansSerif", Font.PLAIN, campSize));
+        joueur2Camp.setFont(new Font("SansSerif", Font.PLAIN, campSize));
+
+        activeHeader1.setFont(new Font("SansSerif", Font.BOLD, headerSize));
+        activeHeader2.setFont(new Font("SansSerif", Font.BOLD, headerSize));
+    }
+
+    private void resizeSlider(JSlider slider, int cardWidth, int cardHeight) {
+        int sliderW = (int)(0.60 * cardWidth);
+        int sliderH = (int)(0.25 * cardHeight);
+
+        slider.setPreferredSize(new Dimension(sliderW, sliderH));
+        slider.setMinimumSize(new Dimension(sliderW, sliderH));
+        slider.setMaximumSize(new Dimension(sliderW, sliderH));
+    }
 }
