@@ -70,23 +70,23 @@ public class ServerTablut{
             jAdverse = (joueur + 1) % 2;
         }
         
-        public void initJoueur(){
-            Reponse rep = new Reponse(Communication.REP_ASSIGN_PLAYER,null);
-            /*Envoie de la couleur a joueur*/
-            comIO[joueur].sndRep(rep);
-            
-            /*Envoie joueur actif*/
-            rep.repType = comIO[joueur].REP_TURN_UPDATE;
-            TableauBit g = new TableauBit(1,0,0,0,0,0);
-            rep.grille = g;
-            comIO[joueur].sndRep(rep);
-            
-            /*Envoie du plateau initiale*/
-            g = j.transformerGrilleEnLong();
-            rep.grille = g;
-            comIO[joueur].sndRep(rep);
+        public void initJoueur() {
+            comIO[joueur].sndRep(new Reponse(
+                Communication.REP_ASSIGN_PLAYER,
+                new TableauBit(joueur + 1, 0, 0, 0, 0, 0)
+            ));
+
+            comIO[joueur].sndRep(new Reponse(
+                Communication.REP_TURN_UPDATE,
+                new TableauBit(j.getJoueur(), 0, 0, 0, 0, 0)
+            ));
+
+            comIO[joueur].sndRep(new Reponse(
+                Communication.REP_BOARD_UPDATE,
+                j.transformerGrilleEnLong()
+            ));
         }
-        
+                
         /*Traite une request r et envoie une reponse aux clients*/
         public void traitementReq(Request r) throws IOException{
             synchronized(j){
