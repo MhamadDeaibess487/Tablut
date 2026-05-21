@@ -91,8 +91,8 @@ public class JoueurActifPanel extends JPanel {
         joueur1Image = new JLabel(joueur1Highlight); // starts active
         joueur2Image = new JLabel(joueur2Normal);
         joueur1Button = new JButton("IA/OFF");
-        this.slider1 = new CustomSlider(0, 2, 1);
-        this.slider2 = new CustomSlider(0, 2, 1);
+        this.slider1 = new CustomSlider(0, 2, 0);
+        this.slider2 = new CustomSlider(0, 2, 0);
 
 
 
@@ -149,7 +149,7 @@ public class JoueurActifPanel extends JPanel {
             joueur1Card.revalidate();
             joueur1Card.repaint();
 
-            controle.set_IA_noir(joueur1_IA);
+            controle.setIaNoir(joueur1_IA);
         });
         joueur2Button.addActionListener(e -> {
             joueur2_IA = !joueur2_IA;
@@ -168,7 +168,7 @@ public class JoueurActifPanel extends JPanel {
             joueur2Card.revalidate();
             joueur2Card.repaint();
 
-            controle.set_IA_blanc(joueur2_IA);
+            controle.setIaBlanc(joueur2_IA);
         });
 
         activeHeader1.setVisible(true);
