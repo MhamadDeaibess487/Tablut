@@ -32,4 +32,10 @@ class IArandom extends IA{
         }
         return new Coup(a,b,couleur);
     }
+
+    @Override
+    public int heuristique(Jeu copie) {
+        // heuristique basique pour IA random
+        return 0;
+    }
 }
