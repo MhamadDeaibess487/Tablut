@@ -7,6 +7,14 @@ import Config.Config;
 public class Jeu extends BaseJeu {
     Stack<TableauBit> redo, undo;
 
+    public Stack<TableauBit> getRedo() {
+        return redo;
+    }
+
+    public Stack<TableauBit> getUndo() {
+        return undo;
+    }
+
     public Jeu() {
         redo = new Stack<>();
         undo = new Stack<>();
@@ -77,7 +85,8 @@ public class Jeu extends BaseJeu {
             return null;
         }
         sauvegarder(tab);
-        changerJoueur();
+        changerJoueur();// regarder avant de jouer s'il existe des coups possibles(Plus de pions ou
+                        // bloqué) + regarder draw après avoir fait un coup
         return tab;
     }
 
@@ -183,12 +192,14 @@ public class Jeu extends BaseJeu {
         // je parcours la liste redo pour voir si la configuaration réapparait
         int nb = 0;
         for (TableauBit tmp : undo) {
+            // System.out.println(tmp.blanc1 + " " + tmp.noir1);
             if (Last.compareTo(tmp) == 0) {
                 nb++;
             }
-            if (nb == 2) {
+            if (nb == 3) {
                 return true;
             }
+
         }
         return false;
 
