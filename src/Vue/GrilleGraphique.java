@@ -133,9 +133,7 @@ public class GrilleGraphique extends JPanel {
                 }
             }
         }
-        affichergrille(grille);
         peindreCasesValides(g2);
-
     }
 
     private void dessinerImageCase(Graphics2D g2, Image image, int x, int y, int marge) {

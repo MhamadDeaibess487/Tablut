@@ -36,13 +36,13 @@ public class Controle extends ControleAbstract{
 
     @Override
     public void undo() {
-        ((Model.Jeu)jeu).annuler();
-        refreshGrid();
+        if(((Model.Jeu)jeu).annuler())
+            refreshGrid();
     }
 
     public void redo() {
-        ((Model.Jeu)jeu).refaire();
-        refreshGrid();
+        if(((Model.Jeu)jeu).refaire())
+            refreshGrid();
     }
     
     public void harder() {
@@ -98,7 +98,7 @@ public class Controle extends ControleAbstract{
         if (nom == null) {
             return false;
         }
-        fichier = CHEMIN_SAUVEGARDES+nom;
+        fichier = nom;
         return true;
     }
     

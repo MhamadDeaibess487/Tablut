@@ -102,7 +102,7 @@ public class MenuGraphique extends JFrame {
                     return;
                 }
 
-                BaseJeu jeuCharge = new Jeu(CHEMIN_SAUVEGARDES + choix);
+                BaseJeu jeuCharge = new Jeu(choix);
 
                 dispose();
                 new FenetreJeu(jeuCharge);

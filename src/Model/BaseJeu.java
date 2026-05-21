@@ -161,10 +161,11 @@ public abstract class BaseJeu {
         return grille[l][c] == 0;
     }
     
-    public ListePion deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le déplacement
+    public TableauBit deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le déplacement
         if (!estCaseLibre(b.l, b.c) || !CoupValide(a, b)) {
             return null;
         }
+        TableauBit save = transformerGrilleEnLong();
         grille[b.l][b.c] = grille[a.l][a.c];
         if (grille[b.l][b.c] == 3 && a.l == 4 && a.c == 4) {
             grille[a.l][a.c] = 4;
@@ -174,7 +175,7 @@ public abstract class BaseJeu {
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
-                // gagner blanc
+                fini = true;
                 System.out.println("blanc ganger");
             }
         }
@@ -186,13 +187,12 @@ public abstract class BaseJeu {
             for (Pion p : Liste.LP) {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
-                    // gagner noir
+                    fini = true;
                     System.out.println("noir ganger");
                 }
                 if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
                     ListePointB.SupprimeListePoint(P);
                     grille[P.l][P.c] = 0;
-
                 }
             }
         }
@@ -204,11 +204,11 @@ public abstract class BaseJeu {
                 grille[P.l][P.c] = 0;
                 ListePointN.SupprimeListePoint(P);
                 if (ListePointN.totale == 0) {
-                    // gagner blanc
+                    fini = true;
                 }
             }
         }
-        return Liste;
+        return save;
     }
 
     public boolean CaptureRoi(int L, int C) { // roi bloqué des 4 cotés par des pions noirs
