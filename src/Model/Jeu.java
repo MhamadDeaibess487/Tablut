@@ -188,15 +188,16 @@ public class Jeu extends BaseJeu {
     }
 
     // draw doit être utilisé après chaque coup joué
-    public boolean draw(TableauBit Last) {// retourne un boolean: true si on doit arreter la partie,faux sinon
+    public boolean draw(Jeu jeu) {// retourne un boolean: true si on doit arreter la partie,faux sinon
         // je parcours la liste redo pour voir si la configuaration réapparait
+        TableauBit Last = jeu.transformerGrilleEnLong();
         int nb = 0;
         for (TableauBit tmp : undo) {
             // System.out.println(tmp.blanc1 + " " + tmp.noir1);
             if (Last.compareTo(tmp) == 0) {
                 nb++;
             }
-            if (nb == 3) {
+            if (nb == 2) {
                 return true;
             }
 
