@@ -17,6 +17,8 @@ class IAhard extends IA{
 
         return null;
     }
+
+    // alphabeta is implemented in the base IA class and reused here
     
     //Calcul et renvoie un coup à jouer par l'ia (fonction appelé dans IA.java)
     public Coup calculCoup(){
@@ -29,7 +31,7 @@ class IAhard extends IA{
         for (Coup c : coups.Liste) {
             Jeu copie = new Jeu(j); // Utilise le constructeur de copie profonde
             copie.deplacer(c.a, c.b);
-            int score = minimax(copie, 2, couleur!=1);
+            int score = alphabeta(copie, 3, Integer.MIN_VALUE, Integer.MAX_VALUE, couleur==1);
 
             
             //copie.annuler(); // pas besoin d'annuler si on utilise une copie profonde à chaque fois
@@ -56,45 +58,10 @@ class IAhard extends IA{
         return bestCoup;
     }
     
-    private int minimax(Jeu copie, int profondeur, boolean estmax) {
-        if (profondeur == 0 || copie.getFini()) {
-            return heuristique(copie);
-        }
-
-        int joueurActuel;
-        if (estmax) {
-            joueurActuel = 1; // IA noire
-        }else{
-            joueurActuel = 2; // IA blanche
-        }
-        
-        ListeCoup coups = copie.CoupJouable(joueurActuel);
-        if (coups.Liste.isEmpty()) {
-            return heuristique(copie);
-        }
-        
-        if (estmax) {
-            int maxEval = Integer.MIN_VALUE;
-            for (Coup c : coups.Liste) {
-                Jeu souscopie = new Jeu(copie); // Copie profonde pour chaque branche
-                souscopie.deplacer(c.a, c.b);
-                int eval = minimax(souscopie, profondeur - 1, false);
-                maxEval = Math.max(maxEval, eval);
-            }
-            return maxEval;
-        } else {
-            int minEval = Integer.MAX_VALUE;
-            for (Coup c : coups.Liste) {
-                Jeu souscopie = new Jeu(copie); // Copie profonde pour chaque branche
-                souscopie.deplacer(c.a, c.b);
-                int eval = minimax(souscopie, profondeur - 1, true);
-                minEval = Math.min(minEval, eval);
-            }
-            return minEval;
-        }
-    }
+    // use IA.minimax inherited
     
-    private int heuristique(Jeu copie) {
+    @Override
+    public int heuristique(Jeu copie) {
         // + score = bon pour les noirs
         // - score = bon pour les blancs
 

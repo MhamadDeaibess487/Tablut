@@ -3,14 +3,13 @@ import Model.BaseJeu;
 import Model.Point;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
-import Vue.JoueurActifPanel;
 import Model.IA;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
+import java.lang.Thread;
 
 
 public class Controle {
@@ -20,13 +19,14 @@ public class Controle {
     int colonneSelectee;
     String fichier;
     FenetreJeu fenetreJeu;
-
-    public boolean joueur1_IA;
-    public boolean joueur2_IA;
-    IA IA_blanc;
-    IA IA_noir;
+    public boolean iaNoirActive;
+    public boolean iaBlancActive;
+    IA IaBlanc;
+    IA IaNoir;
     int levelIANoir;
     int levelIABlanc;
+    int dernierLevelBlanc;
+    int dernierLevelNoir;
     Timer timer_IA;
     Timer timer_joueur;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
@@ -38,11 +38,13 @@ public class Controle {
         this.fenetreJeu = fenetreJeu;
         levelIANoir = 0;
         levelIABlanc = 0;
-        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
-        this.IA_noir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
+        dernierLevelBlanc = 0;
+        dernierLevelNoir = 0;
+        this.IaBlanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
+        this.IaNoir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
         this.fichier = "";
-        this.joueur1_IA = false;
-        this.joueur2_IA = false;
+        this.iaNoirActive=false;
+        this.iaBlancActive=false;
 
         timer_joueur = new Timer(10, new ActionListener() {
             @Override
@@ -54,18 +56,23 @@ public class Controle {
         timer_IA = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                verifierTourIA();
+                try {
+                    verifierTourIA();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         timer_IA.start();
 
     }
 
-    public void set_IA_blanc(boolean active) {
-        joueur1_IA = active;
+    public void setIaNoir(boolean active) {
+        iaNoirActive = active;
     }
-    public void set_IA_noir(boolean active) {
-        joueur2_IA = active;
+
+    public void setIaBlanc(boolean active) {
+        iaBlancActive = active;
     }
 
     public BaseJeu getJeu() {
@@ -83,27 +90,30 @@ public class Controle {
         refreshGrid();
     }
 
-    public void verifierTourIA() {
+    public void verifierTourIA() throws InterruptedException {
         if (Jeu.getFini()) {
             timer_IA.stop();
             return;
         }
-        this.IA_blanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
-        this.IA_noir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
-        if (Jeu.getJoueur() == 2 && joueur1_IA) {
-            IA_blanc.joue();
-            refreshGrid();
-            //ajouter l'affichage des coup possible
+        if (dernierLevelBlanc != levelIABlanc) {
+            IaBlanc = IA.creer(((Model.Jeu) Jeu), levelIABlanc, 2);
+            dernierLevelBlanc = levelIABlanc;
+        }
 
+        if (dernierLevelNoir != levelIANoir) {
+            IaNoir = IA.creer(((Model.Jeu) Jeu), levelIANoir, 1);
+            dernierLevelNoir = levelIANoir;
+        }
+
+        if (Jeu.getJoueur() == 2 && iaBlancActive) {
+            IaBlanc.joue();
+            refreshGrid();
             return;
         }
 
-        if (Jeu.getJoueur() == 1 && joueur2_IA) {
-
-            IA_noir.joue();
+        if (Jeu.getJoueur() == 1 && iaNoirActive) {
+            IaNoir.joue();
             refreshGrid();
-            //ajouter l'affichage des coup possible
-
         }
     }
     public void undo() {
@@ -128,7 +138,7 @@ public class Controle {
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
 
-            if (contenu == 0 || contenu == 4) {
+            if (contenu == 0 || contenu == 4 || getJeu().getFini()) {
                 return;
             }
 

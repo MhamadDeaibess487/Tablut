@@ -11,12 +11,11 @@ class IAinter extends IA{
         Coup bestCoup = null;
         int bestScore = Integer.MIN_VALUE;
         ListeCoup coups = j.CoupJouable(couleur);
-        
+        Jeu travail = new Jeu(j);
         for (Coup c : coups.Liste) {
-            Jeu copie = new Jeu(j); // Utilise le constructeur de copie profonde
-            copie.deplacer(c.a, c.b);
-            int score = minimax(copie, 2, false);
-            copie.annuler();
+            travail.deplacer(c.a, c.b);
+            int score = alphabeta(travail, 2, Integer.MIN_VALUE, Integer.MAX_VALUE, couleur != 1);
+            travail.annuler();
             if (score > bestScore) {
                 bestScore = score;
                 bestCoup = c;
@@ -25,38 +24,8 @@ class IAinter extends IA{
         return bestCoup;
     }
     
-    private int minimax(Jeu copie, int profondeur, boolean estmax) {
-        if (profondeur == 0 || copie.getFini()) {
-            return heuristique(copie);
-        }
-        
-        ListeCoup coups = copie.CoupJouable(couleur);
-        if (coups.Liste.isEmpty()) {
-            return heuristique(copie);
-        }
-        
-        if (estmax) {
-            int maxEval = Integer.MIN_VALUE;
-            for (Coup c : coups.Liste) {
-                Jeu souscopie = new Jeu(copie); // Copie profonde pour chaque branche
-                souscopie.deplacer(c.a, c.b);
-                int eval = minimax(souscopie, profondeur - 1, false);
-                maxEval = Math.max(maxEval, eval);
-            }
-            return maxEval;
-        } else {
-            int minEval = Integer.MAX_VALUE;
-            for (Coup c : coups.Liste) {
-                Jeu souscopie = new Jeu(copie); // Copie profonde pour chaque branche
-                souscopie.deplacer(c.a, c.b);
-                int eval = minimax(souscopie, profondeur - 1, true);
-                minEval = Math.min(minEval, eval);
-            }
-            return minEval;
-        }
-    }
-    
-    private int heuristique(Jeu copie) {
+    @Override
+    public int heuristique(Jeu copie) {
         //position actuelle du roi
         Point king = null;
         for (int l = 0; l < 9; l++) {

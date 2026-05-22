@@ -13,7 +13,8 @@ public class FenetreJeu extends JFrame {
     public FenetreJeu(BaseJeu jeu) {
         setTitle("Tablut");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 800);
+        setSize(900, 700);
+        setMinimumSize(new Dimension(900, 700));
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -58,6 +59,25 @@ public class FenetreJeu extends JFrame {
         add(centerPanel, BorderLayout.CENTER);
         getContentPane().setBackground(new Color(18, 22, 32));
 
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                int w = getWidth();
+                int h = getHeight();
+
+                int btnSize = (int) (Math.min(w, h) * 0.10);
+
+                ((RoundedButton) buttons.undo).updateSize(btnSize);
+                ((RoundedButton) buttons.redo).updateSize(btnSize);
+                ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
+
+
+                joueurActifPanel.resizePanel(w, h);
+
+                revalidate();
+                repaint();
+            }
+        });
 
         setVisible(true);
     }
