@@ -1,60 +1,71 @@
 package Vue;
+
 import java.io.File;
 import Model.BaseJeu;
 import Model.Jeu;
+import Reseau.ServerTablut;
+import Config.Config;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 
 import static Config.Config.CHEMIN_SAUVEGARDES;
 
 public class MenuGraphique extends JFrame {
-    BaseJeu jeu;
+
+    private BaseJeu jeu;
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    public boolean sauvegarde;
     private int nbPartie;
+
+    private final int BTN_W = 420;
+    private final int BTN_H = 105;
+
     public MenuGraphique(BaseJeu jeu) {
         this.jeu = jeu;
         nbPartie = 0;
+
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 400);
+        setSize(1200, 750);
         setLocationRelativeTo(null);
-        this.sauvegarde = false;
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
         mainPanel.add(creerMenuPrincipal(), "MENU");
         mainPanel.add(creerMenuOptions(), "OPTIONS");
 
-
         add(mainPanel);
+
+        KeyStroke esc = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(esc, "MENU");
+        getRootPane().getActionMap().put("MENU", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, "MENU");
+            }
+        });
 
         setVisible(true);
     }
 
-
     private JPanel creerMenuPrincipal() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        panel.setBackground(new Color(40, 40, 45));
+        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background.png");
+        panel.setLayout(new BorderLayout());
 
-        JPanel box = new JPanel();
-        box.setLayout(new GridLayout(5, 1, 0, 15));
-        box.setOpaque(false);
+        JPanel menuBox = new JPanel();
+        menuBox.setOpaque(false);
+        menuBox.setLayout(new BoxLayout(menuBox, BoxLayout.Y_AXIS));
+        menuBox.setBorder(BorderFactory.createEmptyBorder(40, 30, 40, 120));
 
-        JLabel titre = new JLabel("TABLUT", SwingConstants.CENTER);
-        titre.setFont(new Font("Serif", Font.BOLD, 36));
-        titre.setForeground(Color.WHITE);
-
-        JButton nouvellePartie = new JButton("Nouvelle Partie");
-        JButton multiplayer = new JButton("Multiplayer");
-        JButton chargerPartie = new JButton("Charger Partie");
-        JButton options = new JButton("Options");
-        JButton quitter = new JButton("Quitter");
+        JButton nouvellePartie = imageButton("btn_new_game.png", "btn_new_game_hover.png");
+        JButton multiplayer = imageButton("btn_multiplayer.png", "btn_multiplayer_hover.png");
+        JButton chargerPartie = imageButton("btn_load.png", "btn_load_hover.png");
+        JButton options = imageButton("btn_options.png", "btn_options_hover.png");
+        JButton quitter = imageButton("btn_quit.png", "btn_quit_hover.png");
 
         nouvellePartie.addActionListener(new ActionListener() {
             @Override
@@ -67,137 +78,274 @@ public class MenuGraphique extends JFrame {
                 nbPartie++;
             } 
         });
-        
+
         multiplayer.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
-               /*A Faire*/
-            } 
+                ouvrirMenuMultijoueur();
+            }
         });
 
         chargerPartie.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
-                //pas implementé encore
-                File dossier = new File(CHEMIN_SAUVEGARDES);
-                File[] fichiers = dossier.listFiles();
-
-                if (fichiers == null || fichiers.length == 0) {
-                    JOptionPane.showMessageDialog(null,"Aucune sauvegarde trouvée.");
-                    return;
-                }
-
-                String[] noms = new String[fichiers.length];
-
-                for (int i = 0; i < fichiers.length; i++) {
-                    noms[i] = fichiers[i].getName();
-                }
-
-                String choix = (String) JOptionPane.showInputDialog(
-                        null,
-                        "Choisissez une sauvegarde :",
-                        "Charger Partie",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        noms,
-                        noms[0]
-                );
-
-                if (choix == null) {
-                    return;
-                }
-
-                BaseJeu jeuCharge = new Jeu(choix);
-
-                dispose();
-                new FenetreJeu(jeuCharge);
-            } 
+                chargerPartie();
+            }
         });
 
         options.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, "OPTIONS"); 
-            } 
+                cardLayout.show(mainPanel, "OPTIONS");
+            }
         });
 
         quitter.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
-            } 
+            }
         });
-        
 
-        box.add(titre);
-        box.add(nouvellePartie);
-        box.add(chargerPartie);
-        box.add(options);
-        box.add(quitter);
+        menuBox.add(Box.createVerticalGlue());
+        menuBox.add(buildTitleBlock());
+        menuBox.add(Box.createVerticalStrut(35));
+        menuBox.add(nouvellePartie);
+        menuBox.add(Box.createVerticalStrut(12));
+        menuBox.add(multiplayer);
+        menuBox.add(Box.createVerticalStrut(12));
+        menuBox.add(chargerPartie);
+        menuBox.add(Box.createVerticalStrut(12));
+        menuBox.add(options);
+        menuBox.add(Box.createVerticalStrut(12));
+        menuBox.add(quitter);
+        menuBox.add(Box.createVerticalGlue());
 
-        panel.add(box);
-        adapterMenu(titre, nouvellePartie, chargerPartie, options, quitter);
+        panel.add(menuBox, BorderLayout.EAST);
         return panel;
     }
 
     private JPanel creerMenuOptions() {
-        JPanel panel = new JPanel();
+        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background.png");
         panel.setLayout(new GridBagLayout());
-        panel.setBackground(new Color(35, 35, 40));
 
         JPanel box = new JPanel();
-        box.setLayout(new GridLayout(4, 1, 0, 15));
         box.setOpaque(false);
+        box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
 
-        JLabel titre = new JLabel("Options", SwingConstants.CENTER);
-        titre.setFont(new Font("Serif", Font.BOLD, 28));
-        titre.setForeground(Color.WHITE);
+        JLabel titre = new JLabel("OPTIONS");
+        titre.setFont(new Font("Serif", Font.BOLD, 72));
+        titre.setForeground(new Color(240, 225, 185));
+        titre.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton modeTut = new JButton("Mode Tutoriel On/Off "); // avec feed forward etc
-        JButton theme = new JButton("Thème : diff themes...");
-        JButton retour = new JButton("Retour");
+        JButton modeTuto = textButton("Mode Tutoriel On/Off");
+        JButton changerTheme = textButton("Changer thème");
+        JButton retour = textButton("Retour");
 
         retour.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, "MENU");
             }
         });
 
         box.add(titre);
-        box.add(modeTut);
-        box.add(theme);
+        box.add(Box.createVerticalStrut(40));
+        box.add(modeTuto);
+        box.add(Box.createVerticalStrut(15));
+        box.add(changerTheme);
+        box.add(Box.createVerticalStrut(30));
         box.add(retour);
 
         panel.add(box);
-        adapterMenu(titre, modeTut, theme, retour);
         return panel;
     }
 
+    private JButton imageButton(String normalName, String hoverName) {
+        String normalPath = Config.CHEMIN_IMAGES + "/" + normalName;
+        String hoverPath = Config.CHEMIN_IMAGES + "/" + hoverName;
 
-    private void adapterMenu(JLabel titre, JButton... boutons) { // pour adapter full screen/ windowed / different ordi etc 
-        addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
-                int w = getWidth();
-                int h = getHeight();
+        JButton button = new JButton(scaledIcon(normalPath, BTN_W, BTN_H));
+        button.setRolloverIcon(scaledIcon(hoverPath, BTN_W, BTN_H));
 
-                int titleSize = Math.max(36, Math.min(w, h) / 10);
-                int buttonFontSize = Math.max(18, Math.min(w, h) / 35);
+        button.setPreferredSize(new Dimension(BTN_W, BTN_H));
+        button.setMaximumSize(new Dimension(BTN_W, BTN_H));
+        button.setMinimumSize(new Dimension(BTN_W, BTN_H));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-                titre.setFont(new Font("Serif", Font.BOLD, titleSize));
+        button.setBorder(null);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-                int buttonWidth = Math.max(280, w / 4);
-                int buttonHeight = Math.max(60, h / 13);
+        return button;
+    }
 
-                for (JButton b : boutons) {
-                    b.setFont(new Font("SansSerif", Font.BOLD, buttonFontSize));
-                    b.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+    private JButton textButton(String text) {
+        JButton b = new JButton(text);
+        b.setFont(new Font("SansSerif", Font.BOLD, 22));
+        b.setPreferredSize(new Dimension(320, 60));
+        b.setMaximumSize(new Dimension(320, 60));
+        b.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return b;
+    }
+
+    private ImageIcon scaledIcon(String path, int w, int h) {
+        Image img = new ImageIcon(path).getImage();
+        BufferedImage scaled = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = scaled.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(img, 0, 0, w, h, null);
+        g2.dispose();
+
+        return new ImageIcon(scaled);
+    }
+
+    private void ouvrirMenuMultijoueur() {
+        String[] choix = {"Host", "join"};
+
+        int rep = JOptionPane.showOptionDialog(
+                this,
+                "Choisissez le mode réseau",
+                "Multijoueur",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                choix,
+                choix[0]
+        );
+
+        if (rep == 0) {
+            new Thread(new Runnable() {
+                public void run() {
+                    ServerTablut.main(new String[0]);
                 }
+            }).start();
 
-                revalidate();
-                repaint();
+            Timer timer = new Timer(800, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    lancerClientReseau("localhost");
+                }
+            });
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+        else if (rep == 1) {
+            String ip = JOptionPane.showInputDialog(
+                    this,
+                    "Adresse IP / hostname du serveur :",
+                    "localhost"
+            );
+
+            if (ip != null && !ip.trim().isEmpty()) {
+                lancerClientReseau(ip.trim());
             }
-        });
+        }
+    }
+    // Improved title block with subtitle, dark translucent background, and gold lines
+    private JPanel buildTitleBlock() {
+        JPanel block = new JPanel() {
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+
+                g2.setColor(new Color(0, 0, 0, 140));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+
+                g2.setColor(new Color(212, 175, 90));
+                g2.drawLine(20, 3, getWidth() - 20, 3);
+                g2.drawLine(20, getHeight() - 4, getWidth() - 20, getHeight() - 4);
+
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+
+        block.setOpaque(false);
+        block.setLayout(new BoxLayout(block, BoxLayout.Y_AXIS));
+        block.setBorder(BorderFactory.createEmptyBorder(14, 32, 14, 32));
+        block.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("JEU DE STRATÉGIE NORDIQUE");
+        subtitle.setFont(new Font("Serif", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(212, 175, 90));
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("TABLUT");
+        title.setFont(new Font("Serif", Font.BOLD, 78));
+        title.setForeground(new Color(240, 225, 185));
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        block.add(subtitle);
+        block.add(title);
+
+        return block;
+    }
+
+    private void lancerClientReseau(String ip) {
+        try {
+            dispose();
+            new FenetreJeuReseau(new Jeu(), ip);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erreur réseau : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void chargerPartie() {
+        File dossier = new File(CHEMIN_SAUVEGARDES);
+        File[] fichiers = dossier.listFiles();
+
+        if (fichiers == null || fichiers.length == 0) {
+            JOptionPane.showMessageDialog(this, "Aucune sauvegarde trouvée.");
+            return;
+        }
+
+        String[] noms = new String[fichiers.length];
+
+        for (int i = 0; i < fichiers.length; i++) {
+            noms[i] = fichiers[i].getName();
+        }
+
+        String choix = (String) JOptionPane.showInputDialog(
+                this,
+                "Choisissez une sauvegarde :",
+                "Charger Partie",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                noms,
+                noms[0]
+        );
+
+        if (choix != null) {
+            dispose();
+            new FenetreJeu(new Jeu(choix));
+        }
+    }
+
+    private static class BackgroundPanel extends JPanel {
+        private Image background;
+
+        public BackgroundPanel(String path) {
+            background = new ImageIcon(path).getImage();
+        }
+
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+
+            Graphics2D g2 = (Graphics2D) g;
+            GradientPaint shade = new GradientPaint(
+                    getWidth() * 0.45f, 0,
+                    new Color(0, 0, 0, 0),
+                    getWidth(), 0,
+                    new Color(0, 0, 0, 150)
+            );
+
+            g2.setPaint(shade);
+            g2.fillRect(0, 0, getWidth(), getHeight());
+        }
     }
 }
