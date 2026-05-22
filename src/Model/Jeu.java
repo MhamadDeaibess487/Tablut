@@ -6,18 +6,18 @@ import Config.Config;
 
 public class Jeu extends BaseJeu {
     Stack<TableauBit> redo, undo;
+
     public Jeu() {
         redo = new Stack<>();
         undo = new Stack<>();
-    
     }
 
     public Jeu(String fichier) { // Charge une sauvegarde
         redo = new Stack<>();
         undo = new Stack<>();
-        
+
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Config.CHEMIN_SAUVEGARDES+fichier));
+            BufferedReader br = new BufferedReader(new FileReader(Config.CHEMIN_SAUVEGARDES + fichier));
             String line;
             TableauBit tab;
             boolean inRedo = false;
@@ -27,19 +27,17 @@ public class Jeu extends BaseJeu {
                 if (line.isEmpty()) {
                     continue;
                 }
-//                else if(line.equalsIgnoreCase("GRILLE")){
-//                }
+                // else if(line.equalsIgnoreCase("GRILLE")){
+                // }
                 else if (line.equalsIgnoreCase("REDO")) {
                     inRedo = true;
                     inUndo = false;
                     continue;
-                }
-                else if (line.equalsIgnoreCase("UNDO")) {
+                } else if (line.equalsIgnoreCase("UNDO")) {
                     inRedo = false;
                     inUndo = true;
                     continue;
-                }
-                else if(line.equalsIgnoreCase("JACTIF")){
+                } else if (line.equalsIgnoreCase("JACTIF")) {
                     Joueur_actif = Integer.valueOf(br.readLine());
                     continue;
                 }
@@ -59,39 +57,57 @@ public class Jeu extends BaseJeu {
             System.err.println("Erreur lors du chargement : " + e.getMessage());
         }
     }
+    
+    public Stack<TableauBit> getRedo() {
+        return redo;
+    }
+
+    public Stack<TableauBit> getUndo() {
+        return undo;
+    }
 
     @Override
-    void jeuRedondant() {
-        System.err.println("Jeu redondant non implem");
-        System.exit(0);
-    }
-    
+    public boolean jeuRedondant() {  // true si on doit arreter la partie,faux sinon
+        TableauBit Last = transformerGrilleEnLong();
+        int nb = 0;
+        for (TableauBit tmp : undo) {
+            if (Last.compareTo(tmp) == 0) {
+                nb++;
+            }
+            if (nb == 2) {
+                return true;
+            }
 
-    public void sauvegarder(TableauBit t){
+        }
+        return false;
+    }
+
+    public void sauvegarder(TableauBit t) {
         undo.push(t);
         redo.clear();
     }
-    
+
     @Override
-    public TableauBit deplacer(Point a, Point b){
+    public TableauBit deplacer(Point a, Point b) {
         TableauBit tab = super.deplacer(a, b);
         if (tab == null) {
             return null;
         }
         sauvegarder(tab);
-        changerJoueur();
+        changerJoueur();// regarder avant de jouer s'il existe des coups possibles(Plus de pions ou
+                        // bloqué) + regarder draw après avoir fait un coup
         return tab;
     }
-    
-    public void ecritTabBit(PrintWriter pw, TableauBit tab){
+
+    public void ecritTabBit(PrintWriter pw, TableauBit tab) {
         pw.print(tab.noir1 + ", " + tab.noir2);
-        pw.print(", "+ tab.blanc1 + ", " + tab.blanc2 + ", ");
+        pw.print(", " + tab.blanc1 + ", " + tab.blanc2 + ", ");
         pw.println(tab.roi1 + ", " + tab.roi2);
     }
 
     public void sauvegardeFichier(String fichier) {
         try {
-            File file = new File(Config.CHEMIN_SAUVEGARDES+fichier);
+            File file = new File(Config.CHEMIN_SAUVEGARDES + fichier);
 
             if (file.getParentFile() != null) {
                 file.getParentFile().mkdirs();
@@ -99,19 +115,19 @@ public class Jeu extends BaseJeu {
 
             try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
                 pw.println("GRILLE");
-                ecritTabBit(pw,transformerGrilleEnLong());
+                ecritTabBit(pw, transformerGrilleEnLong());
                 pw.println("JACTIF\n" + Joueur_actif);
-                Stack<TableauBit> tmp; 
-                for(int i = 0;i<2;i++){
-                    if(i==0){
+                Stack<TableauBit> tmp;
+                for (int i = 0; i < 2; i++) {
+                    if (i == 0) {
                         pw.println("REDO");
                         tmp = redo;
-                    }else{
+                    } else {
                         pw.println("UNDO");
                         tmp = undo;
                     }
                     for (TableauBit tab : tmp) {
-                        ecritTabBit(pw,tab);
+                        ecritTabBit(pw, tab);
                     }
                 }
             }
@@ -120,19 +136,18 @@ public class Jeu extends BaseJeu {
         }
     }
 
-    
     public boolean annuler() {
-       if (!undo.isEmpty()) {
+        if (!undo.isEmpty()) {
             TableauBit last = undo.pop();
             redo.push(transformerGrilleEnLong());
             transformeLongEnGrille(last);
             changerJoueur();
             return true;
         }
-       return false;
+        return false;
     }
 
-    public boolean refaire(){
+    public boolean refaire() {
         if (!redo.isEmpty()) {
             TableauBit last = redo.pop();
             undo.push(transformerGrilleEnLong());
@@ -146,8 +161,7 @@ public class Jeu extends BaseJeu {
     private void reconstruireJeu() {
         transformeLongEnGrille(undo.peek());
     }
-    
-    
+
     private TableauBit lirePlateau(String line) {
         String[] parts = line.split(",");
         try {
@@ -158,29 +172,35 @@ public class Jeu extends BaseJeu {
             b2 = Long.parseLong(parts[3].trim());
             r1 = Long.parseLong(parts[4].trim());
             r2 = Long.parseLong(parts[5].trim());
-            return new TableauBit(n1,n2,b1,b2,r1,r2);
+            return new TableauBit(n1, n2, b1, b2, r1, r2);
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
-        public void nouvellePartie() {
-            this.Joueur_actif = 1;
-            this.fini = false;
-            this.grille = new int[Taille_plateau][Taille_plateau];
-            ListePoint init = new ListePoint();
-            this.ListePointN = init.ListeBaseNoir();
-            this.ListePointB = init.ListeBaseBlanc();
-            for (Point PB : ListePointB.LP) {
-                grille[PB.l][PB.c] = 2;
-            }
-            grille[4][4] = 3;
-            for (Point PN : ListePointN.LP) {
-                grille[PN.l][PN.c] = 1;
-            }
-            // Clear undo/redo stacks
-            this.redo.clear();
-            this.undo.clear();
+    public void nouvellePartie() {
+        this.Joueur_actif = 1;
+        this.fini = false;
+        this.grille = new int[Taille_plateau][Taille_plateau];
+        ListePoint init = new ListePoint();
+        this.ListePointN = init.ListeBaseNoir();
+        this.ListePointB = init.ListeBaseBlanc();
+        for (Point PB : ListePointB.LP) {
+            grille[PB.l][PB.c] = 2;
         }
-
+        grille[4][4] = 3;
+        for (Point PN : ListePointN.LP) {
+            grille[PN.l][PN.c] = 1;
+        }
+        // Clear undo/redo stacks
+        this.redo.clear();
+        this.undo.clear();
+        grille[4][4] = 3;
+        for (Point PN : ListePointN.LP) {
+            grille[PN.l][PN.c] = 1;
+        }
+        // Clear undo/redo stacks
+        this.redo.clear();
+        this.undo.clear();
+    }
 }

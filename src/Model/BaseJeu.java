@@ -44,7 +44,7 @@ public abstract class BaseJeu {
         }
     }
 
-    abstract void jeuRedondant();
+    abstract public boolean jeuRedondant();
 
     public int[][] getGrille() {
         return this.grille;
