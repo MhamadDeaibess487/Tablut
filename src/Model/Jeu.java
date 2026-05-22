@@ -166,6 +166,7 @@ public class Jeu extends BaseJeu {
 
         public void nouvellePartie() {
             this.Joueur_actif = 1;
+            this.fini = false;
             this.grille = new int[Taille_plateau][Taille_plateau];
             ListePoint init = new ListePoint();
             this.ListePointN = init.ListeBaseNoir();

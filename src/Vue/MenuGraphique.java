@@ -15,8 +15,10 @@ public class MenuGraphique extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     public boolean sauvegarde;
+    private int nbPartie;
     public MenuGraphique(BaseJeu jeu) {
         this.jeu = jeu;
+        nbPartie = 0;
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 400);
@@ -58,8 +60,11 @@ public class MenuGraphique extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
+                if(nbPartie != 0)
+                    ((Model.Jeu)jeu).nouvellePartie();
                 FenetreJeu fenetreJeu = new FenetreJeu(jeu);
                 fenetreJeu.setVisible(true);
+                nbPartie++;
             } 
         });
         
