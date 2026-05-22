@@ -139,6 +139,7 @@ public class GrilleGraphique extends JPanel {
             }
 
         }
+<<<<<<< HEAD
 
         //cases valides
         peindreCasesValides(g2);
@@ -173,6 +174,9 @@ public class GrilleGraphique extends JPanel {
         }
 
 
+=======
+        peindreCasesValides(g2);
+>>>>>>> origin/resaux
     }
 
     private void dessinerImageCase(Graphics2D g2, Image image, int x, int y, int marge) {

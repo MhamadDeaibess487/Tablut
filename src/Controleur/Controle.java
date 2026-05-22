@@ -1,6 +1,7 @@
 package Controleur;
-import Model.BaseJeu;
+
 import Model.Point;
+import Model.BaseJeu;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
 import Model.IA;
@@ -12,9 +13,9 @@ import java.util.ArrayList;
 import java.lang.Thread;
 
 
-public class Controle {
-    BaseJeu Jeu;
-    GrilleGraphique Grille;
+public class Controle extends ControleAbstract{
+    String fichier;
+    FenetreJeu fenetreJeu;
     int ligneSelectee;
     int colonneSelectee;
     String fichier;
@@ -30,9 +31,9 @@ public class Controle {
     Timer timer_IA;
     Timer timer_joueur;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
-
-        this.Jeu = Jeu;
-        this.Grille = Grille;
+        super(Jeu,Grille);
+        this.fenetreJeu = fenetreJeu;
+        this.fichier = "";
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
@@ -86,7 +87,7 @@ public class Controle {
     }
 
     public void reset() {
-        ((Model.Jeu)Jeu).nouvellePartie();
+        ((Model.Jeu)jeu).nouvellePartie();
         refreshGrid();
     }
 
@@ -117,13 +118,13 @@ public class Controle {
         }
     }
     public void undo() {
-        ((Model.Jeu)Jeu).annuler();
-        refreshGrid();
+        if(((Model.Jeu)jeu).annuler())
+            refreshGrid();
     }
 
     public void redo() {
-        ((Model.Jeu)Jeu).refaire();
-        refreshGrid();
+        if(((Model.Jeu)jeu).refaire())
+            refreshGrid();
     }
 
 
@@ -143,26 +144,25 @@ public class Controle {
             }
 
             // joueur 1 = noir, il ne peut sélectionner que les noirs
-            if (Jeu.getJoueur() == 1 && contenu != 1) {
+            if (jeu.getJoueur() == 1 && contenu != 1) {
                 return;
             }
 
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
-            Grille.dessiner_valide(liste);
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
-            Grille.effacerCasesValides();
+            grille.effacerCasesValides();
             refreshGrid();
         }else{
-
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Jeu.deplacer(p,p1);
@@ -172,8 +172,8 @@ public class Controle {
             ligneSelectee=-1;
             refreshGrid();
         }
-
     }
+    
     public boolean choisir_nom(){
         String nom = JOptionPane.showInputDialog(fenetreJeu,"Entrez le nom du fichier");
 
@@ -181,8 +181,10 @@ public class Controle {
             return false;
         }
         fichier = nom;
+        fichier = nom;
         return true;
     }
+    
     public void demanderSauvegardeEtQuitter() {
         int choix = JOptionPane.showConfirmDialog(
                 fenetreJeu,
@@ -199,11 +201,8 @@ public class Controle {
             if(!choisir_nom()){
              return;
             }
-            ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
+            ((Model.Jeu) jeu).sauvegardeFichier(fichier);
         }
-
         fenetreJeu.retourMenu();
     }
-
-
 }

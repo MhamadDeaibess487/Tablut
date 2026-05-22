@@ -44,10 +44,14 @@ public abstract class BaseJeu {
         }
     }
 
-    abstract void jeuRedondant();
+    abstract public boolean jeuRedondant();
 
     public int[][] getGrille() {
         return this.grille;
+    }
+    
+    public boolean estFini(){
+        return fini;
     }
 
     public int getJoueur() {
@@ -161,10 +165,11 @@ public abstract class BaseJeu {
         return grille[l][c] == 0;
     }
     
-    public ListePion deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le déplacement
+    public TableauBit deplacer(Point a, Point b) {// renvoie faux si coup invalide sinon renvoie vrai avec le déplacement
         if (!estCaseLibre(b.l, b.c) || !CoupValide(a, b)) {
             return null;
         }
+        TableauBit save = transformerGrilleEnLong();
         grille[b.l][b.c] = grille[a.l][a.c];
         if (grille[b.l][b.c] == 3 && a.l == 4 && a.c == 4) {
             grille[a.l][a.c] = 4;
@@ -174,7 +179,10 @@ public abstract class BaseJeu {
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
+<<<<<<< HEAD
                 // gagner blanc
+=======
+>>>>>>> origin/resaux
                 fini = true;
                 System.out.println("blanc ganger");
             }
@@ -187,14 +195,16 @@ public abstract class BaseJeu {
             for (Pion p : Liste.LP) {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
+<<<<<<< HEAD
                     // gagner noir
+=======
+>>>>>>> origin/resaux
                     fini = true;
                     System.out.println("noir ganger");
                 }
                 if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
                     ListePointB.SupprimeListePoint(P);
                     grille[P.l][P.c] = 0;
-
                 }
             }
         }
@@ -206,12 +216,15 @@ public abstract class BaseJeu {
                 grille[P.l][P.c] = 0;
                 ListePointN.SupprimeListePoint(P);
                 if (ListePointN.totale == 0) {
+<<<<<<< HEAD
                     // gagner blanc
+=======
+>>>>>>> origin/resaux
                     fini = true;
                 }
             }
         }
-        return Liste;
+        return save;
     }
 
     public boolean CaptureRoi(int L, int C) { // roi bloqué des 4 cotés par des pions noirs
@@ -464,6 +477,7 @@ public abstract class BaseJeu {
         return cases;
     }
 
+<<<<<<< HEAD
     public ListeCoup CoupJouable(int couleur){
         ListeCoup Lcoup = new ListeCoup();
         ArrayList<Point> L = new ArrayList<>();
@@ -478,5 +492,75 @@ public abstract class BaseJeu {
             }
         }
         return Lcoup;
+=======
+    public TableauBit transformerGrilleEnLong() {
+        TableauBit b = new TableauBit();
+
+        for (int i = 0; i < Taille_plateau; i++) {
+            for (int j = 0; j < Taille_plateau; j++) {
+                int index = i * Taille_plateau + j; // 0 to 80
+                boolean partie1 = index < 64;
+                int bitIndex;
+                if (partie1){
+                    bitIndex = index;
+                } else bitIndex = index - 64;
+
+                long masque = 1L << bitIndex;
+
+                if (grille[i][j] == 1) { // noir
+                    if (partie1) b.noir1 |= masque;
+                    else b.noir2 |= masque;
+                }
+                else if (grille[i][j] == 2) { // blanc
+                    if (partie1) b.blanc1 |= masque;
+                    else b.blanc2 |= masque;
+                }
+                else if (grille[i][j] == 3) { // roi
+                    if (partie1) b.roi1 |= masque;
+                    else b.roi2 |= masque;
+                }
+            }
+        }
+
+        return b;
+    }
+
+    private boolean hasBit(long value, int bitIndex) {
+        return (value & (1L << bitIndex)) != 0;
+    }
+
+    public void transformeLongEnGrille(TableauBit b) { // l'inverse 
+        grille = new int[Taille_plateau][Taille_plateau];
+
+        for (int index = 0; index < Taille_plateau * Taille_plateau; index++) {
+            boolean partie1 = index < 64;
+            int bitIndex = partie1 ? index : index - 64;
+
+            int l = index / Taille_plateau;
+            int c = index % Taille_plateau;
+
+            if (partie1) {
+                if (hasBit(b.noir1, bitIndex)) {
+                    grille[l][c] = 1;
+                } else if (hasBit(b.blanc1, bitIndex)) {
+                    grille[l][c] = 2;
+                } else if (hasBit(b.roi1, bitIndex)) {
+                    grille[l][c] = 3;
+                }
+            } else {
+                if (hasBit(b.noir2, bitIndex)) {
+                    grille[l][c] = 1;
+                } else if (hasBit(b.blanc2, bitIndex)) {
+                    grille[l][c] = 2;
+                } else if (hasBit(b.roi2, bitIndex)) {
+                    grille[l][c] = 3;
+                }
+            }
+        }
+
+        if (grille[4][4] == 0) {
+            grille[4][4] = 4;
+        }
+>>>>>>> origin/resaux
     }
 }

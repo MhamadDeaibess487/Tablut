@@ -4,15 +4,12 @@ import java.io.*;
 import java.util.Stack;
 import Config.Config;
 
-/*BUG DUPPLICATION QUAND NOIR MANGE BLANC PUIS UNDO*/
-
 public class Jeu extends BaseJeu {
-    Stack<Coup> redo, undo;
-    Stack<Historique> pionMange;
+    Stack<TableauBit> redo, undo;
+
     public Jeu() {
         redo = new Stack<>();
         undo = new Stack<>();
-        pionMange = new Stack<>();
     }
 
     // fonction pour faire copie du jeu pour l'ia
@@ -45,10 +42,11 @@ public class Jeu extends BaseJeu {
     public Jeu(String fichier) { // Charge une sauvegarde
         redo = new Stack<>();
         undo = new Stack<>();
-        pionMange = new Stack<>();
+
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Config.CHEMIN_SAUVEGARDES+fichier));
+            BufferedReader br = new BufferedReader(new FileReader(Config.CHEMIN_SAUVEGARDES + fichier));
             String line;
+            TableauBit tab;
             boolean inRedo = false;
             boolean inUndo = false;
             while ((line = br.readLine()) != null) {
@@ -56,82 +54,108 @@ public class Jeu extends BaseJeu {
                 if (line.isEmpty()) {
                     continue;
                 }
-                if (line.equalsIgnoreCase("REDO")) {
+                // else if(line.equalsIgnoreCase("GRILLE")){
+                // }
+                else if (line.equalsIgnoreCase("REDO")) {
                     inRedo = true;
                     inUndo = false;
                     continue;
-                }
-                if (line.equalsIgnoreCase("UNDO")) {
+                } else if (line.equalsIgnoreCase("UNDO")) {
                     inRedo = false;
                     inUndo = true;
                     continue;
+                } else if (line.equalsIgnoreCase("JACTIF")) {
+                    Joueur_actif = Integer.valueOf(br.readLine());
+                    continue;
                 }
-                Coup coup = lireCoup(line);
-                if (coup != null) {
-                    if (inRedo) {
-                        redo.add(coup);
-                    } else if (inUndo) {
-                        undo.add(coup);
-                    }
+                tab = lirePlateau(line);
+                if (tab != null) {
+                    if (inRedo)
+                        redo.add(tab);
+                    else if (inUndo)
+                        undo.add(tab);
+                    else
+                        transformeLongEnGrille(tab);
                 }
             }
-            reconstruireJeu();
         } catch (FileNotFoundException e) {
             System.err.println("Fichier introuvable");
         } catch (IOException e) {
             System.err.println("Erreur lors du chargement : " + e.getMessage());
         }
     }
-
-    @Override
-    void jeuRedondant() {
-        System.err.println("Jeu redondant non implem");
-        System.exit(0);
-    }
     
-    public void sauveHistorique(ListePion l){
-        if(!l.isEmpty()){
-            Pion p = l.getPion(0);
-            pionMange.push(new Historique(l,p.t,undo.size())); 
-        }
+    public Stack<TableauBit> getRedo() {
+        return redo;
     }
 
-    public void sauvegarder(Point a, Point b,ListePion l){
-        undo.push(new Coup(a, b, Joueur_actif));
-        redo.clear();
-        sauveHistorique(l);
+    public Stack<TableauBit> getUndo() {
+        return undo;
     }
 
     @Override
-    public ListePion deplacer(Point a, Point b){
-        ListePion l = super.deplacer(a, b);
-        if (l == null) {
+    public boolean jeuRedondant() {  // true si on doit arreter la partie,faux sinon
+        TableauBit Last = transformerGrilleEnLong();
+        int nb = 0;
+        for (TableauBit tmp : undo) {
+            if (Last.compareTo(tmp) == 0) {
+                nb++;
+            }
+            if (nb == 2) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    public void sauvegarder(TableauBit t) {
+        undo.push(t);
+        redo.clear();
+    }
+
+    @Override
+    public TableauBit deplacer(Point a, Point b) {
+        TableauBit tab = super.deplacer(a, b);
+        if (tab == null) {
             return null;
         }
-        sauvegarder(a, b,l);
-        changerJoueur();
-        return l;
+        sauvegarder(tab);
+        changerJoueur();// regarder avant de jouer s'il existe des coups possibles(Plus de pions ou
+                        // bloqué) + regarder draw après avoir fait un coup
+        return tab;
+    }
+
+    public void ecritTabBit(PrintWriter pw, TableauBit tab) {
+        pw.print(tab.noir1 + ", " + tab.noir2);
+        pw.print(", " + tab.blanc1 + ", " + tab.blanc2 + ", ");
+        pw.println(tab.roi1 + ", " + tab.roi2);
     }
 
     public void sauvegardeFichier(String fichier) {
         try {
-            File file = new File(Config.CHEMIN_SAUVEGARDES+fichier);
+            File file = new File(Config.CHEMIN_SAUVEGARDES + fichier);
 
             if (file.getParentFile() != null) {
                 file.getParentFile().mkdirs();
             }
 
             try (PrintWriter pw = new PrintWriter(new FileWriter(file))) {
-                pw.println("REDO");
-                for (Coup c : redo) {
-                    pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
-                    pw.println();
-                }
-
-                pw.println("UNDO");
-                for (Coup c : undo) {
-                    pw.println(c.a.l + ", " + c.a.c + ";" + c.b.l + ", " + c.b.c + ";" + c.joueur);
-                    pw.println();
+                pw.println("GRILLE");
+                ecritTabBit(pw, transformerGrilleEnLong());
+                pw.println("JACTIF\n" + Joueur_actif);
+                Stack<TableauBit> tmp;
+                for (int i = 0; i < 2; i++) {
+                    if (i == 0) {
+                        pw.println("REDO");
+                        tmp = redo;
+                    } else {
+                        pw.println("UNDO");
+                        tmp = undo;
+                    }
+                    for (TableauBit tab : tmp) {
+                        ecritTabBit(pw, tab);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -139,82 +163,71 @@ public class Jeu extends BaseJeu {
         }
     }
 
-    // Roi  doit retourner sur son throne => impossible si on utilise deplacer
-    public void annuler() {
+    public boolean annuler() {
         if (!undo.isEmpty()) {
-            if(!pionMange.isEmpty()){
-                if(pionMange.peek().numCoup == undo.size()){
-                    Historique h = pionMange.pop();
-                    Pion p;
-                    for(int i = 0;i<h.l.totale;i++){
-                        p = h.l.getPion(i);
-                        grille[p.p.l][p.p.c] = h.couleur;
-                    }
-                }
-            }
-            Coup last = undo.pop();
-            redo.push(last);
-            Point a = last.a;
-            Point b = last.b;
-            if(grille[b.l][b.c] == 3 && a.l == trone.l && a.c == trone.c){
-                grille[a.l][a.c] = 3;
-                grille[b.l][b.c] = 0;
-            }
-            else
-                super.deplacer(last.b, last.a);
+            TableauBit last = undo.pop();
+            redo.push(transformerGrilleEnLong());
+            transformeLongEnGrille(last);
             changerJoueur();
+            return true;
         }
+        return false;
     }
 
-    public void refaire(){
+    public boolean refaire() {
         if (!redo.isEmpty()) {
-            Coup last = redo.pop();
-            undo.push(last);
-            ListePion l = super.deplacer(last.a, last.b);
+            TableauBit last = redo.pop();
+            undo.push(transformerGrilleEnLong());
+            transformeLongEnGrille(last);
             changerJoueur();
-            sauveHistorique(l);
+            return true;
         }
+        return false;
     }
 
     private void reconstruireJeu() {
-        for (Coup c : undo)
-            super.deplacer(c.a, c.b);
+        transformeLongEnGrille(undo.peek());
     }
 
-    private Coup lireCoup(String line) {
-        String[] parts = line.split(";");
-        String[] pa = parts[0].split(",");
-        String[] pb = parts[1].split(",");
-
+    private TableauBit lirePlateau(String line) {
+        String[] parts = line.split(",");
         try {
-            int i1, j1, i2, j2;
-            i1 = Integer.parseInt(pa[0].trim());
-            j1 = Integer.parseInt(pa[1].trim());
-            i2 = Integer.parseInt(pb[0].trim());
-            j2 = Integer.parseInt(pb[1].trim());
-            int joueur = Integer.parseInt(parts[2].trim());
-            return new Coup(new Point(i1, j1), new Point(i2, j2), joueur);
+            long n1, n2, b1, b2, r1, r2;
+            n1 = Long.parseLong(parts[0].trim());
+            n2 = Long.parseLong(parts[1].trim());
+            b1 = Long.parseLong(parts[2].trim());
+            b2 = Long.parseLong(parts[3].trim());
+            r1 = Long.parseLong(parts[4].trim());
+            r2 = Long.parseLong(parts[5].trim());
+            return new TableauBit(n1, n2, b1, b2, r1, r2);
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
-        public void nouvellePartie() {
-            this.Joueur_actif = 1;
-            this.grille = new int[Taille_plateau][Taille_plateau];
-            ListePoint init = new ListePoint();
-            this.ListePointN = init.ListeBaseNoir();
-            this.ListePointB = init.ListeBaseBlanc();
-            for (Point PB : ListePointB.LP) {
-                grille[PB.l][PB.c] = 2;
-            }
-            grille[4][4] = 3;
-            for (Point PN : ListePointN.LP) {
-                grille[PN.l][PN.c] = 1;
-            }
-            // Clear undo/redo stacks
-            this.redo.clear();
-            this.undo.clear();
+    public void nouvellePartie() {
+        this.Joueur_actif = 1;
+        this.fini = false;
+        this.grille = new int[Taille_plateau][Taille_plateau];
+        ListePoint init = new ListePoint();
+        this.ListePointN = init.ListeBaseNoir();
+        this.ListePointB = init.ListeBaseBlanc();
+        for (Point PB : ListePointB.LP) {
+            grille[PB.l][PB.c] = 2;
         }
-
+        grille[4][4] = 3;
+        for (Point PN : ListePointN.LP) {
+            grille[PN.l][PN.c] = 1;
+        }
+        // Clear undo/redo stacks
+        this.redo.clear();
+        this.undo.clear();
+        grille[4][4] = 3;
+        for (Point PN : ListePointN.LP) {
+            grille[PN.l][PN.c] = 1;
+        }
+        // Clear undo/redo stacks
+        this.redo.clear();
+        this.undo.clear();
+    }
 }
