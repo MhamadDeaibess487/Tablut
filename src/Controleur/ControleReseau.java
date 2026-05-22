@@ -35,7 +35,8 @@ public class ControleReseau extends ControleAbstract{
 
     @Override
     public void handleGridClick(int row, int column) {
-        int [][]grille_case = jeu.getGrille();
+        int [][]grille_case = Jeu.getGrille();
+
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
@@ -50,20 +51,20 @@ public class ControleReseau extends ControleAbstract{
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
-            grille.dessiner_valide(liste);
+            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            Grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
-            grille.effacerCasesValides();
+            Grille.effacerCasesValides();
             refreshGrid();
         }else{  
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
             Coup coup = new Coup(p, p1, client.getJoueur());
             client.envoyerCoup(coup);
-            grille.effacerCasesValides();
+            Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
             refreshGrid();

@@ -16,7 +16,6 @@ public class Jeu extends BaseJeu {
     public Jeu(Jeu autre) {
         redo = new Stack<>();
         undo = new Stack<>();
-        pionMange = new Stack<>();
         
         this.grille = new int[autre.grille.length][autre.grille[0].length];
         for (int i = 0; i < autre.grille.length; i++) {

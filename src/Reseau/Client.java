@@ -92,9 +92,11 @@ public class Client {
             case Communication.REP_TURN_UPDATE:
                 int joueurActif = (int) rep.grille.noir1;
                 monTour = (joueurActif == joueur);
-                System.out.println("TURN joueurActif = " + joueurActif 
-                    + ", moi = " + joueur 
-                    + ", monTour = " + monTour);
+                jeu.setJouerActif(joueurActif);
+                joueurActifPanel.setJoueurActif(joueurActif);
+                System.out.println("TURN joueurActif = " + joueurActif
+                        + ", moi = " + joueur
+                        + ", monTour = " + monTour);
                 break;
             case Communication.REP_GAME_OVER:
                 /*Lecture r.grille.n1*/

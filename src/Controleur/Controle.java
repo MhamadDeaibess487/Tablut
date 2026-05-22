@@ -18,8 +18,6 @@ public class Controle extends ControleAbstract{
     FenetreJeu fenetreJeu;
     int ligneSelectee;
     int colonneSelectee;
-    String fichier;
-    FenetreJeu fenetreJeu;
     public boolean iaNoirActive;
     public boolean iaBlancActive;
     IA IaBlanc;
@@ -87,7 +85,7 @@ public class Controle extends ControleAbstract{
     }
 
     public void reset() {
-        ((Model.Jeu)jeu).nouvellePartie();
+        ((Model.Jeu)Jeu).nouvellePartie();
         refreshGrid();
     }
 
@@ -118,12 +116,12 @@ public class Controle extends ControleAbstract{
         }
     }
     public void undo() {
-        if(((Model.Jeu)jeu).annuler())
+        if(((Model.Jeu)Jeu).annuler())
             refreshGrid();
     }
 
     public void redo() {
-        if(((Model.Jeu)jeu).refaire())
+        if(((Model.Jeu)Jeu).refaire())
             refreshGrid();
     }
 
@@ -144,23 +142,23 @@ public class Controle extends ControleAbstract{
             }
 
             // joueur 1 = noir, il ne peut sélectionner que les noirs
-            if (jeu.getJoueur() == 1 && contenu != 1) {
+            if (Jeu.getJoueur() == 1 && contenu != 1) {
                 return;
             }
 
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
-            grille.dessiner_valide(liste);
+            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            Grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
             ligneSelectee = -1;
             colonneSelectee = -1;
-            grille.effacerCasesValides();
+            Grille.effacerCasesValides();
             refreshGrid();
         }else{
             Point p = new Point(ligneSelectee,colonneSelectee);
@@ -201,7 +199,7 @@ public class Controle extends ControleAbstract{
             if(!choisir_nom()){
              return;
             }
-            ((Model.Jeu) jeu).sauvegardeFichier(fichier);
+            ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
         }
         fenetreJeu.retourMenu();
     }

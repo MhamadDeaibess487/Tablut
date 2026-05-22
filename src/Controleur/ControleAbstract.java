@@ -5,19 +5,31 @@ import Vue.GrilleGraphique;
 
 
 public abstract class ControleAbstract {
-    BaseJeu jeu;
-    GrilleGraphique grille;
+    BaseJeu Jeu;
+    GrilleGraphique Grille;
 
     public ControleAbstract(BaseJeu Jeu, GrilleGraphique Grille) {
-        this.jeu = Jeu;
-        this.grille = Grille;
+        this.Jeu = Jeu;
+        this.Grille = Grille;
     }
 
     public abstract void undo();
 
     public void refreshGrid(){
-        grille.repaint();
+        Grille.repaint();
     }
     
     public abstract void handleGridClick(int row, int column);
+
+    public BaseJeu getJeu() {
+        return Jeu;
+    }
+
+    public void setIaNoir(boolean active) {}
+
+    public void setIaBlanc(boolean active) {}
+
+    public void setNiveauIANoir(int niveau) {}
+
+    public void setNiveauIABlanc(int niveau) {}
 }

@@ -3,7 +3,8 @@ import Reseau.Client;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
 import Vue.GrilleButtonsReseau;
-import Controleur.*;
+import Controleur.Controle;
+import Controleur.ControleReseau;
 import Config.Config;
 
 import javax.swing.*;
@@ -18,16 +19,20 @@ public class TestReseauGUI {
         frame.setSize(1000, 800);
         frame.setLayout(new BorderLayout());
 
+        GrilleGraphique grille = new GrilleGraphique(jeu);
+
+        ControleReseau controle = new ControleReseau(jeu, grille);
+
         JoueurActifPanel panel = new JoueurActifPanel(
             Config.CHEMIN_IMAGES + "/nap_on.png",
             Config.CHEMIN_IMAGES + "/nap_on.png",
             Config.CHEMIN_IMAGES + "/julien.png",
-            Config.CHEMIN_IMAGES + "/julien.png"
+            Config.CHEMIN_IMAGES + "/julien.png",
+            controle
         );
 
-        GrilleGraphique grille = new GrilleGraphique(jeu);
+        
 
-        ControleReseau controle = new ControleReseau(jeu, grille);
 
         Client client = new Client("localhost", 2121, jeu, grille, panel);
         controle.setClient(client);

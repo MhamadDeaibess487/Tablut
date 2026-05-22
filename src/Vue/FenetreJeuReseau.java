@@ -24,15 +24,18 @@ public class FenetreJeuReseau extends JFrame {
 
         this.jeu = jeu;
 
-        joueurActifPanel = new JoueurActifPanel(
-                Config.CHEMIN_IMAGES + "/nap_on.png",
-                Config.CHEMIN_IMAGES + "/nap_on.png",
-                Config.CHEMIN_IMAGES + "/julien.png",
-                Config.CHEMIN_IMAGES + "/julien.png"
-        );
-
+        
         grille = new GrilleGraphique(jeu);
+
         controle = new ControleReseau(jeu, grille);
+
+        joueurActifPanel = new JoueurActifPanel(
+            Config.CHEMIN_IMAGES + "/nap_on.png",
+            Config.CHEMIN_IMAGES + "/nap_on.png",
+            Config.CHEMIN_IMAGES + "/julien.png",
+            Config.CHEMIN_IMAGES + "/julien.png",
+            controle
+        );
 
         client = new Client(ip, 2121, jeu, grille, joueurActifPanel);
         controle.setClient(client);

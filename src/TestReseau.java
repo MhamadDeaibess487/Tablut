@@ -4,6 +4,8 @@ import Model.Coup;
 import Model.Point;
 import Vue.GrilleGraphique;
 import Vue.JoueurActifPanel;
+import Controleur.ControleReseau;
+import Config.Config;
 
 public class TestReseau {
     public static void main(String[] args) throws Exception {
@@ -11,11 +13,14 @@ public class TestReseau {
 
         GrilleGraphique grille = new GrilleGraphique(jeu);
 
+        ControleReseau controle = new ControleReseau(jeu, grille);
+
         JoueurActifPanel panel = new JoueurActifPanel(
-            "res/images/j1.png",
-            "res/images/j1_highlight.png",
-            "res/images/j2.png",
-            "res/images/j2_highlight.png"
+            Config.CHEMIN_IMAGES + "/nap_on.png",
+            Config.CHEMIN_IMAGES + "/nap_on.png",
+            Config.CHEMIN_IMAGES + "/julien.png",
+            Config.CHEMIN_IMAGES + "/julien.png",
+            controle
         );
 
         Client client = new Client("localhost", 2121, jeu, grille, panel);

@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.Hashtable;
 
 import Controleur.Controle;
+import Controleur.ControleAbstract;
 
 public class JoueurActifPanel extends JPanel {
     private static final Dimension SIDEBAR_SIZE = new Dimension(300, 0);
@@ -53,10 +54,10 @@ public class JoueurActifPanel extends JPanel {
     private boolean joueur1_IA;
     private boolean joueur2_IA;
     private int joueur_actif;
-    Controle controle;
+    ControleAbstract controle;
 
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
-                             String j2NormalPath, String j2HighlightPath,Controle controle) {
+                             String j2NormalPath, String j2HighlightPath,ControleAbstract controle) {
         this.controle = controle;
         this.j1NormalPath = j1NormalPath;
         this.j1HighlightPath = j1HighlightPath;

@@ -179,10 +179,6 @@ public abstract class BaseJeu {
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
-<<<<<<< HEAD
-                // gagner blanc
-=======
->>>>>>> origin/resaux
                 fini = true;
                 System.out.println("blanc ganger");
             }
@@ -195,10 +191,6 @@ public abstract class BaseJeu {
             for (Pion p : Liste.LP) {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
-<<<<<<< HEAD
-                    // gagner noir
-=======
->>>>>>> origin/resaux
                     fini = true;
                     System.out.println("noir ganger");
                 }
@@ -216,10 +208,6 @@ public abstract class BaseJeu {
                 grille[P.l][P.c] = 0;
                 ListePointN.SupprimeListePoint(P);
                 if (ListePointN.totale == 0) {
-<<<<<<< HEAD
-                    // gagner blanc
-=======
->>>>>>> origin/resaux
                     fini = true;
                 }
             }
@@ -477,7 +465,6 @@ public abstract class BaseJeu {
         return cases;
     }
 
-<<<<<<< HEAD
     public ListeCoup CoupJouable(int couleur){
         ListeCoup Lcoup = new ListeCoup();
         ArrayList<Point> L = new ArrayList<>();
@@ -492,7 +479,7 @@ public abstract class BaseJeu {
             }
         }
         return Lcoup;
-=======
+    }
     public TableauBit transformerGrilleEnLong() {
         TableauBit b = new TableauBit();
 
@@ -561,6 +548,10 @@ public abstract class BaseJeu {
         if (grille[4][4] == 0) {
             grille[4][4] = 4;
         }
->>>>>>> origin/resaux
+    }
+
+    public void setJouerActif(int joueur){
+        this.Joueur_actif = joueur;
+        System.out.println("Joueur actif de base: " + Joueur_actif);
     }
 }

@@ -5,6 +5,48 @@ class IAinter extends IA{
     public IAinter(Jeu j,int couleur){
 
     }
+
+    public int alphabeta(Jeu copie, int profondeur, int alpha, int beta, boolean estmax){
+        if (profondeur == 0 || copie.getFini()){
+            return heuristique(copie);
+        }
+        int joueurActuel = estmax ? 1 : 2;
+
+        ListeCoup coups = copie.CoupJouable(joueurActuel);
+
+        if(coups.Liste.isEmpty()){
+            return heuristique(copie);
+        }
+
+        if(estmax){ // NOIR cherche à maximiser
+            int maxEval = Integer.MIN_VALUE;
+            for(Coup c : coups.Liste){
+                Jeu souscopie = new Jeu(copie);
+                souscopie.deplacer(c.a, c.b);
+                int eval = alphabeta(souscopie, profondeur - 1, alpha, beta, false);
+                maxEval = Math.max(maxEval, eval);
+                alpha = Math.max(alpha, maxEval);
+                if(beta <= alpha){
+                    break; // coupure beta
+                }
+            }
+            return maxEval;
+        }else{ //BLANC cherche a minimiser
+            int minEval = Integer.MAX_VALUE;
+            for(Coup c : coups.Liste){
+                Jeu souscopie = new Jeu(copie);
+                souscopie.deplacer(c.a,c.b);
+                int eval = alphabeta(souscopie, profondeur - 1, alpha, beta, true);
+                minEval = Math.min(eval, minEval);
+                beta = Math.min(minEval, beta);
+                if(beta <= alpha){
+                    break; // coupure alpha
+                }
+            }
+            return minEval;
+
+        }
+    }
     
     //Calcul et renvoie un coup à jouer par l'ia (fonction appelé dans IA.java)
     public Coup calculCoup(){
@@ -24,7 +66,6 @@ class IAinter extends IA{
         return bestCoup;
     }
     
-    @Override
     public int heuristique(Jeu copie) {
         //position actuelle du roi
         Point king = null;
