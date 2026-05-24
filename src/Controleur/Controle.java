@@ -35,8 +35,8 @@ public class Controle extends ControleAbstract{
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        levelIANoir = 0;
-        levelIABlanc = 0;
+        levelIANoir = 1;
+        levelIABlanc = 1;
         dernierLevelBlanc = 0;
         dernierLevelNoir = 0;
         this.IaBlanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);

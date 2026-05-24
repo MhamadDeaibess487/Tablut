@@ -180,7 +180,7 @@ public abstract class BaseJeu {
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
                 fini = true;
-                System.out.println("blanc ganger");
+//                System.out.println("blanc ganger");
             }
         }
 
@@ -192,7 +192,7 @@ public abstract class BaseJeu {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
                     fini = true;
-                    System.out.println("noir ganger");
+//                    System.out.println("noir ganger");
                 }
                 if (grille[P.l][P.c] == 2) { // vérification pions blanc (peut être inutile?)
                     ListePointB.SupprimeListePoint(P);
