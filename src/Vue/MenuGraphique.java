@@ -52,7 +52,7 @@ public class MenuGraphique extends JFrame {
     }
 
     private JPanel creerMenuPrincipal() {
-        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background.png");
+        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
         panel.setLayout(new BorderLayout());
 
         JPanel menuBox = new JPanel();
@@ -61,7 +61,7 @@ public class MenuGraphique extends JFrame {
         menuBox.setBorder(BorderFactory.createEmptyBorder(40, 30, 40, 120));
 
         JButton nouvellePartie = imageButton("btn_new_game.png", "btn_new_game_hover.png");
-        JButton multiplayer = imageButton("btn_multiplayer.png", "btn_multiplayer_hover.png");
+        JButton online = imageButton("btn_online.png", "btn_online_hover.png");
         JButton chargerPartie = imageButton("btn_load.png", "btn_load_hover.png");
         JButton options = imageButton("btn_options.png", "btn_options_hover.png");
         JButton quitter = imageButton("btn_quit.png", "btn_quit_hover.png");
@@ -75,7 +75,7 @@ public class MenuGraphique extends JFrame {
             } 
         });
 
-        multiplayer.addActionListener(new ActionListener() {
+        online.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ouvrirMenuMultijoueur();
             }
@@ -104,7 +104,7 @@ public class MenuGraphique extends JFrame {
         menuBox.add(Box.createVerticalStrut(35));
         menuBox.add(nouvellePartie);
         menuBox.add(Box.createVerticalStrut(12));
-        menuBox.add(multiplayer);
+        menuBox.add(online);
         menuBox.add(Box.createVerticalStrut(12));
         menuBox.add(chargerPartie);
         menuBox.add(Box.createVerticalStrut(12));
@@ -118,7 +118,7 @@ public class MenuGraphique extends JFrame {
     }
 
     private JPanel creerMenuOptions() {
-        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background.png");
+        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
         panel.setLayout(new GridBagLayout());
 
         JPanel box = new JPanel();
