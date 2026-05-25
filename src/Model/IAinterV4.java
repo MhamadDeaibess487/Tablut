@@ -9,6 +9,12 @@ class IAinterV4 extends IA {
         this.couleur = couleur;
     }
 
+    // Si true : lorsque la recherche est faite à profondeur 1, jouer immédiatement
+    // un coup qui donne la victoire (roi sur bord pour Blanc, roi capturé pour Noir).
+    private boolean jouerVictoireImmed = true;
+
+    public void setJouerVictoireImmed(boolean v){ this.jouerVictoireImmed = v; }
+
     private Point posRoi(Jeu jeu) {
         for (int l = 0; l < 9; l++)
             for (int c = 0; c < 9; c++)
@@ -129,7 +135,7 @@ class IAinterV4 extends IA {
             for (Coup c : coups) {
                 Jeu copie = new Jeu(jeu);
                 copie.deplacer(c.a, c.b);
-                best = Math.max(best, alphabeta(copie, prof-1, alpha, beta, true));
+                best = Math.max(best, alphabeta(copie, prof-1, alpha, beta, false)); // estmax doit etre false pour le coup suivant 
 //                if(best > 5000){
 //                   System.err.println("Score " + best);
 //                }
@@ -142,7 +148,7 @@ class IAinterV4 extends IA {
             for (Coup c : coups) {
                 Jeu copie = new Jeu(jeu);
                 copie.deplacer(c.a, c.b);
-                best = Math.min(best, alphabeta(copie, prof-1, alpha, beta, false));
+                best = Math.min(best, alphabeta(copie, prof-1, alpha, beta, true)); // estmax doit etre true pour le coup suivant
                 beta = Math.min(beta, best);
                 if (beta <= alpha) break;   // coupure α
             }
@@ -153,6 +159,7 @@ class IAinterV4 extends IA {
 
     @Override
     Coup calculCoup() {
+        System.out.println("IA INTER CALCUL COUP");
         boolean noir = (couleur == 1);
         int bestScore = noir ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         List<Coup> exAequo = new ArrayList<>();
@@ -161,10 +168,32 @@ class IAinterV4 extends IA {
         //si aucun coup disponible, la partie est terminée
         if (tousLesCoups.isEmpty()) return null;
 
+        int profondeurRecherche = 1; // profondeur utilisée pour l'appel alphabeta
         for (Coup c : tousLesCoups) {
             Jeu copie = new Jeu(j);
             copie.deplacer(c.a, c.b);
-            int score = alphabeta(copie, 1, Integer.MIN_VALUE, Integer.MAX_VALUE, noir);
+
+            // ============== Optimisation pour coup gagnat immédiat ( et probleme de score supérieur pour profondeur 2 ou 3) ============== 
+            // Si détection immédiate d'un coup gagnant lorsque la recherche se fait à profondeur 1 (prochain coup).
+            if (jouerVictoireImmed && profondeurRecherche == 1) {
+                Point roiApres = posRoi(copie);
+
+                // Blanc gagne si le roi atteint un bord
+                if (couleur == 2 && roiApres != null &&
+                    (roiApres.l == 0 || roiApres.l == 8 || roiApres.c == 0 || roiApres.c == 8)) {
+                    System.out.println("Coup gagnant immédiat détecté ! (BLANC)");
+                    return c;
+                }
+
+                // Noir gagne si le roi n'existe plus (capturé)
+                if (couleur == 1 && copie.getFini()) {
+                    System.out.println("Coup gagnant immédiat détecté ! (NOIR)");
+                    return c;
+                }
+            }
+            // ======================= //
+
+            int score = alphabeta(copie, profondeurRecherche, Integer.MIN_VALUE, Integer.MAX_VALUE, noir);
 //            if(score > 5000){
 //                System.err.println("Score " + score);
 //                System.err.println(c.a.l+" " + c.a.c + " " + c.b.l + " " + c.b.c);
@@ -212,7 +241,7 @@ class IAinterV4 extends IA {
         int score = 0;
 
         // ── 2. Matériel ─────────────────────────────────────────────────────
-        score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 100;
+        score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 500;
 
         // ── 3. Suédois en danger (Noir adjacent → peut être capturé) ────────
         // FIX bug 1 : ce critère manquait, l'IA sacrifiait des pièces sans le voir
