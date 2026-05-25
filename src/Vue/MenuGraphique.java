@@ -25,7 +25,6 @@ public class MenuGraphique extends JFrame {
 
     public MenuGraphique(BaseJeu jeu) {
         this.jeu = jeu;
-        nbPartie = 0;
 
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,14 +67,11 @@ public class MenuGraphique extends JFrame {
         JButton quitter = imageButton("btn_quit.png", "btn_quit_hover.png");
 
         nouvellePartie.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                if(nbPartie != 0)
-                    ((Model.Jeu)jeu).nouvellePartie();
+                ((Model.Jeu)jeu).nouvellePartie();
                 FenetreJeu fenetreJeu = new FenetreJeu(jeu);
                 fenetreJeu.setVisible(true);
-                nbPartie++;
             } 
         });
 

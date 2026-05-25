@@ -9,7 +9,6 @@ class IAinterV4 extends IA {
         this.couleur = couleur;
     }
 
-
     private Point posRoi(Jeu jeu) {
         for (int l = 0; l < 9; l++)
             for (int c = 0; c < 9; c++)
@@ -96,7 +95,7 @@ class IAinterV4 extends IA {
             if (dist == 0) return 1000;            // victoire immédiate
             return 100 + (4 - dist) * 20;          // plus proche = plus prioritaire
         }
-
+        
         // Captures (les deux camps)
         int cap = capturesEstimees(src, dst, jeu);
         if (cap > 0) return 500 + cap * 100;
@@ -113,12 +112,12 @@ class IAinterV4 extends IA {
 
 
     //a modifier, faire annule coup apres avoir jouer le coup pour ne pas faire de copie de plateau à chaque fois
-    public int alphabeta(Jeu jeu, int prof, int alpha, int beta, boolean estmax) {
+    public int alphabeta(Jeu jeu,int prof, int alpha, int beta, boolean estmax) {
         if (prof == 0 || jeu.getFini()){
             return heuristique(jeu);
         }
 
-        int joueur = estmax ? 1 : 2; // .?? PQ ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
+        int joueur = estmax ? 1 : 2; // PQ ?? ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
 //        List<Coup> coups = trierCoups(jeu.CoupJouable(joueur).Liste, jeu, estmax);
         List<Coup> coups = jeu.CoupJouable(joueur).Liste;
 
@@ -158,7 +157,7 @@ class IAinterV4 extends IA {
         int bestScore = noir ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         List<Coup> exAequo = new ArrayList<>();
         List<Coup> tousLesCoups = j.CoupJouable(couleur).Liste;
-
+        
         //si aucun coup disponible, la partie est terminée
         if (tousLesCoups.isEmpty()) return null;
 
@@ -202,13 +201,13 @@ class IAinterV4 extends IA {
     // ─────────────────────────────────────────────────────────────────────────
 
     private int heuristique(Jeu jeu) {
-        Point king = posRoi(jeu);
+        Point king = posRoi(jeu); // On peut stcoker la pos du roi dans basejeu => plus optimiser
 
         // ── 1. États terminaux ──────────────────────────────────────────────
         if (king == null)
-            return +10000;
+            return +100000;
         if (king.l==0 || king.l==8 || king.c==0 || king.c==8)
-            return -10000;
+            return -100000;
 
         int score = 0;
 
@@ -239,37 +238,37 @@ class IAinterV4 extends IA {
         score -= (8 - distBord) * 40;
 
         // ── 5. Menace sur le roi (Noirs adjacents) — non-linéaire ───────────
-//        int menace = 0;
-//        if (king.l < 3 || king.l > 5 && king.c < 3 || king.c > 5){
-//            if(jeu.grille[king.l-1][king.c] == 1){
-//                if(jeu.grille[king.l+1][king.c] == 1)
-//                    menace=3;
-//                menace++;
-//            }
-//            if(jeu.grille[king.l][king.c-1] == 1){
-//                if(jeu.grille[king.l][king.c+1] == 1)
-//                    menace=3;
-//                menace++;
-//            }
-//            if(jeu.grille[king.l+1][king.c] == 1){
-//                if(jeu.grille[king.l-1][king.c] == 1)
-//                    menace=3;
-//                menace++;
-//            }
-//            if(jeu.grille[king.l][king.c+1] == 1){
-//                if(jeu.grille[king.l][king.c-1] == 1)
-//                    menace=3;
-//                menace++;
-//            }
-//        }
-//        else{
-//            if (jeu.grille[king.l-1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-//            if (jeu.grille[king.l+1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-//            if (jeu.grille[king.l][king.c-1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-//            if (jeu.grille[king.l][king.c+1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-//        }
-//        score += new int[]{0, 80, 350, 100000}[menace>3?3:menace];
-
+        int menace = 0;
+        if (king.l < 3 || king.l > 5 && king.c < 3 || king.c > 5){
+            if(jeu.grille[king.l-1][king.c] == 1){
+                if(jeu.grille[king.l+1][king.c] == 1)
+                    menace=3;
+                menace++;
+            }
+            if(jeu.grille[king.l][king.c-1] == 1){
+                if(jeu.grille[king.l][king.c+1] == 1)
+                    menace=3;
+                menace++;
+            }
+            if(jeu.grille[king.l+1][king.c] == 1){
+                if(jeu.grille[king.l-1][king.c] == 1)
+                    menace=3;
+                menace++;
+            }
+            if(jeu.grille[king.l][king.c+1] == 1){
+                if(jeu.grille[king.l][king.c-1] == 1)
+                    menace=3;
+                menace++;
+            }
+        }
+        else{
+            if (jeu.grille[king.l-1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
+            if (jeu.grille[king.l+1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
+            if (jeu.grille[king.l][king.c-1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
+            if (jeu.grille[king.l][king.c+1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
+        }
+        score += new int[]{0, 80, 350, 100000}[menace>3?3:menace];
+    
         // ── 6. Protection du roi (Blancs adjacents = bouclier) ──────────────
         int protection = 0;
         if (king.l > 0 && jeu.grille[king.l-1][king.c] == 2) protection++;

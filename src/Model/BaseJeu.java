@@ -11,6 +11,7 @@ import java.util.ArrayList;
 // Répétition 3 coups identiques.
 public abstract class BaseJeu {
     protected int[][] grille; // 0 vide, 1 noir, 2 blanc, 3 roi, 4 trone
+    protected final TableauBit grilleInit; // Grille initiale serializé
     protected int Joueur_actif; // joueur 1(Noir) ou 2(Blanc)
     protected final int Taille_plateau;
     protected Point trone;
@@ -23,25 +24,11 @@ public abstract class BaseJeu {
         Joueur_actif = 1; // Les noirs commencent
         trone = new Point(4, 4);
         grille = new int[Taille_plateau][Taille_plateau];
-        ListePoint init = new ListePoint();
-        ListePointN = init.ListeBaseNoir();
-        ListePointB = init.ListeBaseBlanc();
-
-        if (ListePointB.totale != 9) {
-            System.err.println("error initialisation ListePointB");
-        }
-        if (ListePointN.totale != 16) {
-            System.err.println("error initialisation ListePointN");
-        }
-
-        for (Point PB : ListePointB.LP) {
-            grille[PB.l][PB.c] = 2;
-        }
-        grille[4][4] = 3;
-
-        for (Point PN : ListePointN.LP) {
-            grille[PN.l][PN.c] = 1;
-        }
+        ListePointB = new ListePoint();
+        ListePointN = new ListePoint();
+        
+        grilleInit = new TableauBit(0x20383808002038L, 0x3808, 0x40206c080400000L, 0, 0x10000000000L, 0);
+        transformeLongEnGrille(grilleInit);
     }
 
     abstract public boolean jeuRedondant();
@@ -73,15 +60,6 @@ public abstract class BaseJeu {
     public ListePoint getListePointN() {
         return this.ListePointN;
     }
-    /*
-     * public ListePion getListeBlanc() {
-     * return Liste_blanc;
-     * }
-     *
-     * public ListePion getListeNoir() {
-     * return Liste_noir;
-     * }
-     */
 
     public int getTaillePlateau() {
         return this.Taille_plateau;
@@ -466,19 +444,15 @@ public abstract class BaseJeu {
     }
 
     public ListeCoup CoupJouable(int couleur){
-        ListeCoup Lcoup = new ListeCoup();
-        ArrayList<Point> L = new ArrayList<>();
-        ListePoint Lpoint = new ListePoint();
-        if (couleur ==1) Lpoint = ListePointN;
-        else Lpoint = ListePointB;
-        for (Point p: Lpoint.LP){
-            L = listeCasesValides(p.l, p.c);
+        ListeCoup lCoup = new ListeCoup();
+        ListePoint lPoint = couleur == 1?ListePointN:ListePointB;
+        for(Point p: lPoint.LP){
+            ArrayList<Point> L = listeCasesValides(p.l, p.c);
             for (Point pcases: L){
-                Coup c = new Coup(p, pcases, Joueur_actif);
-                Lcoup.AddListeCoup(c);
+                lCoup.AddListeCoup(new Coup(p, pcases, Joueur_actif));
             }
         }
-        return Lcoup;
+        return lCoup;
     }
     public TableauBit transformerGrilleEnLong() {
         TableauBit b = new TableauBit();
@@ -516,9 +490,10 @@ public abstract class BaseJeu {
         return (value & (1L << bitIndex)) != 0;
     }
 
-    public void transformeLongEnGrille(TableauBit b) { // l'inverse 
+    public final void transformeLongEnGrille(TableauBit b){
         grille = new int[Taille_plateau][Taille_plateau];
-
+        ListePointB.clear();
+        ListePointN.clear();
         for (int index = 0; index < Taille_plateau * Taille_plateau; index++) {
             boolean partie1 = index < 64;
             int bitIndex = partie1 ? index : index - 64;
@@ -529,18 +504,24 @@ public abstract class BaseJeu {
             if (partie1) {
                 if (hasBit(b.noir1, bitIndex)) {
                     grille[l][c] = 1;
+                    ListePointN.AddListePoint(new Point(l,c));
                 } else if (hasBit(b.blanc1, bitIndex)) {
                     grille[l][c] = 2;
+                    ListePointB.AddListePoint(new Point(l,c));
                 } else if (hasBit(b.roi1, bitIndex)) {
                     grille[l][c] = 3;
+                    ListePointB.AddListePoint(new Point(l,c));
                 }
             } else {
                 if (hasBit(b.noir2, bitIndex)) {
                     grille[l][c] = 1;
+                    ListePointN.AddListePoint(new Point(l,c));
                 } else if (hasBit(b.blanc2, bitIndex)) {
                     grille[l][c] = 2;
+                    ListePointB.AddListePoint(new Point(l,c));
                 } else if (hasBit(b.roi2, bitIndex)) {
                     grille[l][c] = 3;
+                    ListePointB.AddListePoint(new Point(l,c));
                 }
             }
         }

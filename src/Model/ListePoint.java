@@ -16,6 +16,11 @@ class ListePoint {
         return totale == 0;
     }
     
+    public void clear(){
+        LP.clear(); 
+        totale = 0;
+    }
+    
     public Point getPoint(int i){
         return LP.get(i);
     }
@@ -27,15 +32,7 @@ class ListePoint {
 
     public void SupprimeListePoint(Point Supp) {
         LP.remove(Supp);
-//        List<Point> res = new ListePoint();
-//        for (Point p : LP) {
-//            if (p.l != Supp.l && p.c != Supp.l)
-//                res.AddListePoint(p);
-//            if (p.l == Supp.l && p.c == Supp.c)
-//                totale--;
-//        }
-//
-//        return res;
+        totale--;
     }
 
     public ListePoint ListeBaseBlanc() {
@@ -107,6 +104,5 @@ class ListePoint {
             }
         }
         return LP;
-
     }
 }

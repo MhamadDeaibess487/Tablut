@@ -53,8 +53,6 @@ public class Jeu extends BaseJeu {
                 if (line.isEmpty()) {
                     continue;
                 }
-                // else if(line.equalsIgnoreCase("GRILLE")){
-                // }
                 else if (line.equalsIgnoreCase("REDO")) {
                     inRedo = true;
                     inUndo = false;
@@ -184,10 +182,6 @@ public class Jeu extends BaseJeu {
         return false;
     }
 
-    private void reconstruireJeu() {
-        transformeLongEnGrille(undo.peek());
-    }
-
     private TableauBit lirePlateau(String line) {
         String[] parts = line.split(",");
         try {
@@ -207,25 +201,7 @@ public class Jeu extends BaseJeu {
     public void nouvellePartie() {
         this.Joueur_actif = 1;
         this.fini = false;
-        this.grille = new int[Taille_plateau][Taille_plateau];
-        ListePoint init = new ListePoint();
-        this.ListePointN = init.ListeBaseNoir();
-        this.ListePointB = init.ListeBaseBlanc();
-        for (Point PB : ListePointB.LP) {
-            grille[PB.l][PB.c] = 2;
-        }
-        grille[4][4] = 3;
-        for (Point PN : ListePointN.LP) {
-            grille[PN.l][PN.c] = 1;
-        }
-        // Clear undo/redo stacks
-        this.redo.clear();
-        this.undo.clear();
-        grille[4][4] = 3;
-        for (Point PN : ListePointN.LP) {
-            grille[PN.l][PN.c] = 1;
-        }
-        // Clear undo/redo stacks
+        transformeLongEnGrille(grilleInit);
         this.redo.clear();
         this.undo.clear();
     }
