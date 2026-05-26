@@ -5,6 +5,8 @@ import Model.BaseJeu;
 import Config.Config;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class FenetreJeu extends JFrame {
     BaseJeu jeu;
@@ -12,6 +14,7 @@ public class FenetreJeu extends JFrame {
     private JPanel victoryButtonsPanel;
     private Timer victoryTimer;
     private GrilleGraphique grille;
+    private Timer resizeTimer;
 
     public FenetreJeu(BaseJeu jeu) {
         setTitle("Tablut");
@@ -80,20 +83,31 @@ public class FenetreJeu extends JFrame {
         addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
-                int w = getWidth();
-                int h = getHeight();
+                if (resizeTimer != null && resizeTimer.isRunning()) {
+                    resizeTimer.restart();
+                    return;
+                }
 
-                int btnSize = (int) (Math.min(w, h) * 0.10);
+                resizeTimer = new Timer(80, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ev) {
+                        int w = getWidth();
+                        int h = getHeight();
 
-                ((RoundedButton) buttons.undo).updateSize(btnSize);
-                ((RoundedButton) buttons.redo).updateSize(btnSize);
-                ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
+                        int btnSize = (int) (Math.min(w, h) * 0.10);
 
+                        ((RoundedButton) buttons.undo).updateSize(btnSize);
+                        ((RoundedButton) buttons.redo).updateSize(btnSize);
+                        ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
 
-                joueurActifPanel.resizePanel(w, h);
+                        joueurActifPanel.resizePanel(w, h);
 
-                revalidate();
-                repaint();
+                        revalidate();
+                        repaint();
+                    }
+                });
+                resizeTimer.setRepeats(false);
+                resizeTimer.start();
             }
         });
 

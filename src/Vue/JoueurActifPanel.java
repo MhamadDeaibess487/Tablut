@@ -468,7 +468,7 @@ public class JoueurActifPanel extends JPanel {
         resizeSlider(slider2, (int) drawnWidth, (int) drawnHeight);
 
         revalidate();
-        repaint();
+        //repaint();
     }
     private void resizeCard(JPanel card, int w, int h) {
         Dimension d = new Dimension(w, h);
