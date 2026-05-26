@@ -205,4 +205,23 @@ public class Jeu extends BaseJeu {
         this.redo.clear();
         this.undo.clear();
     }
+
+    // draw doit être utilisé après chaque coup joué
+    public boolean draw() {// retourne un boolean: true si on doit arreter la partie,faux sinon
+        // je parcours la liste redo pour voir si la configuaration réapparait
+        TableauBit Last = transformerGrilleEnLong();
+        int nb = 0;
+        for (TableauBit tmp : undo) {
+            // System.out.println(tmp.blanc1 + " " + tmp.noir1);
+            if (Last.compareTo(tmp) == 0) {
+                nb++;
+            }
+            if (nb == 2) {
+                return true;
+            }
+
+        }
+        return false;
+
+    }
 }
