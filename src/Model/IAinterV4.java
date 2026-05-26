@@ -109,6 +109,11 @@ class IAinterV4 extends IA {
         // Noir : rapprocher une pièce du roi
         if (estmax && king != null) {
             int dist = Math.abs(dst.l - king.l) + Math.abs(dst.c - king.c);
+            if (dist == 1) {
+                // Si la pièce se place directement au sud du roi, encore plus prioritaire
+                if (dst.l == king.l + 1 && dst.c == king.c) return 800;
+                return 400;
+            }
             return Math.max(0, 20 - dist * 2);
         }
 
@@ -123,9 +128,9 @@ class IAinterV4 extends IA {
             return heuristique(jeu);
         }
 
-        int joueur = estmax ? 1 : 2; // PQ ?? ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
+        //int joueur = estmax ? 1 : 2; // PQ ?? ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
 //        List<Coup> coups = trierCoups(jeu.CoupJouable(joueur).Liste, jeu, estmax);
-        List<Coup> coups = jeu.CoupJouable(joueur).Liste;
+        List<Coup> coups = jeu.CoupJouable(jeu.Joueur_actif).Liste;
 
         if (coups.isEmpty())
             return heuristique(jeu);
@@ -140,7 +145,7 @@ class IAinterV4 extends IA {
 //                   System.err.println("Score " + best);
 //                }
                 alpha = Math.max(alpha, best);
-                if (beta <= alpha) break;   // coupure β
+                if (beta <= alpha || alpha >= 100000) break;   // coupure β
             }
             return best;
         } else {
@@ -150,7 +155,7 @@ class IAinterV4 extends IA {
                 copie.deplacer(c.a, c.b);
                 best = Math.min(best, alphabeta(copie, prof-1, alpha, beta, true)); // estmax doit etre true pour le coup suivant
                 beta = Math.min(beta, best);
-                if (beta <= alpha) break;   // coupure α
+                if (beta <= alpha || beta <= -100000) break;   // coupure α
             }
             return best;
         }
@@ -170,12 +175,22 @@ class IAinterV4 extends IA {
 
         int profondeurRecherche = 1; // profondeur utilisée pour l'appel alphabeta
         for (Coup c : tousLesCoups) {
+
+            // Vérification : la pièce source appartient bien à notre couleur
+            // int pieceSource = j.grille[c.a.l][c.a.c];
+            // boolean bonCamp = (couleur == 1) ? (pieceSource == 1) : (pieceSource == 2 || pieceSource == 3);
+            // if (!bonCamp) {
+            //     System.err.println("COUP INVALIDE : pièce " + pieceSource
+            //         + " pour couleur " + couleur + " en (" + c.a.l + "," + c.a.c + ")");
+            //     continue;  // ignore ce coup
+            // }
+
             Jeu copie = new Jeu(j);
             copie.deplacer(c.a, c.b);
 
             // ============== Optimisation pour coup gagnat immédiat ( et probleme de score supérieur pour profondeur 2 ou 3) ============== 
             // Si détection immédiate d'un coup gagnant lorsque la recherche se fait à profondeur 1 (prochain coup).
-            if (jouerVictoireImmed && profondeurRecherche == 1) {
+            if (jouerVictoireImmed) {
                 Point roiApres = posRoi(copie);
 
                 // Blanc gagne si le roi atteint un bord
@@ -193,7 +208,7 @@ class IAinterV4 extends IA {
             }
             // ======================= //
 
-            int score = alphabeta(copie, profondeurRecherche, Integer.MIN_VALUE, Integer.MAX_VALUE, noir);
+            int score = alphabeta(copie, profondeurRecherche, Integer.MIN_VALUE, Integer.MAX_VALUE, !noir);
 //            if(score > 5000){
 //                System.err.println("Score " + score);
 //                System.err.println(c.a.l+" " + c.a.c + " " + c.b.l + " " + c.b.c);
@@ -305,6 +320,20 @@ class IAinterV4 extends IA {
         if (king.c > 0 && jeu.grille[king.l][king.c-1] == 2) protection++;
         if (king.c < 8 && jeu.grille[king.l][king.c+1] == 2) protection++;
         score -= protection * 60;
+
+        // ── 6.5 Potentiel de capture au prochain tour (si Noir peut capturer le roi)
+        // On simule rapidement tous les coups noirs possibles et on compte
+        // ceux qui terminent la partie (capture du roi)
+        // if (king != null) { // trop cher a calculer
+        //     int potCap = 0;
+        //     List<Coup> coupsNoirs = jeu.CoupJouable(1).Liste;
+        //     for (Coup mv : coupsNoirs) {
+        //         Jeu sim = new Jeu(jeu);
+        //         sim.deplacer(mv.a, mv.b);
+        //         if (sim.getFini()) potCap++;
+        //     }
+        //     score += potCap * 8000; // gros poids : capture prochaine vaut presque une victoire
+        // }
 
         // ── 7. Routes d'évasion ─────────────────────────────────────────────
         boolean routeN = true, routeS = true, routeE = true, routeO = true;
