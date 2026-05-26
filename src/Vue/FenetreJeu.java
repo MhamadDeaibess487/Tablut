@@ -9,6 +9,8 @@ import java.awt.*;
 public class FenetreJeu extends JFrame {
     BaseJeu jeu;
     private JoueurActifPanel joueurActifPanel;
+    private JPanel victoryButtonsPanel;
+    private Timer victoryTimer;
 
     public FenetreJeu(BaseJeu jeu) {
         setTitle("Tablut");
@@ -51,7 +53,22 @@ public class FenetreJeu extends JFrame {
         northBox.add(Box.createHorizontalGlue());
         northBox.add(buttons.parametres);
 
-        centerPanel.add(grille, BorderLayout.CENTER);
+        JPanel grilleWrapper = new JPanel();
+        grilleWrapper.setLayout(new OverlayLayout(grilleWrapper));
+        grilleWrapper.setOpaque(false);
+
+        victoryButtonsPanel = createVictoryButtonsPanel();
+        victoryButtonsPanel.setVisible(false);
+
+        grille.setAlignmentX(0.5f);
+        grille.setAlignmentY(0.5f);
+        victoryButtonsPanel.setAlignmentX(0.5f);
+        victoryButtonsPanel.setAlignmentY(0.78f);
+
+        grilleWrapper.add(victoryButtonsPanel);
+        grilleWrapper.add(grille);
+
+        centerPanel.add(grilleWrapper, BorderLayout.CENTER);
         centerPanel.add(southBox, BorderLayout.SOUTH);
         centerPanel.add(northBox, BorderLayout.NORTH);
 
@@ -79,7 +96,42 @@ public class FenetreJeu extends JFrame {
             }
         });
 
+        victoryTimer = new Timer(200, e -> {
+            boolean fini = jeu.getFini();
+            victoryButtonsPanel.setVisible(fini);
+            victoryButtonsPanel.revalidate();
+            victoryButtonsPanel.repaint();
+        });
+        victoryTimer.start();
+
         setVisible(true);
+    }
+
+    private JPanel createVictoryButtonsPanel() {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
+
+        JButton nouvellePartie = new JButton("Nouvelle partie");
+        JButton quitter = new JButton("Quitter");
+
+        nouvellePartie.setFont(new Font("SansSerif", Font.BOLD, 22));
+        quitter.setFont(new Font("SansSerif", Font.BOLD, 22));
+
+        nouvellePartie.addActionListener(e -> {
+            dispose();
+            new FenetreJeu(new Model.Jeu());
+        });
+
+        quitter.addActionListener(e -> {
+            dispose();
+            new MenuGraphique(new Model.Jeu());
+        });
+
+        panel.add(nouvellePartie);
+        panel.add(quitter);
+
+        return panel;
     }
 
     public void setJoueurActif(int joueur) {
