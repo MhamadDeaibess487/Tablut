@@ -152,7 +152,7 @@ public class GrilleGraphique extends JPanel {
 
 
 
-        double pourcentage = 0.85;
+        double pourcentage = 1;
 
         int tailleVict = (int) (taillePlateau * pourcentage);
         int joueur_actif = jeu.getJoueur();
@@ -235,5 +235,12 @@ public class GrilleGraphique extends JPanel {
     public void afficherImageVictoire() {
         afficherVictoire = true;
         repaint();
+    }
+
+    public int getVictoireImageBottom() {
+        // Retourne la coordonnée Y du bas de l'image de victoire dans le panel
+        int imageH = (int)(getHeight() * 0.65); // adapte selon ta logique d'affichage
+        int imageY = (getHeight() - imageH) / 2;
+        return imageY + imageH;
     }
 }
