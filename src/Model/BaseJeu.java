@@ -73,13 +73,8 @@ public abstract class BaseJeu {
         int min;
         int max;// vérifie si des pions sont entre les deux positions
         if (c1 == c2) {
-            if (l1 >= l2) {
-                min = l2;
-                max = l1;
-            } else {
-                min = l1;
-                max = l2;
-            }
+            min = Math.min(l1, l2);
+            max = Math.max(l1, l2);
             for (int l = min + 1; l < max; l++) {
                 if (grille[l][c1] != 0) {
                     return false;
@@ -88,13 +83,8 @@ public abstract class BaseJeu {
         }
 
         if (l1 == l2) {
-            if (c1 >= c2) {
-                min = c2;
-                max = c1;
-            } else {
-                min = c1;
-                max = c2;
-            }
+            min = Math.min(c1, c2);
+            max = Math.max(c1, c2);
             for (int c = min + 1; c < max; c++) {
                 if (grille[l1][c] != 0) {
                     return false;
@@ -193,19 +183,14 @@ public abstract class BaseJeu {
         return save;
     }
 
-    public boolean CaptureRoi(int L, int C) { // roi bloqué des 4 cotés par des pions noirs
 
-        if (grille[L + 1][C] != 1 && grille[L + 1][C] != 4) { // je regarde si le roi peut s'échapper
-            return false;
-        }
-        if (grille[L - 1][C] != 1 && grille[L - 1][C] != 4) {
-            return false;
-        }
-        if (grille[L][C + 1] != 1 && grille[L][C + 1] != 4) {
-            return false;
-        }
-        if (grille[L][C - 1] != 1 && grille[L][C - 1] != 4) {
-            return false;
+    public boolean CaptureRoi(int L, int C) { // roi bloqué des 4 cotés par des pions noirs ou trone
+
+        int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        for (int[] d : directions) {// je regarde si le roi peut s'échapper
+            int val = grille[L + d[0]][C + d[1]];
+            if (val != 1 && val != 4)
+                return false;
         }
         return true;
 
@@ -214,153 +199,68 @@ public abstract class BaseJeu {
 
     public ListePion CaptureBlanc(Point P) { // Liste des pions blancs qui peuvent être manger
         ListePion Liste = new ListePion();
-
-        if (P.l < 7) {
-            if (grille[P.l + 1][P.c] == 2) { // mange les pions blanc basiques
-                if (grille[P.l + 2][P.c] == 1 || grille[P.l + 2][P.c] == 4) {
-                    Point tmp = new Point(P.l + 1, P.c);
-                    Liste.AddListePion(new Pion(tmp,2));
-                }
-            }
-            if (grille[P.l + 1][P.c] == 3) { // le roi
-                if (P.l + 1 <= 5 && P.l + 1 >= 3 && P.c <= 5 && P.c >= 3) { // centre du plateau
-                    if (CaptureRoi(P.l + 1, P.c)) {
-                        Point tmp = new Point(P.l + 1, P.c);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                } else {
-                    if (grille[P.l + 2][P.c] == 1) { // comme un pion normal
-                        Point tmp = new Point(P.l + 1, P.c);
-                        Liste.AddListePion(new Pion(tmp,2));
+        int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        for (int[] d : directions) {
+            if (P.l + 2 * d[0] <= 8 && P.l + 2 * d[0] >= 0 && P.c + 2 * d[1] <= 8 && P.c + 2 * d[1] >= 0) {// cas de
+                                                                                                           // bords
+                int type = grille[P.l + d[0]][P.c + d[1]];
+                int DeuxCasesPlusLoin = grille[P.l + 2 * d[0]][P.c + 2 * d[1]]; // JE REGARDE deux cases plus loins
+                if (type == 2) { // mange les pions blanc basiques
+                    if (DeuxCasesPlusLoin == 1 || DeuxCasesPlusLoin == 4) {
+                        Point tmp = new Point(P.l + d[0], P.c + d[1]);
+                        Pion res = new Pion(tmp, 2);
+                        Liste.AddListePion(res);
                     }
                 }
-            }
-        }
-        if (P.l > 1) {
-            if (grille[P.l - 1][P.c] == 2) { // pion normal
-                if (grille[P.l - 2][P.c] == 1 || grille[P.l - 2][P.c] == 4) {
-                    Point tmp = new Point(P.l - 1, P.c);
-                    Liste.AddListePion(new Pion(tmp,2));
-                }
-            }
-            if (grille[P.l - 1][P.c] == 3) { // le roi
-                if (P.l - 1 <= 5 && P.l - 1 >= 3 && P.c <= 5 && P.c >= 3) { // centre du plateau
-                    if (CaptureRoi(P.l - 1, P.c)) {
-                        Point tmp = new Point(P.l - 1, P.c);
-                        Liste.AddListePion(new Pion(tmp,2));
+                if (type == 3) { // le roi
+                    if (P.l + d[0] <= 5 && P.l + d[0] >= 3 && P.c + d[1] <= 5 && P.c + d[1] >= 3) { // centre du plateau
+                        if (CaptureRoi(P.l + d[0], P.c + d[1])) {
+                            Point tmp = new Point(P.l + d[0], P.c + d[1]);
+                            Pion res = new Pion(tmp, 3);
+                            Liste.AddListePion(res);
+                        }
+                    } else { // comme un pion normale
+                        if (DeuxCasesPlusLoin == 1) {
+                            Point tmp = new Point(P.l + d[0], P.c + d[1]);
+                            Pion res = new Pion(tmp, 3);
+                            Liste.AddListePion(res);
+                        }
                     }
-                } else {
-                    if (grille[P.l - 2][P.c] == 1) { // comme un pion normal
-                        Point tmp = new Point(P.l - 1, P.c);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                }
-            }
-        }
-
-        if (P.c < 7) {
-            if (grille[P.l][P.c + 1] == 2) { // pion normal
-                if (grille[P.l][P.c + 2] == 1 || grille[P.l][P.c + 2] == 4) {
-                    Point tmp = new Point(P.l, P.c + 1);
-                    Liste.AddListePion(new Pion(tmp,2));
-                }
-            }
-            if (grille[P.l][P.c + 1] == 3) { // le roi
-                if (P.l <= 5 && P.l >= 3 && P.c + 1 <= 5 && P.c + 1 >= 3) { // centre du plateau
-                    if (CaptureRoi(P.l, P.c + 1)) {
-                        Point tmp = new Point(P.l, P.c + 1);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                } else {
-                    if (grille[P.l][P.c + 2] == 1) { // comme un pion normal
-                        Point tmp = new Point(P.l, P.c + 1);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                }
-            }
-        }
-        if (P.c > 1) {
-            if (grille[P.l][P.c - 1] == 2) { // Pion normal
-                if (grille[P.l][P.c - 2] == 1 || grille[P.l][P.c - 2] == 4) {
-                    Point tmp = new Point(P.l, P.c - 1);
-                    Liste.AddListePion(new Pion(tmp,2));
-                }
-            }
-            if (grille[P.l][P.c - 1] == 3) { // le roi
-                if (P.l <= 5 && P.l >= 3 && P.c - 1 <= 5 && P.c - 1 >= 3) { // centre du plateau
-                    if (CaptureRoi(P.l, P.c - 1)) {
-                        Point tmp = new Point(P.l, P.c - 1);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                } else {
-                    if (grille[P.l][P.c - 2] == 1) { // comme un pion normal
-                        Point tmp = new Point(P.l, P.c - 1);
-                        Liste.AddListePion(new Pion(tmp,2));
-                    }
-                }
-            }
-        }
-
-        return Liste;
-    }
-
-    public ListePion CaptureNoir(Point P) { // Liste des pions noirs qui peuvent être manger
-        ListePion Liste = new ListePion();
-        if (P.l < 7) {
-            if (grille[P.l + 1][P.c] == 1) {
-                if (grille[P.l + 2][P.c] == 2 || grille[P.l + 2][P.c] == 4 || grille[P.l + 2][P.c] == 3) {
-                    Point tmp = new Point(P.l + 1, P.c);
-                    Liste.AddListePion(new Pion(tmp,1));
-                }
-            }
-        }
-        if (P.l > 1) {
-            if (grille[P.l - 1][P.c] == 1) {
-                if (grille[P.l - 2][P.c] == 2 || grille[P.l - 2][P.c] == 4 || grille[P.l - 2][P.c] == 3) {
-                    Point tmp = new Point(P.l - 1, P.c);
-                    Liste.AddListePion(new Pion(tmp,1));
-                }
-            }
-        }
-        if (P.c < 7) {
-            if (grille[P.l][P.c + 1] == 1) {
-                if (grille[P.l][P.c + 2] == 2 || grille[P.l][P.c + 2] == 4 || grille[P.l][P.c + 2] == 3) {
-                    Point tmp = new Point(P.l, P.c + 1);
-                    Liste.AddListePion(new Pion(tmp,1));
-                }
-            }
-        }
-        if (P.c > 1) {
-            if (grille[P.l][P.c - 1] == 1) {
-                if (grille[P.l][P.c - 2] == 2 || grille[P.l][P.c - 2] == 4 || grille[P.l][P.c - 2] == 3) {
-                    Point tmp = new Point(P.l, P.c - 1);
-                    Liste.AddListePion(new Pion(tmp,1));
                 }
             }
         }
         return Liste;
     }
 
-    public boolean EstBloque(Point P) { // Regarde si un Point est bloqué
-        if (P.l + 1 <= 8) {
-            if (grille[P.l + 1][P.c] == 0) {
-                return false;
+    public ListePion CaptureNoir(Point P) { // Liste des pions noirs qui peuvent être manger
+        ListePion Liste = new ListePion();
+        int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        for (int[] d : directions) {
+            if (P.l + 2 * d[0] <= 8 && P.l + 2 * d[0] >= 0 && P.c + 2 * d[1] <= 8 && P.c + 2 * d[1] >= 0) {
+                int type = grille[P.l + d[0]][P.c + d[1]];
+                int DeuxCasesPlusLoin = grille[P.l + 2 * d[0]][P.c + 2 * d[1]]; // JE REGARDE deux cases plus loins
+                if (type == 1) {
+                    if (DeuxCasesPlusLoin == 2 || DeuxCasesPlusLoin == 4 || DeuxCasesPlusLoin == 3) {
+                        Point tmp = new Point(P.l + d[0], P.c + d[1]);
+                        Pion res = new Pion(tmp, 1);
+                        Liste.AddListePion(res);
+                    }
+                }
             }
         }
-        if (P.l - 1 >= 0) {
-            if (grille[P.l - 1][P.c] == 0) {
-                return false;
+        return Liste;
+    }
+
+     public boolean EstBloque(Point P) { // Regarde si un Point est bloqué
+
+        int[][] directions = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        for (int[] d : directions) {// je regarde si le roi peut s'échapper
+            if (P.l + d[0] <= 8 && P.l + d[0] >= 0 && P.c + d[1] <= 8 && P.c + d[1] >= 0) {
+                int val = grille[P.l + d[0]][P.c + d[1]];
+                if (val == 0)
+                    return false;
             }
-        }
-        if (P.c + 1 >= 8) {
-            if (grille[P.l][P.c + 1] == 0) {
-                return false;
-            }
-        }
-        if (P.c - 1 >= 0) {
-            if (grille[P.l][P.c - 1] == 0) {
-                return false;
-            }
+
         }
         return true;
     }
