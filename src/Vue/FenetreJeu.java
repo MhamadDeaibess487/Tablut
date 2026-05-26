@@ -151,40 +151,7 @@ public class FenetreJeu extends JFrame {
         setVisible(true);
     }
 
-    private ImageIcon scaledIcon(String path, int w, int h) {
-        Image img = new ImageIcon(path).getImage();
-
-        BufferedImage scaled = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = scaled.createGraphics();
-
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(img, 0, 0, w, h, null);
-        g2.dispose();
-
-        return new ImageIcon(scaled);
-    }
-
-    private JButton imageVictoryButton(String normalName, String hoverName, int w, int h) {
-        String normalPath = Config.CHEMIN_IMAGES + "/" + normalName;
-        String hoverPath = Config.CHEMIN_IMAGES + "/" + hoverName;
-
-        JButton button = new JButton(scaledIcon(normalPath, w, h));
-        button.setRolloverIcon(scaledIcon(hoverPath, w, h));
-
-        Dimension size = new Dimension(w, h);
-        button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
-
-        button.setBorder(null);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(false);
-        button.setFocusPainted(false);
-        button.setOpaque(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        return button;
-    }
+    // Removed image-based button helpers
     private JPanel createVictoryButtonsPanel() {
         JPanel panel = new JPanel();
         panel.setOpaque(false);
@@ -194,10 +161,10 @@ public class FenetreJeu extends JFrame {
         victoryButtonsBox.setOpaque(false);
         victoryButtonsBox.setLayout(new BoxLayout(victoryButtonsBox, BoxLayout.X_AXIS));
 
-        victoryNouvellePartie = imageVictoryButton("btn_new_game.png", "btn_new_game_hover.png", 260, 70);
-        victoryVoirPlateau = imageVictoryButton("btn_voir_plateau.png", "btn_voir_plateau_hover.png", 260, 70);
-        victoryQuitter = imageVictoryButton("btn_quit.png", "btn_quit_hover.png", 260, 70);
-        victoryVoirImage = imageVictoryButton("btn_voir_image.png", "btn_voir_image_hover.png", 260, 70);
+        victoryNouvellePartie = victoryButton("Nouvelle Partie");
+        victoryVoirPlateau = victoryButton("Voir Plateau");
+        victoryQuitter = victoryButton("Quitter");
+        victoryVoirImage = victoryButton("Voir Image");
 
         victoryVoirImage.setVisible(false);
 
@@ -211,9 +178,6 @@ public class FenetreJeu extends JFrame {
             victoryVoirPlateau.setVisible(false);
             victoryVoirImage.setVisible(true);
             resizeVictoryButtons();
-            victoryButtonsPanel.revalidate();
-            victoryButtonsPanel.repaint();
-
         });
 
         victoryVoirImage.addActionListener(e -> {
@@ -221,8 +185,6 @@ public class FenetreJeu extends JFrame {
             victoryVoirImage.setVisible(false);
             victoryVoirPlateau.setVisible(true);
             resizeVictoryButtons();
-            victoryButtonsPanel.revalidate();
-            victoryButtonsPanel.repaint();
         });
 
         victoryQuitter.addActionListener(e -> {
@@ -237,65 +199,68 @@ public class FenetreJeu extends JFrame {
         victoryButtonsBox.add(victoryVoirImage);
         victoryButtonsBox.add(Box.createHorizontalStrut(15));
         victoryButtonsBox.add(victoryQuitter);
-        panel.add(victoryButtonsBox);
 
+        panel.add(victoryButtonsBox);
         return panel;
     }
 
-    private void resizeVictoryImageButton(
-            JButton button,
-            String normalName,
-            String hoverName,
-            int w,
-            int h
-    ) {
-        String normalPath = Config.CHEMIN_IMAGES + "/" + normalName;
-        String hoverPath = Config.CHEMIN_IMAGES + "/" + hoverName;
+    private JButton victoryButton(String text) {
+        JButton b = new JButton(text);
 
-        button.setIcon(scaledIcon(normalPath, w, h));
-        button.setRolloverIcon(scaledIcon(hoverPath, w, h));
+        b.setFont(new Font("Serif", Font.BOLD, 22));
+        b.setForeground(new Color(240, 225, 185));
+        b.setBackground(new Color(18, 22, 32));
+        b.setFocusPainted(false);
+        b.setOpaque(true);
+        b.setContentAreaFilled(true);
+        b.setBorder(BorderFactory.createLineBorder(new Color(200, 160, 80), 2));
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        Dimension size = new Dimension(w, h);
-        button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
-
-        button.revalidate();
-        button.repaint();
+        return b;
     }
+
     private void resizeVictoryButtons() {
-        if (victoryNouvellePartie == null || victoryButtonsPanel == null) return;
+        if (victoryButtonsBox == null || victoryButtonsPanel == null) {
+            return;
+        }
 
         int panelW = grille.getWidth();
         int panelH = grille.getHeight();
 
-        if (panelW <= 0 || panelH <= 0) return; // pas encore layouté, on skip
+        if (panelW <= 0 || panelH <= 0) {
+            return;
+        }
 
-        int btnW = (int) (panelW * 0.16);
-        int btnH = (int) (btnW * 0.27); // garde la proportion de l'image
+        int btnW = Math.max(170, (int) (panelW * 0.17));
+        int btnH = Math.max(45, (int) (panelH * 0.055));
+        int gap = Math.max(10, (int) (panelW * 0.012));
 
+        Dimension size = new Dimension(btnW, btnH);
 
+        JButton[] buttons = {
+            victoryNouvellePartie,
+            victoryVoirPlateau,
+            victoryVoirImage,
+            victoryQuitter
+        };
 
-        resizeVictoryImageButton(victoryNouvellePartie, "btn_new_game.png", "btn_new_game_hover.png", btnW, btnH);
-        resizeVictoryImageButton(victoryVoirPlateau, "btn_voir_plateau.png", "btn_voir_plateau_hover.png", btnW, btnH);
-        resizeVictoryImageButton(victoryQuitter, "btn_quit.png", "btn_quit_hover.png", btnW, btnH);
-        resizeVictoryImageButton(victoryVoirImage, "btn_voir_image.png", "btn_voir_image_hover.png", btnW, btnH);
+        for (JButton b : buttons) {
+            b.setPreferredSize(size);
+            b.setMinimumSize(size);
+            b.setMaximumSize(size);
+            b.setFont(new Font("Serif", Font.BOLD, Math.max(16, btnH / 2)));
+        }
 
-        int gap = Math.max(8, (int) (panelW * 0.01));
-        int visibleButtonCount = victoryVoirImage.isVisible() ? 4 : 3;
+        int visibleButtonCount = victoryVoirImage.isVisible() ? 3 : 3;
         int totalW = visibleButtonCount * btnW + (visibleButtonCount - 1) * gap;
 
         int x = (panelW - totalW) / 2;
-
-        int imageBottom = grille.getVictoireImageBottom();
-        int margin = (int) (panelH * 0.11);
-        int y = imageBottom + margin;
+        int y = 0;
 
         victoryButtonsBox.setBounds(x, y, totalW, btnH);
+
         victoryButtonsBox.revalidate();
         victoryButtonsBox.repaint();
-        victoryButtonsPanel.revalidate();
-        victoryButtonsPanel.repaint();
     }
     public void setJoueurActif(int joueur) {
         joueurActifPanel.setJoueurActif(joueur);
