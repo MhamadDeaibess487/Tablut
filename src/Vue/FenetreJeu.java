@@ -11,6 +11,7 @@ public class FenetreJeu extends JFrame {
     private JoueurActifPanel joueurActifPanel;
     private JPanel victoryButtonsPanel;
     private Timer victoryTimer;
+    private GrilleGraphique grille;
 
     public FenetreJeu(BaseJeu jeu) {
         setTitle("Tablut");
@@ -21,7 +22,7 @@ public class FenetreJeu extends JFrame {
         setLayout(new BorderLayout());
 
         this.jeu = jeu;
-        GrilleGraphique grille = new GrilleGraphique(jeu);
+        grille = new GrilleGraphique(jeu);
         Controle controle = new Controle(jeu, grille, this);
         GrilleButtons buttons = new GrilleButtons(grille, controle);
 
@@ -113,14 +114,21 @@ public class FenetreJeu extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
 
         JButton nouvellePartie = new JButton("Nouvelle partie");
+        JButton voirPlateau = new JButton("Voir plateau");
         JButton quitter = new JButton("Quitter");
 
         nouvellePartie.setFont(new Font("SansSerif", Font.BOLD, 22));
+        voirPlateau.setFont(new Font("SansSerif", Font.BOLD, 22));
         quitter.setFont(new Font("SansSerif", Font.BOLD, 22));
 
         nouvellePartie.addActionListener(e -> {
             dispose();
             new FenetreJeu(new Model.Jeu());
+        });
+
+        voirPlateau.addActionListener(e -> {
+            grille.cacherImageVictoire();
+            victoryButtonsPanel.setVisible(false);
         });
 
         quitter.addActionListener(e -> {
@@ -129,6 +137,7 @@ public class FenetreJeu extends JFrame {
         });
 
         panel.add(nouvellePartie);
+        panel.add(voirPlateau);
         panel.add(quitter);
 
         return panel;

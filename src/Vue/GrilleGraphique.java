@@ -35,6 +35,7 @@ public class GrilleGraphique extends JPanel {
     private int taillePlateau;
     private int taille_grille;
     private ArrayList<Point> casesValides;
+    private boolean afficherVictoire = true;
     public GrilleGraphique(BaseJeu jeu) {
         this.jeu = jeu;
         setBackground(new Color(20, 25, 35));
@@ -155,7 +156,7 @@ public class GrilleGraphique extends JPanel {
 
         int tailleVict = (int) (taillePlateau * pourcentage);
         int joueur_actif = jeu.getJoueur();
-        if(jeu.getFini()){
+        if(jeu.getFini() && afficherVictoire ){
             if(joueur_actif==2){
 
                     ImageVictoire = blackWinImage;
@@ -224,5 +225,15 @@ public class GrilleGraphique extends JPanel {
             }
             System.out.println();
         }
+    }
+
+    public void cacherImageVictoire() {
+        afficherVictoire = false;
+        repaint();
+    }
+
+    public void afficherImageVictoire() {
+        afficherVictoire = true;
+        repaint();
     }
 }

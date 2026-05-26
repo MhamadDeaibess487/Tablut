@@ -28,6 +28,7 @@ public class Controle extends ControleAbstract{
     int dernierLevelNoir;
     Timer timer_IA;
     Timer timer_joueur;
+    private boolean iaEnTrainDeJouer = false;
     public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
         super(Jeu,Grille);
         this.fenetreJeu = fenetreJeu;
@@ -105,24 +106,34 @@ public class Controle extends ControleAbstract{
         }
 
         if (Jeu.getJoueur() == 2 && iaBlancActive) {
-            IaBlanc.joue();
-            refreshGrid();
+            lancerTourIA(IaBlanc);
             return;
         }
 
         if (Jeu.getJoueur() == 1 && iaNoirActive) {
-            IaNoir.joue();
+            lancerTourIA(IaNoir);
+        }
+        
+    }
+    
+    public void undo() {
+        if (Jeu.getFini()) {
+            return;
+        }
+
+        if (((Model.Jeu) Jeu).annuler()) {
             refreshGrid();
         }
     }
-    public void undo() {
-        if(((Model.Jeu)Jeu).annuler())
-            refreshGrid();
-    }
 
     public void redo() {
-        if(((Model.Jeu)Jeu).refaire())
+        if (Jeu.getFini()) {
+            return;
+        }
+
+        if (((Model.Jeu) Jeu).refaire()) {
             refreshGrid();
+        }
     }
 
 
@@ -202,5 +213,26 @@ public class Controle extends ControleAbstract{
             ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
         }
         fenetreJeu.retourMenu();
+    }
+
+    //tamporisation 
+    private void lancerTourIA(IA ia) {
+        if (iaEnTrainDeJouer || Jeu.getFini()) {
+            return;
+        }
+
+        iaEnTrainDeJouer = true;
+
+        Timer timer = new Timer(2000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ia.joue();
+                refreshGrid();
+                iaEnTrainDeJouer = false;
+            }
+        });
+
+        timer.setRepeats(false);
+        timer.start();
     }
 }
