@@ -20,12 +20,9 @@ public class MenuGraphique extends JFrame {
     private JPanel mainPanel;
     private int nbPartie;
 
-    private final int BTN_W = 420;
-    private final int BTN_H = 105;
 
     public MenuGraphique(BaseJeu jeu) {
         this.jeu = jeu;
-
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 750);
@@ -66,13 +63,29 @@ public class MenuGraphique extends JFrame {
         JButton options = imageButton("btn_options.png", "btn_options_hover.png");
         JButton quitter = imageButton("btn_quit.png", "btn_quit_hover.png");
 
+        JPanel titleBlock = buildTitleBlock();
+        panel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeMenuLayout(
+                        panel,
+                        menuBox,
+                        titleBlock,
+                        nouvellePartie,
+                        online,
+                        chargerPartie,
+                        options,
+                        quitter
+                );
+            }
+        });
         nouvellePartie.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 ((Model.Jeu)jeu).nouvellePartie();
                 FenetreJeu fenetreJeu = new FenetreJeu(jeu);
                 fenetreJeu.setVisible(true);
-            } 
+            }
         });
 
         online.addActionListener(new ActionListener() {
@@ -100,7 +113,7 @@ public class MenuGraphique extends JFrame {
         });
 
         menuBox.add(Box.createVerticalGlue());
-        menuBox.add(buildTitleBlock());
+        menuBox.add(titleBlock);
         menuBox.add(Box.createVerticalStrut(35));
         menuBox.add(nouvellePartie);
         menuBox.add(Box.createVerticalStrut(12));
@@ -153,17 +166,11 @@ public class MenuGraphique extends JFrame {
     }
 
     private JButton imageButton(String normalName, String hoverName) {
-        String normalPath = Config.CHEMIN_IMAGES + "/" + normalName;
-        String hoverPath = Config.CHEMIN_IMAGES + "/" + hoverName;
+        JButton button = new JButton();
 
-        JButton button = new JButton(scaledIcon(normalPath, BTN_W, BTN_H));
-        button.setRolloverIcon(scaledIcon(hoverPath, BTN_W, BTN_H));
+        resizeImageButton(button, normalName, hoverName, getWidth(), getHeight());
 
-        button.setPreferredSize(new Dimension(BTN_W, BTN_H));
-        button.setMaximumSize(new Dimension(BTN_W, BTN_H));
-        button.setMinimumSize(new Dimension(BTN_W, BTN_H));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         button.setBorder(null);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
@@ -344,4 +351,107 @@ public class MenuGraphique extends JFrame {
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
     }
+    private void resizeTitleBlock(JPanel titleBlock, int cardWidth, int cardHeight) {
+        int titleW = (int) (0.32 * cardWidth);
+        int titleH = (int) (0.16 * cardHeight);
+
+        Dimension size = new Dimension(titleW, titleH);
+
+        titleBlock.setPreferredSize(size);
+        titleBlock.setMinimumSize(size);
+        titleBlock.setMaximumSize(size);
+
+        int paddingY = (int) (0.015 * cardHeight);
+        int paddingX = (int) (0.015 * cardWidth);
+
+        titleBlock.setBorder(BorderFactory.createEmptyBorder(
+                paddingY,
+                paddingX,
+                paddingY,
+                paddingX
+        ));
+
+        for (Component c : titleBlock.getComponents()) {
+            if (c instanceof JLabel) {
+                JLabel label = (JLabel) c;
+
+                if (label.getText().equals("TABLUT")) {
+                    int fontSize = Math.max(32, (int) (0.085 * cardHeight));
+                    label.setFont(new Font("Serif", Font.BOLD, fontSize));
+                } else {
+                    int fontSize = Math.max(10, (int) (0.018 * cardHeight));
+                    label.setFont(new Font("Serif", Font.PLAIN, fontSize));
+                }
+            }
+        }
+
+        titleBlock.revalidate();
+        titleBlock.repaint();
+    }
+
+    private void resizeImageButton(
+            JButton button,
+            String normalName,
+            String hoverName,
+            int cardWidth,
+            int cardHeight
+    ) {
+        int buttonW = (int) (0.32 * cardWidth);
+        int buttonH = (int) (0.13 * cardHeight);
+
+        Dimension size = new Dimension(buttonW, buttonH);
+
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+
+        String normalPath = Config.CHEMIN_IMAGES + "/" + normalName;
+        String hoverPath = Config.CHEMIN_IMAGES + "/" + hoverName;
+
+        button.setIcon(scaledIcon(normalPath, buttonW, buttonH));
+        button.setRolloverIcon(scaledIcon(hoverPath, buttonW, buttonH));
+
+        button.revalidate();
+        button.repaint();
+    }
+    private void resizeMenuLayout(
+            JPanel panel,
+            JPanel menuBox,
+            JPanel titleBlock,
+            JButton nouvellePartie,
+            JButton online,
+            JButton chargerPartie,
+            JButton options,
+            JButton quitter
+    ) {
+        int w = panel.getWidth();
+        int h = panel.getHeight();
+
+        if (w <= 0 || h <= 0) return;
+
+        int rightMargin = (int) (w * 0.08);
+        int leftMargin = (int) (w * 0.02);
+        int topBottomMargin = (int) (h * 0.05);
+
+        menuBox.setBorder(BorderFactory.createEmptyBorder(
+                topBottomMargin,
+                leftMargin,
+                topBottomMargin,
+                rightMargin
+        ));
+
+        resizeImageButton(nouvellePartie, "btn_new_game.png", "btn_new_game_hover.png", w, h);
+        resizeImageButton(online, "btn_online.png", "btn_online_hover.png", w, h);
+        resizeImageButton(chargerPartie, "btn_load.png", "btn_load_hover.png", w, h);
+        resizeImageButton(options, "btn_options.png", "btn_options_hover.png", w, h);
+        resizeImageButton(quitter, "btn_quit.png", "btn_quit_hover.png", w, h);
+
+        resizeTitleBlock(titleBlock, w, h);
+
+        menuBox.revalidate();
+        menuBox.repaint();
+    }
+
+
+
 }
