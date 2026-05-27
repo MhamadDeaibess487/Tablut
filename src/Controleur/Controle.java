@@ -10,8 +10,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.lang.Thread;
-
 
 public class Controle extends ControleAbstract{
     String fichier;
@@ -36,8 +34,6 @@ public class Controle extends ControleAbstract{
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        levelIANoir = 1;
-        levelIABlanc = 2;
         dernierLevelBlanc = 0;
         dernierLevelNoir = 0;
         this.IaBlanc = IA.creer(Jeu,levelIABlanc,2);
@@ -73,12 +69,20 @@ public class Controle extends ControleAbstract{
     public void setIaBlanc(boolean active) {
         iaBlancActive = active;
     }
-    
-    public void  setNiveauIANoir(int niveau){
+
+//    public BaseJeu getJeu() {
+//        return Jeu;
+//    }
+    public void setNiveauIANoir(int niveau) {
         levelIANoir = niveau;
+        IaNoir = IA.creer(((Model.Jeu)Jeu), levelIANoir, 1);
+        dernierLevelNoir = levelIANoir;
     }
-    public void setNiveauIABlanc(int niveau){
+
+    public void setNiveauIABlanc(int niveau) {
         levelIABlanc = niveau;
+        IaBlanc = IA.creer(((Model.Jeu)Jeu), levelIABlanc, 2);
+        dernierLevelBlanc = levelIABlanc;
     }
 
     public void reset() {
@@ -229,3 +233,4 @@ public class Controle extends ControleAbstract{
         timer.start();
     }
 }
+

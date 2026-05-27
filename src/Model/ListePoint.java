@@ -27,12 +27,12 @@ class ListePoint {
 
     public void AddListePoint(Point P) {
         LP.add(P);
-        totale++;
+        totale = LP.size();
     }
 
     public void SupprimeListePoint(Point Supp) {
-        LP.remove(Supp);
-        totale--;
+        LP.removeIf(p -> p.l == Supp.l && p.c == Supp.c);
+        totale = LP.size();
     }
 
     public ListePoint ListeBaseBlanc() {

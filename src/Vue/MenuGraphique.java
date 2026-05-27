@@ -150,6 +150,12 @@ public class MenuGraphique extends JFrame {
             }
         });
 
+        changerTheme.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                choisirTheme();
+            }
+        });
+
         box.add(titre);
         box.add(Box.createVerticalStrut(40));
         box.add(modeTuto);
@@ -384,6 +390,49 @@ public class MenuGraphique extends JFrame {
 
         titleBlock.revalidate();
         titleBlock.repaint();
+    }
+
+    private void choisirTheme() {
+        String[] themes = {"Principal", "Star Wars"};
+
+        String choix = (String) JOptionPane.showInputDialog(
+                this,
+                "Choisissez le thème :",
+                "Changer thème",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                themes,
+                Config.getNomThemeActuel()
+        );
+
+        if (choix == null) {
+            return;
+        }
+
+        if (choix.equals("Principal")) {
+            Config.setThemePrincipal();
+        } else if (choix.equals("Star Wars")) {
+            Config.setThemeStarWars();
+        }
+
+        refreshMenus();
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Thème actuel : " + Config.getNomThemeActuel()
+        );
+    }
+
+    private void refreshMenus() {
+        mainPanel.removeAll();
+
+        mainPanel.add(creerMenuPrincipal(), "MENU");
+        mainPanel.add(creerMenuOptions(), "OPTIONS");
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
+
+        cardLayout.show(mainPanel, "OPTIONS");
     }
 
     private void resizeImageButton(

@@ -1,16 +1,14 @@
 package Model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-class IAhard extends IA{
-    
-    public IAhard(Jeu j,int couleur){
+class IAhard extends IA {
+
+    public IAhard(Jeu j, int couleur) {
         this.j = j;
         this.couleur = couleur;
     }
 
-    
     // Si true : lorsque la recherche est faite à profondeur 1, jouer immédiatement
     // un coup qui donne la victoire (roi sur bord pour Blanc, roi capturé pour Noir).
     private boolean jouerVictoireImmed = true;
@@ -130,9 +128,7 @@ class IAhard extends IA{
             return heuristique(jeu);
         }
 
-        //int joueur = estmax ? 1 : 2; // PQ ?? ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
-//        List<Coup> coups = trierCoups(jeu.CoupJouable(joueur).Liste, jeu, estmax);
-        List<Coup> coups = jeu.CoupJouable(jeu.Joueur_actif).Liste;
+        List<Coup> coups = trierCoups(jeu.CoupJouable(jeu.Joueur_actif).Liste, jeu, estmax);
 
         if (coups.isEmpty())
             return heuristique(jeu);
@@ -143,9 +139,6 @@ class IAhard extends IA{
                 Jeu copie = new Jeu(jeu);
                 copie.deplacer(c.a, c.b);
                 best = Math.max(best, alphabeta(copie, prof-1, alpha, beta, false)); // estmax doit etre false pour le coup suivant 
-//                if(best > 5000){
-//                   System.err.println("Score " + best);
-//                }
                 alpha = Math.max(alpha, best);
                 if (beta <= alpha || alpha >= 100000) break;   // coupure β
             }
@@ -166,7 +159,7 @@ class IAhard extends IA{
 
     @Override
     Coup calculCoup() {
-//        System.out.println("IA INTER CALCUL COUP");
+        System.out.println("IA HARD CALCUL COUP");
         boolean noir = (couleur == 1);
         int bestScore = noir ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         List<Coup> exAequo = new ArrayList<>();
@@ -175,7 +168,7 @@ class IAhard extends IA{
         //si aucun coup disponible, la partie est terminée
         if (tousLesCoups.isEmpty()) return null;
 
-        int profondeurRecherche = 3; // profondeur utilisée pour l'appel alphabeta
+        int profondeurRecherche = 1; // profondeur utilisée pour l'appel alphabeta
         for (Coup c : tousLesCoups) {
 
             // Vérification : la pièce source appartient bien à notre couleur
@@ -198,13 +191,11 @@ class IAhard extends IA{
                 // Blanc gagne si le roi atteint un bord
                 if (couleur == 2 && roiApres != null &&
                     (roiApres.l == 0 || roiApres.l == 8 || roiApres.c == 0 || roiApres.c == 8)) {
-//                    System.out.println("Coup gagnant immédiat détecté ! (BLANC)");
                     return c;
                 }
 
                 // Noir gagne si le roi n'existe plus (capturé)
                 if (couleur == 1 && copie.getFini()) {
-//                    System.out.println("Coup gagnant immédiat détecté ! (NOIR)");
                     return c;
                 }
             }
@@ -258,7 +249,7 @@ class IAhard extends IA{
         int score = 0;
 
         // ── 2. Matériel ─────────────────────────────────────────────────────
-        score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 500;
+        score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 150;
 
         // ── 3. Suédois en danger (Noir adjacent → peut être capturé) ────────
         // FIX bug 1 : ce critère manquait, l'IA sacrifiait des pièces sans le voir
@@ -274,46 +265,42 @@ class IAhard extends IA{
                 if (noirAdj >= 1) enDanger++;
             }
         }
-        score += enDanger * 40;   // positif : mauvais pour Blanc
+        score += enDanger * 120;   // positif : mauvais pour Blanc
 
         // ── 4. Distance roi au bord ─────────────────────────────────────────
         int distBord = Math.min(
             Math.min(king.l, 8 - king.l),
             Math.min(king.c, 8 - king.c)
         );
-        score -= (8 - distBord) * 40;
+        score -= (8 - distBord) * 80;
 
         // ── 5. Menace sur le roi (Noirs adjacents) — non-linéaire ───────────
+        // changement de la structure pour optimiser
         int menace = 0;
-        if (king.l < 3 || king.l > 5 && king.c < 3 || king.c > 5){
-            if(jeu.grille[king.l-1][king.c] == 1){
-                if(jeu.grille[king.l+1][king.c] == 1)
-                    menace=3;
-                menace++;
-            }
-            if(jeu.grille[king.l][king.c-1] == 1){
-                if(jeu.grille[king.l][king.c+1] == 1)
-                    menace=3;
-                menace++;
-            }
-            if(jeu.grille[king.l+1][king.c] == 1){
-                if(jeu.grille[king.l-1][king.c] == 1)
-                    menace=3;
-                menace++;
-            }
-            if(jeu.grille[king.l][king.c+1] == 1){
-                if(jeu.grille[king.l][king.c-1] == 1)
-                    menace=3;
-                menace++;
+        if ((king.l < 3 || king.l > 5) && (king.c < 3 || king.c > 5)){
+            boolean nordNoir = king.l > 0 && jeu.grille[king.l-1][king.c] == 1;
+            boolean sudNoir = king.l < 8 && jeu.grille[king.l+1][king.c] == 1;
+            boolean estNoir = king.c < 8 && jeu.grille[king.l][king.c+1] == 1;
+            boolean ouestNoir = king.c > 0 && jeu.grille[king.l][king.c-1] == 1;
+
+            // capture si deux opposés
+            if ((nordNoir && sudNoir) || (estNoir && ouestNoir)) {
+                menace = 3;
+            } else {
+                if (nordNoir) menace++;
+                if (sudNoir) menace++;
+                if (estNoir) menace++;
+                if (ouestNoir) menace++;
             }
         }
+        //fix bug : mauvais indices pour le trone
         else{
-            if (jeu.grille[king.l-1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-            if (jeu.grille[king.l+1][king.c] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-            if (jeu.grille[king.l][king.c-1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
-            if (jeu.grille[king.l][king.c+1] == 1|| jeu.grille[king.l-1][king.c]==4) menace++;
+            if (king.l > 0 && (jeu.grille[king.l-1][king.c] == 1 || jeu.grille[king.l-1][king.c] == 4)) menace++;
+            if (king.l < 8 && (jeu.grille[king.l+1][king.c] == 1 || jeu.grille[king.l+1][king.c] == 4)) menace++;
+            if (king.c > 0 && (jeu.grille[king.l][king.c-1] == 1 || jeu.grille[king.l][king.c-1] == 4)) menace++;
+            if (king.c < 8 && (jeu.grille[king.l][king.c+1] == 1 || jeu.grille[king.l][king.c+1] == 4)) menace++;
         }
-        score += new int[]{0, 80, 350, 100000}[menace>3?3:menace];
+        score += new int[]{0, 150, 1200, 100000}[menace>3?3:menace];
     
         // ── 6. Protection du roi (Blancs adjacents = bouclier) ──────────────
         int protection = 0;
@@ -321,21 +308,7 @@ class IAhard extends IA{
         if (king.l < 8 && jeu.grille[king.l+1][king.c] == 2) protection++;
         if (king.c > 0 && jeu.grille[king.l][king.c-1] == 2) protection++;
         if (king.c < 8 && jeu.grille[king.l][king.c+1] == 2) protection++;
-        score -= protection * 60;
-
-        // ── 6.5 Potentiel de capture au prochain tour (si Noir peut capturer le roi)
-        // On simule rapidement tous les coups noirs possibles et on compte
-        // ceux qui terminent la partie (capture du roi)
-        // if (king != null) { // trop cher a calculer
-        //     int potCap = 0;
-        //     List<Coup> coupsNoirs = jeu.CoupJouable(1).Liste;
-        //     for (Coup mv : coupsNoirs) {
-        //         Jeu sim = new Jeu(jeu);
-        //         sim.deplacer(mv.a, mv.b);
-        //         if (sim.getFini()) potCap++;
-        //     }
-        //     score += potCap * 8000; // gros poids : capture prochaine vaut presque une victoire
-        // }
+        score -= protection * 180;
 
         // ── 7. Routes d'évasion ─────────────────────────────────────────────
         boolean routeN = true, routeS = true, routeE = true, routeO = true;
@@ -349,18 +322,57 @@ class IAhard extends IA{
             if (jeu.grille[king.l][i] != 0) { routeO = false; break; }
 
         if ((routeN && routeS) || (routeE && routeO)) {
-            score -= 4000;   // fork : victoire quasi-certaine Blanc
+            score -= 8000;   // fork : victoire quasi-certaine Blanc
         } else {
-            if (routeN) score -= 200;
-            if (routeS) score -= 200;
-            if (routeE) score -= 200;
-            if (routeO) score -= 200;
+            if (routeN) score -= 500;
+            if (routeS) score -= 500;
+            if (routeE) score -= 500;
+            if (routeO) score -= 500;
         }
 
         // ── 8. Mobilité globale ─────────────────────────────────────────────
         score += (jeu.CoupJouable(1).Liste.size()
-                - jeu.CoupJouable(2).Liste.size()) * 2;
-        
+                - jeu.CoupJouable(2).Liste.size()) * 5;
+
+        // ── 9. NOUVEAU : Garde menacé proche du roi = situation critique ─────
+        // si un garde adjacent au roi est lui-même menacé → situation très dangereuse
+        int gardeMenaceProxRoi = 0;
+        for (Point p : jeu.ListePointB.LP) {
+            if (jeu.grille[p.l][p.c] != 2) continue;
+            int distRoi = Math.abs(p.l - king.l) + Math.abs(p.c - king.c);
+            if (distRoi > 2) continue; // on ne regarde que les gardes proches
+            // ce garde est-il menacé ?
+            int noirAdj = 0;
+            if (p.l > 0 && jeu.grille[p.l-1][p.c] == 1) noirAdj++;
+            if (p.l < 8 && jeu.grille[p.l+1][p.c] == 1) noirAdj++;
+            if (p.c > 0 && jeu.grille[p.l][p.c-1] == 1) noirAdj++;
+            if (p.c < 8 && jeu.grille[p.l][p.c+1] == 1) noirAdj++;
+            if (noirAdj >= 1) gardeMenaceProxRoi++;
+        }
+        // très pénalisant : un garde proche du roi menacé = le roi sera exposé
+        score += gardeMenaceProxRoi * 250;
+
+        // ── 10. Encerclement progressif ────────────────────────────────────────
+        // un noir proche du roi n'est valorisé que s'il est en sécurité
+        int noirProche = 0;
+        for (Point p : jeu.ListePointN.LP) {
+            int dist = Math.abs(p.l - king.l) + Math.abs(p.c - king.c);
+            if (dist > 4) continue;
+
+            // si le noir est capturable (2 blancs opposés), il ne vaut rien
+            boolean capturableNS = p.l > 0 && p.l < 8
+                && (jeu.grille[p.l-1][p.c] == 2 || jeu.grille[p.l-1][p.c] == 3)
+                && (jeu.grille[p.l+1][p.c] == 2 || jeu.grille[p.l+1][p.c] == 3);
+            boolean capturableEO = p.c > 0 && p.c < 8
+                && (jeu.grille[p.l][p.c-1] == 2 || jeu.grille[p.l][p.c-1] == 3)
+                && (jeu.grille[p.l][p.c+1] == 2 || jeu.grille[p.l][p.c+1] == 3);
+
+            if (capturableNS || capturableEO) continue; // ce noir va se faire manger, on l'ignore
+
+            if (dist <= 2) noirProche += 3;
+            else if (dist <= 4) noirProche += 1;
+        }
+        score += noirProche * 40;
         return score;
     }
 }
