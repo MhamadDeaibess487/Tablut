@@ -176,7 +176,7 @@ public class MenuGraphique extends JFrame {
         return panel;
     }
 
-    private JButton imageButton(String normalName, String hoverName) {
+    private JButton imageButton(String normalName, String hoverName) throws IOException {
         JButton button = new JButton();
 
         resizeImageButton(button, normalName, hoverName, getWidth(), getHeight());
@@ -201,12 +201,28 @@ public class MenuGraphique extends JFrame {
         return b;
     }
 
-    private ImageIcon scaledIcon(String path, int w, int h) {
-        Image img = new ImageIcon(path).getImage();
-        BufferedImage scaled = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    private ImageIcon scaledIcon(String path, int w, int h) throws IOException {
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
 
+        java.io.InputStream is =
+                ClassLoader.getSystemClassLoader().getResourceAsStream(path);
+
+        if (is == null) {
+            throw new IOException("Image introuvable : " + path);
+        }
+
+        Image img = ImageIO.read(is);
+
+        BufferedImage scaled = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = scaled.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+        g2.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR
+        );
+
         g2.drawImage(img, 0, 0, w, h, null);
         g2.dispose();
 
@@ -447,13 +463,7 @@ public class MenuGraphique extends JFrame {
         cardLayout.show(mainPanel, "OPTIONS");
     }
 
-    private void resizeImageButton(
-            JButton button,
-            String normalName,
-            String hoverName,
-            int cardWidth,
-            int cardHeight
-    ) {
+    private void resizeImageButton(JButton button, String normalName, String hoverName, int cardWidth, int cardHeight) throws IOException {
         int buttonW = (int) (0.32 * cardWidth);
         int buttonH = (int) (0.13 * cardHeight);
 
@@ -498,11 +508,15 @@ public class MenuGraphique extends JFrame {
                 rightMargin
         ));
 
-        resizeImageButton(nouvellePartie, "btn_new_game.png", "btn_new_game_hover.png", w, h);
-        resizeImageButton(online, "btn_online.png", "btn_online_hover.png", w, h);
-        resizeImageButton(chargerPartie, "btn_load.png", "btn_load_hover.png", w, h);
-        resizeImageButton(options, "btn_options.png", "btn_options_hover.png", w, h);
-        resizeImageButton(quitter, "btn_quit.png", "btn_quit_hover.png", w, h);
+        try {
+            resizeImageButton(nouvellePartie, "btn_new_game.png", "btn_new_game_hover.png", w, h);
+            resizeImageButton(online, "btn_online.png", "btn_online_hover.png", w, h);
+            resizeImageButton(chargerPartie, "btn_load.png", "btn_load_hover.png", w, h);
+            resizeImageButton(options, "btn_options.png", "btn_options_hover.png", w, h);
+            resizeImageButton(quitter, "btn_quit.png", "btn_quit_hover.png", w, h);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         resizeTitleBlock(titleBlock, w, h);
 

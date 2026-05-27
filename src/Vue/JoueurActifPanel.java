@@ -366,6 +366,9 @@ public class JoueurActifPanel extends JPanel {
     }
 
     private ImageIcon scaleIcon(String path, int w, int h) throws IOException{
+        if (path.startsWith("/")){
+            path = path.substring(1); // remove leading slash for ClassLoader access
+        }
         Image img = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(path));
         img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
