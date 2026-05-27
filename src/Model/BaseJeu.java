@@ -49,6 +49,10 @@ public abstract class BaseJeu {
         return fini;
     }
 
+    public void terminerPartie() {
+        fini = true;
+    }
+
     public void changerJoueur() {
         Joueur_actif = (Joueur_actif % 2) + 1;
     }
@@ -263,6 +267,11 @@ public abstract class BaseJeu {
 
         }
         return true;
+    }
+
+    public boolean PlusDeCoup() { // renvoie vrai si le joueur actif n'a plus de coup
+        ListePoint liste = Joueur_actif == 1 ? ListePointN : ListePointB;
+        return PlusDeCoup(liste);
     }
 
     public boolean PlusDeCoup(ListePoint Liste) { // renvoie vrai le joueur n'a plus de coup

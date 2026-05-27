@@ -84,12 +84,29 @@ public class Controle extends ControleAbstract{
 
     public void reset() {
         jeu.nouvellePartie();
+        ligneSelectee = -1;
+        colonneSelectee = -1;
+        Grille.effacerCasesValides();
+        iaEnTrainDeJouer = false;
+        if (!timer_joueur.isRunning()) {
+            timer_joueur.start();
+        }
+        if (!timer_IA.isRunning()) {
+            timer_IA.start();
+        }
         refreshGrid();
     }
 
     public void verifierTourIA() throws InterruptedException {
+        if (jeu.PlusDeCoup()) {
+            jeu.terminerPartie();
+            arreterTimersSiPartieFinie();
+            refreshGrid();
+            return;
+        }
+
         if (jeu.getFini()) {
-            timer_IA.stop();
+            arreterTimersSiPartieFinie();
             return;
         }
         if (dernierLevelBlanc != levelIABlanc) {
@@ -136,8 +153,40 @@ public class Controle extends ControleAbstract{
     public void refreshGrid() {
         Grille.repaint();
     }
+
+    private void arreterTimersSiPartieFinie() {
+        if (!jeu.getFini()) {
+            return;
+        }
+        timer_IA.stop();
+        timer_joueur.stop();
+        iaEnTrainDeJouer = false;
+    }
+
+    private void finaliserApresCoup() {
+        if (!jeu.getFini() && jeu.PlusDeCoup()) {
+            jeu.terminerPartie();
+        }
+
+        if (jeu.draw()) {
+            arreterTimersSiPartieFinie();
+            refreshGrid();
+            return;
+        }
+
+        arreterTimersSiPartieFinie();
+        refreshGrid();
+    }
+
     public void handleGridClick(int row, int column) {
         int [][]grille_case = jeu.getGrille();
+
+        if (jeu.PlusDeCoup()) {
+            jeu.terminerPartie();
+            arreterTimersSiPartieFinie();
+            refreshGrid();
+            return;
+        }
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
@@ -168,12 +217,14 @@ public class Controle extends ControleAbstract{
         }else{
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
-            jeu.deplacer(p,p1);
+            if (jeu.deplacer(p,p1) == null) {
+                return;
+            }
 
             Grille.effacerCasesValides();
             colonneSelectee=-1;
             ligneSelectee=-1;
-            refreshGrid();
+            finaliserApresCoup();
         }
     }
     
@@ -221,8 +272,8 @@ public class Controle extends ControleAbstract{
             @Override
             public void actionPerformed(ActionEvent e) {
                 ia.joue();
-                refreshGrid();
                 iaEnTrainDeJouer = false;
+                finaliserApresCoup();
             }
         });
 
@@ -230,4 +281,3 @@ public class Controle extends ControleAbstract{
         timer.start();
     }
 }
-

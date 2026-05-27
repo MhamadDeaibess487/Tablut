@@ -260,6 +260,7 @@ public class Jeu extends BaseJeu {
                 nb++;
             }
             if (nb == 2) {
+                terminerPartie();
                 return true;
             }
 
