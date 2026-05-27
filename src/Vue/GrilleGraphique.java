@@ -4,7 +4,7 @@ import Config.Config;
 import Model.BaseJeu;
 import Model.Point;
 import javax.imageio.ImageIO;
-import java.io.File;
+import java.lang.ClassLoader;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -45,18 +45,19 @@ public class GrilleGraphique extends JPanel {
         this.taillePlateau = 0;
         this.taille_grille = 0;
         this.casesValides = new ArrayList<>();
+        
         try {
-            blackWinImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/blackWin.png"));
-            whiteWinImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/whiteWin.png"));
-            whiteImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/white.png"));
-            selected = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/selected.png"));
-            nap_on = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne+king.png"));
-            blackImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/black.png"));
-            kingImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/king.png"));
-            throneImage = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/throne.png"));
-            backgroundImagewhite = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/backgroundwhite.png"));
-            backgroundImageblack = ImageIO.read(new File(Config.CHEMIN_IMAGES + "/backgroundblack.png"));
-            casecentrale =  ImageIO.read(new File(Config.CHEMIN_IMAGES + "/centrale.png"));
+            blackWinImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/blackWin.png"));
+            whiteWinImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/whiteWin.png"));
+            whiteImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/white.png"));
+            selected = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/selected.png"));
+            nap_on = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/throne+king.png"));
+            blackImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/black.png"));
+            kingImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/king.png"));
+            throneImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/throne.png"));
+            backgroundImagewhite = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/backgroundwhite.png"));
+            backgroundImageblack = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/backgroundblack.png"));
+            casecentrale =  ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/centrale.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

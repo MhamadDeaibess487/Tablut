@@ -2,7 +2,8 @@ package Vue;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class RoundedButton extends JButton {
     private final String imagePath;
@@ -14,12 +15,15 @@ public class RoundedButton extends JButton {
     public RoundedButton(String imagePath,int size) {
         this.imagePath = imagePath;
         this.currentSize = size;
-        ImageIcon original = new ImageIcon(imagePath);
 
-        this.normalIcon = resizeIcon(original, size, size);
-        this.hoverIcon = resizeIcon(original, size + 6, size + 6);
-        this.pressedIcon = resizeIcon(original, size - 4, size - 4);
-
+        try{
+            this.normalIcon = resizeIcon(imagePath, size, size);
+            this.hoverIcon = resizeIcon(imagePath, size + 6, size + 6);
+            this.pressedIcon = resizeIcon(imagePath, size - 4, size - 4);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         setIcon(normalIcon);
 
         Dimension d = new Dimension(size + 8, size + 8);
@@ -57,15 +61,14 @@ public class RoundedButton extends JButton {
     }
 
 
-    public void updateSize(int size) {
+    public void updateSize(int size) throws IOException {
         if (size == currentSize) return;
         this.currentSize = size;
-        ImageIcon original = new ImageIcon(imagePath);
 
         // mettre à jour les 3 icônes
-        this.normalIcon  = resizeIcon(original, size, size);
-        this.hoverIcon   = resizeIcon(original, size + 6, size + 6);
-        this.pressedIcon = resizeIcon(original, size - 4, size - 4);
+        this.normalIcon  = resizeIcon(imagePath, size, size);
+        this.hoverIcon   = resizeIcon(imagePath, size + 6, size + 6);
+        this.pressedIcon = resizeIcon(imagePath, size - 4, size - 4);
 
         setIcon(this.normalIcon); // ← utilise l'attribut
         Dimension d = new Dimension(size + 8, size + 8);
@@ -75,8 +78,9 @@ public class RoundedButton extends JButton {
         revalidate();
         repaint();
     }
-    private ImageIcon resizeIcon(ImageIcon icon, int width, int height) {
-        Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    private ImageIcon resizeIcon(String path, int width, int height) throws IOException{
+        Image img = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(path));
+        img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
     }
 }

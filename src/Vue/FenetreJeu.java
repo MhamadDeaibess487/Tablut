@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
+/* Faire la transit propre entre le cancel du choix pseudo vers le menuPrincipale*/
 public class FenetreJeu extends JFrame {
     Jeu jeu;
     private JoueurActifPanel joueurActifPanel;
@@ -113,11 +115,14 @@ public class FenetreJeu extends JFrame {
                         int h = getHeight();
 
                         int btnSize = (int) (Math.min(w, h) * 0.10);
-
-                        ((RoundedButton) buttons.undo).updateSize(btnSize);
-                        ((RoundedButton) buttons.redo).updateSize(btnSize);
-                        ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
-
+                        try{
+                            ((RoundedButton) buttons.undo).updateSize(btnSize);
+                            ((RoundedButton) buttons.redo).updateSize(btnSize);
+                            ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         joueurActifPanel.resizePanel(w, h);
 
                         revalidate();
@@ -132,9 +137,14 @@ public class FenetreJeu extends JFrame {
 
                 int btnSize = (int) (Math.min(w, h) * 0.10);
 
-                ((RoundedButton) buttons.undo).updateSize(btnSize);
-                ((RoundedButton) buttons.redo).updateSize(btnSize);
-                ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
+                try{
+                    ((RoundedButton) buttons.undo).updateSize(btnSize);
+                    ((RoundedButton) buttons.redo).updateSize(btnSize);
+                    ((RoundedButton) buttons.parametres).updateSize((int)(btnSize * 1.1));
+                }
+                catch (IOException p) {
+                    p.printStackTrace();
+                }
 
 
                 joueurActifPanel.resizePanel(w, h);

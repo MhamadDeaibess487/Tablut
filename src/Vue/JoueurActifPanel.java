@@ -5,6 +5,8 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Hashtable;
 import java.util.Random;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 import Controleur.ControleAbstract;
 
@@ -74,10 +76,15 @@ public class JoueurActifPanel extends JPanel {
         this.joueur1_IA = false;
         this.joueur2_IA = false;
         int imgW = 68, imgH = 68;
-        joueur1Normal    = scaleIcon(new ImageIcon(j1NormalPath),    imgW, imgH);
-        joueur1Highlight = scaleIcon(new ImageIcon(j1HighlightPath), imgW, imgH);
-        joueur2Normal    = scaleIcon(new ImageIcon(j2NormalPath),    imgW, imgH);
-        joueur2Highlight = scaleIcon(new ImageIcon(j2HighlightPath), imgW, imgH);
+        try{
+            joueur1Normal    = scaleIcon(j1NormalPath,    imgW, imgH);
+            joueur1Highlight = scaleIcon(j1HighlightPath, imgW, imgH);
+            joueur2Normal    = scaleIcon(j2NormalPath,    imgW, imgH);
+            joueur2Highlight = scaleIcon(j2HighlightPath, imgW, imgH);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
 
         // "JOUEUR ACTIF" floating header
         activeHeader1 = new JLabel("JOUEUR ACTIF", SwingConstants.CENTER);
@@ -358,8 +365,9 @@ public class JoueurActifPanel extends JPanel {
         return new JLabel();
     }
 
-    private ImageIcon scaleIcon(ImageIcon icon, int w, int h) {
-        Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+    private ImageIcon scaleIcon(String path, int w, int h) throws IOException{
+        Image img = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(path));
+        img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
     }
 

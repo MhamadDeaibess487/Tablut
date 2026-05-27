@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 import static Config.Config.CHEMIN_SAUVEGARDES;
 
@@ -29,9 +31,13 @@ public class MenuGraphique extends JFrame {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        mainPanel.add(creerMenuPrincipal(), "MENU");
-        mainPanel.add(creerMenuOptions(), "OPTIONS");
-
+        try{
+            mainPanel.add(creerMenuPrincipal(), "MENU");
+            mainPanel.add(creerMenuOptions(), "OPTIONS");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         add(mainPanel);
 
         KeyStroke esc = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
@@ -45,10 +51,10 @@ public class MenuGraphique extends JFrame {
         setVisible(true);
     }
 
-    private JPanel creerMenuPrincipal() {
-        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
+    private JPanel creerMenuPrincipal() throws IOException{
+        BackgroundPanel panel;
+        panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
         panel.setLayout(new BorderLayout());
-
         JPanel menuBox = new JPanel();
         menuBox.setOpaque(false);
         menuBox.setLayout(new BoxLayout(menuBox, BoxLayout.Y_AXIS));
@@ -127,8 +133,10 @@ public class MenuGraphique extends JFrame {
         return panel;
     }
 
-    private JPanel creerMenuOptions() {
-        BackgroundPanel panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
+    private JPanel creerMenuOptions() throws IOException{
+        BackgroundPanel panel;
+        
+        panel = new BackgroundPanel(Config.CHEMIN_IMAGES + "/background_new.png");
         panel.setLayout(new GridBagLayout());
 
         JPanel box = new JPanel();
@@ -334,8 +342,8 @@ public class MenuGraphique extends JFrame {
     private static class BackgroundPanel extends JPanel {
         private Image background;
 
-        public BackgroundPanel(String path) {
-            background = new ImageIcon(path).getImage();
+        public BackgroundPanel(String path) throws IOException{
+            background = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(path));
         }
 
         protected void paintComponent(Graphics g) {
@@ -426,9 +434,13 @@ public class MenuGraphique extends JFrame {
     private void refreshMenus() {
         mainPanel.removeAll();
 
-        mainPanel.add(creerMenuPrincipal(), "MENU");
-        mainPanel.add(creerMenuOptions(), "OPTIONS");
-
+        try{
+            mainPanel.add(creerMenuPrincipal(), "MENU");
+            mainPanel.add(creerMenuOptions(), "OPTIONS");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         mainPanel.revalidate();
         mainPanel.repaint();
 
