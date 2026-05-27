@@ -2,6 +2,7 @@ package Vue;
 
 import Config.Config;
 import Model.BaseJeu;
+import Model.Jeu;
 import Model.Point;
 import javax.imageio.ImageIO;
 import java.lang.ClassLoader;
@@ -18,7 +19,7 @@ public class GrilleGraphique extends JPanel {
     private Image ImageVictoire;
     private Image blackWinImage;
     private Image whiteWinImage;
-
+    private Image drawImage;
     private Image blackImage;
     private Image kingImage;
     private Image throneImage;
@@ -28,7 +29,7 @@ public class GrilleGraphique extends JPanel {
     private Image casecentrale;
 
     private Color entourageColor = new Color(200, 200, 200);
-    private BaseJeu jeu;
+    private Jeu jeu;
     private int decalageX ;
     private int decalageY ;
     private int tailleCase;
@@ -37,7 +38,7 @@ public class GrilleGraphique extends JPanel {
     private ArrayList<Point> casesValides;
     private boolean afficherVictoire = true;
     public GrilleGraphique(BaseJeu jeu) {
-        this.jeu = jeu;
+        this.jeu = (Jeu) jeu;
         setBackground(new Color(20, 25, 35));
         this.decalageX = 0;
         this.decalageY = 0;
@@ -47,6 +48,7 @@ public class GrilleGraphique extends JPanel {
         this.casesValides = new ArrayList<>();
         
         try {
+            drawImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/draw.png"));
             blackWinImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/blackWin.png"));
             whiteWinImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/whiteWin.png"));
             whiteImage = ImageIO.read(ClassLoader.getSystemClassLoader().getResourceAsStream(Config.CHEMIN_IMAGES + "/white.png"));
@@ -157,22 +159,27 @@ public class GrilleGraphique extends JPanel {
 
         int tailleVict = (int) (taillePlateau * pourcentage);
         int joueur_actif = jeu.getJoueur();
-        if(jeu.getFini() && afficherVictoire ){
-            if(joueur_actif==2){
+        if(jeu.draw()){
+            ImageVictoire = drawImage;
+        }else {
+            if (jeu.getFini() && afficherVictoire) {
+                if (joueur_actif == 2) {
 
                     ImageVictoire = blackWinImage;
 
 
-            }else{
+                } else {
 
                     ImageVictoire = whiteWinImage;
 
+                }
             }
+        }
             int xVict = (width - tailleVict) / 2;
             int yVict = (height - tailleVict) / 2;
 
             g2.drawImage(ImageVictoire, xVict, yVict, tailleVict, tailleVict, null);
-        }
+
 
 
         peindreCasesValides(g2);
