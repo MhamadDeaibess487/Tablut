@@ -19,8 +19,21 @@ public class TableauBit implements Comparable<TableauBit>{
     /*On veut juste savoir si deux plateaux sont egaux*/
     @Override
     public int compareTo(TableauBit o) {
-        return (int) (noir1 - o.noir1 + noir2 - o.noir2 + 
-                blanc1 - o.blanc1 + blanc2 - o.blanc2 
-                + roi1 - o.roi1 + roi2 - o.roi2);
+        if (noir1 != o.noir1) {
+            return Long.compare(noir1, o.noir1);
+        }
+        if (noir2 != o.noir2) {
+            return Long.compare(noir2, o.noir2);
+        }
+        if (blanc1 != o.blanc1) {
+            return Long.compare(blanc1, o.blanc1);
+        }
+        if (blanc2 != o.blanc2) {
+            return Long.compare(blanc2, o.blanc2);
+        }
+        if (roi1 != o.roi1) {
+            return Long.compare(roi1, o.roi1);
+        }
+        return Long.compare(roi2, o.roi2);
     }
 }
