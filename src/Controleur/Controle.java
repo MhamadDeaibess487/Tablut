@@ -36,8 +36,6 @@ public class Controle extends ControleAbstract{
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
-        levelIANoir = 1;
-        levelIABlanc = 1;
         dernierLevelBlanc = 0;
         dernierLevelNoir = 0;
         this.IaBlanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
@@ -78,11 +76,16 @@ public class Controle extends ControleAbstract{
     public BaseJeu getJeu() {
         return Jeu;
     }
-    public void  setNiveauIANoir(int niveau){
+    public void setNiveauIANoir(int niveau) {
         levelIANoir = niveau;
+        IaNoir = IA.creer(((Model.Jeu)Jeu), levelIANoir, 1);
+        dernierLevelNoir = levelIANoir;
     }
-    public void setNiveauIABlanc(int niveau){
+
+    public void setNiveauIABlanc(int niveau) {
         levelIABlanc = niveau;
+        IaBlanc = IA.creer(((Model.Jeu)Jeu), levelIABlanc, 2);
+        dernierLevelBlanc = levelIABlanc;
     }
 
     public void reset() {
@@ -236,3 +239,4 @@ public class Controle extends ControleAbstract{
         timer.start();
     }
 }
+

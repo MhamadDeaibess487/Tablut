@@ -125,12 +125,14 @@ public class JoueurActifPanel extends JPanel {
             if (!slider1.getValueIsAdjusting()) {
                 int niveau = slider1.getValue(); // 0, 1 ou 2
                 controle.setNiveauIANoir(niveau);
+                System.out.println("Niveau IA Noir changé : " + niveau);
             }
         });
         slider2.addChangeListener(e -> {
             if (!slider2.getValueIsAdjusting()) {
                 int niveau = slider2.getValue(); // 0, 1 ou 2
                 controle.setNiveauIABlanc(niveau);
+                System.out.println("Niveau IA Blanc changé : " + niveau);
             }
         });
         joueur1Button.addActionListener(e -> {
