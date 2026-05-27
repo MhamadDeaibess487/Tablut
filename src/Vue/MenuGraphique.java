@@ -194,10 +194,20 @@ public class MenuGraphique extends JFrame {
 
     private JButton textButton(String text) {
         JButton b = new JButton(text);
-        b.setFont(new Font("SansSerif", Font.BOLD, 22));
-        b.setPreferredSize(new Dimension(320, 60));
-        b.setMaximumSize(new Dimension(320, 60));
+
+        b.setFont(new Font("Serif", Font.BOLD, 22));
+        b.setForeground(new Color(240, 225, 185));
+        b.setBackground(new Color(28, 34, 52));
+        b.setFocusPainted(false);
+        b.setOpaque(true);
+        b.setContentAreaFilled(true);
+        b.setBorder(BorderFactory.createLineBorder(new Color(200, 160, 80), 2));
+        b.setPreferredSize(new Dimension(260, 55));
+        b.setMinimumSize(new Dimension(260, 55));
+        b.setMaximumSize(new Dimension(260, 55));
         b.setAlignmentX(Component.CENTER_ALIGNMENT);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
         return b;
     }
 
