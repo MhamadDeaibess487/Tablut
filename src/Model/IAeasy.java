@@ -227,8 +227,17 @@ class IAeasy extends IA {
         Point king = posRoi(jeu);
 
         // ── 1. États terminaux ──────────────────────────────────────────────
-        if (king == null)                                    return +100000; // roi capturé
-        if (king.l==0||king.l==8||king.c==0||king.c==8)     return -100000; // roi échappé
+        if (king == null){
+            // IA facile donc ajout d'un random pour parfois ne pas faire un coup gagnant, laisser une chance
+            if(Math.random() < 0.33) {
+                return +100000; // 33% de chance de ne pas voir la victoire immédiate
+            }
+        }
+        if (king.l==0||king.l==8||king.c==0||king.c==8){
+            if(Math.random() < 0.33){
+                return -100000; // 33% de chance de ne pas voir la défaite immédiate
+            }
+        }     
 
         int score = 0;
         int[] dl = {-1, 1, 0, 0};
