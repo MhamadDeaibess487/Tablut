@@ -12,7 +12,7 @@ public abstract class IA{
         switch(lvl){
             case 0 -> res = new IAeasy(jeu,couleur);
             case 1 -> res = new IAinterV5(jeu, couleur);
-            case 2 -> res = new IAhard(jeu,couleur);
+            case 2 -> res = new IAinter(jeu,couleur);
             default -> {
                 System.err.println("Erreur creation IA de type "+lvl);
                 System.exit(-2);
