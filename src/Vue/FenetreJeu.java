@@ -1,7 +1,7 @@
 package Vue;
 
 import Controleur.Controle;
-import Model.BaseJeu;
+import Model.Jeu;
 import Config.Config;
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 public class FenetreJeu extends JFrame {
-    BaseJeu jeu;
+    Jeu jeu;
     private JoueurActifPanel joueurActifPanel;
     private JPanel victoryButtonsPanel;
     private Timer victoryTimer;
@@ -22,7 +22,7 @@ public class FenetreJeu extends JFrame {
     private JButton victoryVoirImage;
     private JPanel victoryButtonsBox;
 
-    public FenetreJeu(BaseJeu jeu) {
+    public FenetreJeu(Jeu jeu) {
         setTitle("Tablut");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(900, 700);
@@ -31,17 +31,28 @@ public class FenetreJeu extends JFrame {
         setLayout(new BorderLayout());
 
         this.jeu = jeu;
+        String[] pseudo = new String[2];
+        if(!jeu.isLoaded){
+            pseudo = openMenuPseudo();
+            if(pseudo == null){
+                retourMenu();
+                return;
+            }
+        }
         grille = new GrilleGraphique(jeu);
         Controle controle = new Controle(jeu, grille, this);
+        if(!jeu.isLoaded){
+            controle.setPseudo(1,pseudo[0]);
+            controle.setPseudo(2,pseudo[1]);
+        }
         GrilleButtons buttons = new GrilleButtons(grille, controle);
-
+        
         joueurActifPanel = new JoueurActifPanel(
                 Config.CHEMIN_IMAGES + "/nap_on.png",
                 Config.CHEMIN_IMAGES + "/nap_on.png",
                 Config.CHEMIN_IMAGES + "/julien.png",
                 Config.CHEMIN_IMAGES + "/julien.png",
                 controle);
-
 
 
 // CENTER — grille + boutons autour
@@ -150,6 +161,19 @@ public class FenetreJeu extends JFrame {
 
         setVisible(true);
     }
+    
+    private String[] openMenuPseudo(){
+        String[] ps = new String[2];
+        for(int i =1;i<=2;i++){
+            String tag = JOptionPane.showInputDialog("Pseudo Joueur "+i);
+            if(tag == null)
+                return null;
+            if(tag.length() == 0)
+                tag = "Joueur " + i;
+            ps[i-1] = tag;
+        }
+        return ps;
+    }
 
     private ImageIcon scaledIcon(String path, int w, int h) {
         Image img = new ImageIcon(path).getImage();
@@ -203,7 +227,7 @@ public class FenetreJeu extends JFrame {
 
         victoryNouvellePartie.addActionListener(e -> {
             dispose();
-            new FenetreJeu(new Model.Jeu());
+            new FenetreJeu(new Jeu());
         });
 
         victoryVoirPlateau.addActionListener(e -> {

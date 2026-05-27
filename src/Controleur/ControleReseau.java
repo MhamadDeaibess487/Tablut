@@ -1,6 +1,6 @@
 package Controleur;
 
-import Model.BaseJeu;
+import Model.Jeu;
 import Model.Coup;
 import Model.Point;
 import Vue.GrilleGraphique;
@@ -13,7 +13,7 @@ public class ControleReseau extends ControleAbstract{
     int colonneSelectee;
     private Client client;
 
-    public ControleReseau(BaseJeu Jeu, GrilleGraphique Grille) {
+    public ControleReseau(Jeu Jeu, GrilleGraphique Grille) {
         super(Jeu,Grille);
         this.ligneSelectee = -1;
         this.colonneSelectee = -1;
@@ -35,7 +35,7 @@ public class ControleReseau extends ControleAbstract{
 
     @Override
     public void handleGridClick(int row, int column) {
-        int [][]grille_case = Jeu.getGrille();
+        int [][]grille_case = jeu.getGrille();
 
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
@@ -51,7 +51,7 @@ public class ControleReseau extends ControleAbstract{
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
             Grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {

@@ -1,7 +1,7 @@
 package Vue;
 
 import Controleur.ControleReseau;
-import Model.BaseJeu;
+import Model.Jeu;
 import Reseau.Client;
 import Config.Config;
 
@@ -9,13 +9,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class FenetreJeuReseau extends JFrame {
-    private BaseJeu jeu;
+    private Jeu jeu;
     private JoueurActifPanel joueurActifPanel;
     private GrilleGraphique grille;
     private ControleReseau controle;
     private Client client;
 
-    public FenetreJeuReseau(BaseJeu jeu, String ip) throws Exception {
+    public FenetreJeuReseau(Jeu jeu, String ip) throws Exception {
         setTitle("Tablut - Multijoueur");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 800);

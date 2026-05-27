@@ -6,6 +6,8 @@ import Config.Config;
 
 public class Jeu extends BaseJeu {
     Stack<TableauBit> redo, undo;
+    String pseudo1 = "Joueur 1",pseudo2 = "Joueur 2";
+    public boolean isLoaded = false;
 
     public Jeu() {
         redo = new Stack<>();
@@ -16,7 +18,8 @@ public class Jeu extends BaseJeu {
     public Jeu(Jeu autre) {
         redo = new Stack<>();
         undo = new Stack<>();
-        
+        pseudo1 = autre.pseudo1;
+        pseudo2 = autre.pseudo2;
         this.grille = new int[autre.grille.length][autre.grille[0].length];
         for (int i = 0; i < autre.grille.length; i++) {
             for (int j = 0; j < autre.grille[i].length; j++) {
@@ -53,6 +56,14 @@ public class Jeu extends BaseJeu {
                 if (line.isEmpty()) {
                     continue;
                 }
+                else if (line.equalsIgnoreCase("J1")){
+                    pseudo1 = br.readLine();
+                    continue;
+                }
+                else if (line.equalsIgnoreCase("J2")){
+                    pseudo2 = br.readLine();
+                    continue;
+                }
                 else if (line.equalsIgnoreCase("REDO")) {
                     inRedo = true;
                     inUndo = false;
@@ -75,6 +86,7 @@ public class Jeu extends BaseJeu {
                         transformeLongEnGrille(tab);
                 }
             }
+            isLoaded = true;
         } catch (FileNotFoundException e) {
             System.err.println("Fichier introuvable");
         } catch (IOException e) {
@@ -89,6 +101,35 @@ public class Jeu extends BaseJeu {
     public Stack<TableauBit> getUndo() {
         return undo;
     }
+    
+    // J1 = 1; J2 = 2
+    public void setPseudo(int i,String tag){
+        switch(i){
+            case 1:
+                pseudo1 = tag;
+                break;
+            case 2:
+                pseudo2 = tag;
+                break;
+            default:
+                System.err.println("No pseudo for Joueur "+i);
+                break;
+        }
+    }
+    
+    // J1 = 1; J2 = 2
+    public String getPseudo(int i){
+        switch(i){
+            case 1:
+                return pseudo1;
+            case 2:
+                return pseudo2;
+            default:
+                return "Unknown Joueur " + i;
+        }
+    }
+    
+    
 
     @Override
     public boolean jeuRedondant() {  // true si on doit arreter la partie,faux sinon
@@ -141,6 +182,8 @@ public class Jeu extends BaseJeu {
                 pw.println("GRILLE");
                 ecritTabBit(pw, transformerGrilleEnLong());
                 pw.println("JACTIF\n" + Joueur_actif);
+                pw.println("J1\n" + pseudo1);
+                pw.println("J2\n" + pseudo2);
                 Stack<TableauBit> tmp;
                 for (int i = 0; i < 2; i++) {
                     if (i == 0) {

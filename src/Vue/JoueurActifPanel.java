@@ -4,8 +4,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.Hashtable;
+import java.util.Random;
 
-import Controleur.Controle;
 import Controleur.ControleAbstract;
 
 public class JoueurActifPanel extends JPanel {
@@ -55,9 +55,11 @@ public class JoueurActifPanel extends JPanel {
     private boolean joueur2_IA;
     private int joueur_actif;
     ControleAbstract controle;
+    private Random r;
 
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
-                             String j2NormalPath, String j2HighlightPath,ControleAbstract controle) {
+                             String j2NormalPath, String j2HighlightPath,
+                            ControleAbstract controle) {
         this.controle = controle;
         this.j1NormalPath = j1NormalPath;
         this.j1HighlightPath = j1HighlightPath;
@@ -96,7 +98,6 @@ public class JoueurActifPanel extends JPanel {
         this.slider2 = new CustomSlider(0, 2, 0);
 
 
-
 // labels personnalisés
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         labels.put(0, new JLabel("Facile"));
@@ -108,9 +109,19 @@ public class JoueurActifPanel extends JPanel {
 
         slider2.setVisible(false);
         slider1.setVisible(false);
-
-        joueur1Card = buildCard("JOUEUR 1", "Noirs", joueur1Image, true, joueur1Button,joueur1_IA,slider1);
-        joueur2Card = buildCard("JOUEUR 2", "Blancs",  joueur2Image, false,joueur2Button,joueur2_IA,slider2);
+        
+        
+        int rng;
+        if(!controle.isLoaded()){ //Tirage au sort du joueur qui commence
+            r = new Random();
+            rng = r.nextInt(2);
+        }
+        else // Restoration des pseudos d'une partie chargé
+            rng = 1;
+        joueur1Card = buildCard(rng == 1?controle.getPseudo(1):controle.getPseudo(2), 
+                "Noirs", joueur1Image, true, joueur1Button,joueur1_IA,slider1);
+        joueur2Card = buildCard(rng == 1?controle.getPseudo(2):controle.getPseudo(1), 
+                "Blancs",  joueur2Image, false,joueur2Button,joueur2_IA,slider2);
 
         // grab the text labels from cards for later updates
         joueur1Titre = findTitre(joueur1Card);

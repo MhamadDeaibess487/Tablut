@@ -1,15 +1,15 @@
 package Controleur;
 
-import Model.BaseJeu;
+import Model.Jeu;
 import Vue.GrilleGraphique;
 
 
 public abstract class ControleAbstract {
-    BaseJeu Jeu;
+    Jeu jeu;
     GrilleGraphique Grille;
 
-    public ControleAbstract(BaseJeu Jeu, GrilleGraphique Grille) {
-        this.Jeu = Jeu;
+    public ControleAbstract(Jeu jeu, GrilleGraphique Grille) {
+        this.jeu = jeu;
         this.Grille = Grille;
     }
 
@@ -19,10 +19,23 @@ public abstract class ControleAbstract {
         Grille.repaint();
     }
     
+    // J1 = 1; J2 = 2
+    public void setPseudo(int i,String tag){
+        jeu.setPseudo(i,tag);
+    }
+    
+    public String getPseudo(int i){
+        return jeu.getPseudo(i);
+    }
+    
+    public boolean isLoaded(){
+        return jeu.isLoaded;
+    }
+    
     public abstract void handleGridClick(int row, int column);
 
-    public BaseJeu getJeu() {
-        return Jeu;
+    public Jeu getJeu() {
+        return jeu;
     }
 
     public void setIaNoir(boolean active) {}

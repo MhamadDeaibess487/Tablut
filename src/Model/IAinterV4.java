@@ -164,7 +164,7 @@ class IAinterV4 extends IA {
 
     @Override
     Coup calculCoup() {
-        System.out.println("IA INTER CALCUL COUP");
+//        System.out.println("IA INTER CALCUL COUP");
         boolean noir = (couleur == 1);
         int bestScore = noir ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         List<Coup> exAequo = new ArrayList<>();
@@ -173,7 +173,7 @@ class IAinterV4 extends IA {
         //si aucun coup disponible, la partie est terminée
         if (tousLesCoups.isEmpty()) return null;
 
-        int profondeurRecherche = 1; // profondeur utilisée pour l'appel alphabeta
+        int profondeurRecherche = 2; // profondeur utilisée pour l'appel alphabeta
         for (Coup c : tousLesCoups) {
 
             // Vérification : la pièce source appartient bien à notre couleur
@@ -196,13 +196,13 @@ class IAinterV4 extends IA {
                 // Blanc gagne si le roi atteint un bord
                 if (couleur == 2 && roiApres != null &&
                     (roiApres.l == 0 || roiApres.l == 8 || roiApres.c == 0 || roiApres.c == 8)) {
-                    System.out.println("Coup gagnant immédiat détecté ! (BLANC)");
+//                    System.out.println("Coup gagnant immédiat détecté ! (BLANC)");
                     return c;
                 }
 
                 // Noir gagne si le roi n'existe plus (capturé)
                 if (couleur == 1 && copie.getFini()) {
-                    System.out.println("Coup gagnant immédiat détecté ! (NOIR)");
+//                    System.out.println("Coup gagnant immédiat détecté ! (NOIR)");
                     return c;
                 }
             }

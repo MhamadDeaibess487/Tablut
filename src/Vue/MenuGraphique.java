@@ -1,7 +1,6 @@
 package Vue;
 
 import java.io.File;
-import Model.BaseJeu;
 import Model.Jeu;
 import Reseau.ServerTablut;
 import Config.Config;
@@ -14,14 +13,12 @@ import java.awt.image.BufferedImage;
 import static Config.Config.CHEMIN_SAUVEGARDES;
 
 public class MenuGraphique extends JFrame {
-
-    private BaseJeu jeu;
+    private Jeu jeu;
     private CardLayout cardLayout;
     private JPanel mainPanel;
-    private int nbPartie;
 
 
-    public MenuGraphique(BaseJeu jeu) {
+    public MenuGraphique(Jeu jeu) {
         this.jeu = jeu;
         setTitle("Menu Principal - Tablut");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,8 +78,8 @@ public class MenuGraphique extends JFrame {
         });
         nouvellePartie.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                jeu.nouvellePartie();
                 dispose();
-                ((Model.Jeu)jeu).nouvellePartie();
                 FenetreJeu fenetreJeu = new FenetreJeu(jeu);
                 fenetreJeu.setVisible(true);
             }

@@ -1,7 +1,7 @@
 package Controleur;
 
 import Model.Point;
-import Model.BaseJeu;
+import Model.Jeu;
 import Vue.FenetreJeu;
 import Vue.GrilleGraphique;
 import Model.IA;
@@ -29,7 +29,7 @@ public class Controle extends ControleAbstract{
     Timer timer_IA;
     Timer timer_joueur;
     private boolean iaEnTrainDeJouer = false;
-    public Controle(BaseJeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
+    public Controle(Jeu Jeu, GrilleGraphique Grille,FenetreJeu fenetreJeu) {
         super(Jeu,Grille);
         this.fenetreJeu = fenetreJeu;
         this.fichier = "";
@@ -37,11 +37,11 @@ public class Controle extends ControleAbstract{
         this.colonneSelectee = -1;
         this.fenetreJeu = fenetreJeu;
         levelIANoir = 1;
-        levelIABlanc = 1;
+        levelIABlanc = 2;
         dernierLevelBlanc = 0;
         dernierLevelNoir = 0;
-        this.IaBlanc = IA.creer(((Model.Jeu)Jeu),levelIABlanc,2);
-        this.IaNoir = IA.creer(((Model.Jeu)Jeu),levelIANoir,1);
+        this.IaBlanc = IA.creer(Jeu,levelIABlanc,2);
+        this.IaNoir = IA.creer(Jeu,levelIANoir,1);
         this.fichier = "";
         this.iaNoirActive=false;
         this.iaBlancActive=false;
@@ -49,10 +49,9 @@ public class Controle extends ControleAbstract{
         timer_joueur = new Timer(10, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fenetreJeu.setJoueurActif(Jeu.getJoueur());
+                fenetreJeu.setJoueurActif(jeu.getJoueur());
             }
         });
-        timer_joueur.start();
         timer_IA = new Timer(500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,8 +62,8 @@ public class Controle extends ControleAbstract{
                 }
             }
         });
+        timer_joueur.start();
         timer_IA.start();
-
     }
 
     public void setIaNoir(boolean active) {
@@ -74,10 +73,7 @@ public class Controle extends ControleAbstract{
     public void setIaBlanc(boolean active) {
         iaBlancActive = active;
     }
-
-    public BaseJeu getJeu() {
-        return Jeu;
-    }
+    
     public void  setNiveauIANoir(int niveau){
         levelIANoir = niveau;
     }
@@ -86,84 +82,81 @@ public class Controle extends ControleAbstract{
     }
 
     public void reset() {
-        ((Model.Jeu)Jeu).nouvellePartie();
+        jeu.nouvellePartie();
         refreshGrid();
     }
 
     public void verifierTourIA() throws InterruptedException {
-        if (Jeu.getFini()) {
+        if (jeu.getFini()) {
             timer_IA.stop();
             return;
         }
         if (dernierLevelBlanc != levelIABlanc) {
-            IaBlanc = IA.creer(((Model.Jeu) Jeu), levelIABlanc, 2);
+            IaBlanc = IA.creer(jeu, levelIABlanc, 2);
             dernierLevelBlanc = levelIABlanc;
         }
 
         if (dernierLevelNoir != levelIANoir) {
-            IaNoir = IA.creer(((Model.Jeu) Jeu), levelIANoir, 1);
+            IaNoir = IA.creer(jeu, levelIANoir, 1);
             dernierLevelNoir = levelIANoir;
         }
 
-        if (Jeu.getJoueur() == 2 && iaBlancActive) {
+        if (jeu.getJoueur() == 2 && iaBlancActive) {
             lancerTourIA(IaBlanc);
             return;
         }
 
-        if (Jeu.getJoueur() == 1 && iaNoirActive) {
+        if (jeu.getJoueur() == 1 && iaNoirActive) {
             lancerTourIA(IaNoir);
         }
         
     }
     
     public void undo() {
-        if (Jeu.getFini()) {
+        if (jeu.getFini()) {
             return;
         }
 
-        if (((Model.Jeu) Jeu).annuler()) {
+        if (jeu.annuler()) {
             refreshGrid();
         }
     }
 
     public void redo() {
-        if (Jeu.getFini()) {
+        if (jeu.getFini()) {
             return;
         }
 
-        if (((Model.Jeu) Jeu).refaire()) {
+        if (jeu.refaire()) {
             refreshGrid();
         }
     }
-
-
-
 
     public void refreshGrid() {
         Grille.repaint();
     }
     public void handleGridClick(int row, int column) {
-        int [][]grille_case = Jeu.getGrille();
+        int [][]grille_case = jeu.getGrille();
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
             int contenu = grille_case[row][column];
 
-            if (contenu == 0 || contenu == 4 || getJeu().getFini()) {
+            if (contenu == 0 || contenu == 4 || jeu.getFini()) {
                 return;
             }
 
             // joueur 1 = noir, il ne peut sélectionner que les noirs
-            if (Jeu.getJoueur() == 1 && contenu != 1) {
+            if (jeu.getJoueur() == 1 && contenu != 1) {
                 return;
             }
 
             // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (Jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
                 return;
             }
             ligneSelectee = row;
             colonneSelectee = column;
-            ArrayList<Point> liste = Jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
             Grille.dessiner_valide(liste);
             refreshGrid();
         }else  if(ligneSelectee == row && colonneSelectee == column) {
@@ -174,7 +167,7 @@ public class Controle extends ControleAbstract{
         }else{
             Point p = new Point(ligneSelectee,colonneSelectee);
             Point p1= new Point(row,column);
-            Jeu.deplacer(p,p1);
+            jeu.deplacer(p,p1);
 
             Grille.effacerCasesValides();
             colonneSelectee=-1;
@@ -210,14 +203,14 @@ public class Controle extends ControleAbstract{
             if(!choisir_nom()){
              return;
             }
-            ((Model.Jeu) Jeu).sauvegardeFichier(fichier);
+            jeu.sauvegardeFichier(fichier);
         }
         fenetreJeu.retourMenu();
     }
 
-    //tamporisation 
+    //temporisation 
     private void lancerTourIA(IA ia) {
-        if (iaEnTrainDeJouer || Jeu.getFini()) {
+        if (iaEnTrainDeJouer || jeu.getFini()) {
             return;
         }
 
