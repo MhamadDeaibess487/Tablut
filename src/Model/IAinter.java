@@ -7,7 +7,7 @@ class IAinter extends IA {
     // ─────────────────────────────────────────────────────────────────────────
     // Profondeur de recherche (augmenter = plus fort mais plus lent)
     // depth=2 : rapide, depth=3 : bon compromis, depth=4 : lent
-    private static final int PROFONDEUR = 2;
+    private static final int PROFONDEUR = 1;
     // ─────────────────────────────────────────────────────────────────────────
 
     public IAinter(Jeu j, int couleur) {
@@ -45,18 +45,6 @@ class IAinter extends IA {
             return v == 1 || v == 4 || estHostile(nl, nc);
     }
 
-    private int countOpenPath(Jeu jeu, Point king, int dl, int dc) {
-        int l = king.l + dl;
-        int c = king.c + dc;
-        int count = 0;
-        while (inBounds(l, c)) {
-            if (jeu.grille[l][c] != 0) return -1;
-            count++;
-            l += dl;
-            c += dc;
-        }
-        return count;
-    }
 
     private boolean estMonCoup(Jeu jeu, Coup c) {
         int src = jeu.grille[c.a.l][c.a.c];
@@ -107,25 +95,6 @@ class IAinter extends IA {
 
     // ─── Tri des coups ────────────────────────────────────────────────────────
 
-        // Détecte si, dans la position donnée (le joueur courant est celui
-    // qui joue maintenant), l'adversaire possède un coup qui termine
-    // immédiatement la partie (capture du roi ou victoire).
-    private boolean roiPeutEtreCaptureImmediat(Jeu jeu) {
-        // Si la position est déjà terminale, considérer comme vulnérable
-        if (jeu.getFini()) return true;
-
-        Point king = posRoi(jeu);
-        if (king == null) return true;
-
-        int adv = jeu.Joueur_actif; // joueur qui va jouer maintenant
-        List<Coup> coups = jeu.CoupJouable(adv).Liste;
-        for (Coup c : coups) {
-            Jeu copie = copieAvecJoueur(jeu, adv);
-            copie.deplacer(c.a, c.b);
-            if (copie.getFini()) return true;
-        }
-        return false;
-    }
 
     // Meilleurs coups explorés en premier → alpha-bêta élague plus tôt
 
@@ -141,16 +110,6 @@ class IAinter extends IA {
     private int priorite(Coup c, Jeu jeu, boolean estmax, Point king) {
         Point src = c.a, dst = c.b;
         int piece = jeu.grille[src.l][src.c];
-
-        // // Si le mouvement est un déplacement du roi, vérifier si après
-        // // ce coup l'adversaire peut capturer le roi immédiatement.
-        // // On pénalise fortement ces coups pour éviter que l'IA mette
-        // // le roi à portée d'une capture immédiate.
-        // if (!estmax && piece == 3) {
-        //     Jeu copie = copieAvecJoueur(jeu, jeu.Joueur_actif);
-        //     copie.deplacer(src, dst);
-        //     if (roiPeutEtreCaptureImmediat(copie)) return -100000;
-        // }
 
         // Blanc : roi vers le bord (victoire potentielle)
         if (!estmax && piece == 3) {
@@ -191,12 +150,12 @@ class IAinter extends IA {
         if (estmax) {
             int best = Integer.MIN_VALUE;
             for (Coup c : coups) {
-                // Joueur_actif actuel est estmax ? 1 : 2, on le force pour être sûr
+                
                 Jeu copie = copieAvecJoueur(jeu, 1); // Noir joue
                 copie.deplacer(c.a, c.b);            // → changerJoueur() → Blanc
                 best  = Math.max(best, alphabeta(copie, prof-1, alpha, beta, false));
                 alpha = Math.max(alpha, best);
-                if (beta <= alpha) break;             // ✂ coupure β
+                if (beta <= alpha) break;             //  coupure β
             }
             return best;
         } else {
@@ -206,7 +165,7 @@ class IAinter extends IA {
                 copie.deplacer(c.a, c.b);            // → changerJoueur() → Noir
                 best = Math.min(best, alphabeta(copie, prof-1, alpha, beta, true));
                 beta = Math.min(beta, best);
-                if (beta <= alpha) break;             // ✂ coupure α
+                if (beta <= alpha) break;             //  coupure α
             }
             return best;
         }
@@ -227,11 +186,10 @@ class IAinter extends IA {
         if (tousLesCoups.isEmpty()) return null;
 
         for (Coup c : tousLesCoups) {
-            // Force Joueur_actif = couleur AVANT deplacer
-            // → changerJoueur() donnera l'adversaire, l'arbre est toujours en sync
+   
             Jeu copie = copieAvecJoueur(j, couleur);
             copie.deplacer(c.a, c.b);
-            // Ici copie.Joueur_actif == adversaire ✓
+            // Ici copie.Joueur_actif == adversaire 
 
             // Victoire immédiate : jouer sans hésiter
             Point roiApres = posRoi(copie);
@@ -279,64 +237,50 @@ class IAinter extends IA {
         // ── 2. Matériel ─────────────────────────────────────────────────────
         score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 500;
 
-        // ── 3 & 4. Pièces réellement en danger (demi-sandwich) ──────────────
-        // On détecte maintenant un vrai demi-sandwich : ennemi sur UN côté
-        // ET ennemi/hostile sur le côté OPPOSÉ → capture possible au prochain coup
-        //
-        // Axes à vérifier : N-S et E-O
-        int[][] axes = {{-1,0, 1,0}, {0,-1, 0,1}};
+        // // ── 3 & 4. Pièces réellement en danger (demi-sandwich) ──────────────
+        // // On détecte maintenant un vrai demi-sandwich : ennemi sur UN côté
+        // // ET ennemi/hostile sur le côté OPPOSÉ → capture possible au prochain coup
+        // //
+        // // Axes à vérifier : N-S et E-O
+        // int[][] axes = {{-1,0, 1,0}, {0,-1, 0,1}};
  
-        int suedoisMenaces = 0, noirsMenaces = 0;
+        // int suedoisMenaces = 0, noirsMenaces = 0;
  
-        for (int l = 0; l < 9; l++) {
-            for (int c = 0; c < 9; c++) {
-                int piece = jeu.grille[l][c];
-                if (piece != 1 && piece != 2) continue; // Noirs et Suédois seulement
+        // for (int l = 0; l < 9; l++) {
+        //     for (int c = 0; c < 9; c++) {
+        //         int piece = jeu.grille[l][c];
+        //         if (piece != 1 && piece != 2) continue; // Noirs et Suédois seulement
  
-                for (int[] ax : axes) {
-                    int l1 = l + ax[0], c1 = c + ax[1]; // côté A
-                    int l2 = l + ax[2], c2 = c + ax[3]; // côté B
+        //         for (int[] ax : axes) {
+        //             int l1 = l + ax[0], c1 = c + ax[1]; // côté A
+        //             int l2 = l + ax[2], c2 = c + ax[3]; // côté B
  
-                    boolean coteA = estHostilePour(jeu, l1, c1, piece);
-                    boolean coteB = estHostilePour(jeu, l2, c2, piece);
+        //             boolean coteA = estHostilePour(jeu, l1, c1, piece);
+        //             boolean coteB = estHostilePour(jeu, l2, c2, piece);
  
-                    if (coteA && coteB) {
-                        // Sandwich complet : pièce déjà capturée (ne devrait pas arriver)
-                        if (piece == 2) suedoisMenaces += 3;
-                        else            noirsMenaces  += 3;
-                    } else if (coteA || coteB) {
-                        // Demi-sandwich : un adversaire peut compléter la capture
-                        if (piece == 2) suedoisMenaces++;
-                        else            noirsMenaces++;
-                    }
-                }
-            }
-        }
+        //             if (coteA && coteB) {
+        //                 // Sandwich complet : pièce déjà capturée (ne devrait pas arriver)
+        //                 if (piece == 2) suedoisMenaces += 3;
+        //                 else            noirsMenaces  += 3;
+        //             } else if (coteA || coteB) {
+        //                 // Demi-sandwich : un adversaire peut compléter la capture
+        //                 if (piece == 2) suedoisMenaces++;
+        //                 else            noirsMenaces++;
+        //             }
+        //         }
+        //     }
+        // }
  
-        score += suedoisMenaces * 35;   // bon pour Noir  (Suédois menacés)
-        score -= noirsMenaces  * 35;    // bon pour Blanc (Noirs menacés)
+        // score += suedoisMenaces * 35;   // bon pour Noir  (Suédois menacés)
+        // score -= noirsMenaces  * 35;    // bon pour Blanc (Noirs menacés)
 
         // ── 4. Distance roi au bord ─────────────────────────────────────────
-        int distBord = Math.min(
-            Math.min(king.l, 8 - king.l),
-            Math.min(king.c, 8 - king.c)
-        );
-        score -= (8 - distBord) * 40;
+        // int distBord = Math.min(
+        //     Math.min(king.l, 8 - king.l),
+        //     Math.min(king.c, 8 - king.c)
+        // );
+        // score -= (8 - distBord) * 40;
 
-        // // ── 4.5 Évaluation des corridors d'évasion ───────────────────────────
-        // int openN = countOpenPath(jeu, king, -1, 0);
-        // int openS = countOpenPath(jeu, king, 1, 0);
-        // int openE = countOpenPath(jeu, king, 0, 1);
-        // int openO = countOpenPath(jeu, king, 0, -1);
-
-        // if (openN >= 0) score -= 800 + openN * 10;
-        // if (openS >= 0) score -= 800 + openS * 10;
-        // if (openE >= 0) score -= 800 + openE * 10;
-        // if (openO >= 0) score -= 800 + openO * 10;
-
-        // if ((openN >= 0 && openS >= 0) || (openE >= 0 && openO >= 0)) {
-        //     score -= 3000; // fork : deux couloirs opposés
-        // }
 
         // ── 6. Couloirs d'évasion du roi ─────────────────────────────────────
         // le bonus de couloir partiel est réduit (était +350, maintenant +120)
@@ -363,7 +307,6 @@ class IAinter extends IA {
                 if (nNoirs == 0) {
                     score -= 700;     // couloir totalement libre : fort bonus Blanc
                 } else {
-                    // FIX : bonus réduit pour couloir partiellement bloqué
                     // chaque Noir dans le couloir vaut ~120 pts pour Noir
                     // (inférieur à la valeur d'une pièce = 150, donc pas rentable de suicide)
                     score -= Math.max(0, 700 - nNoirs * 120);
@@ -371,48 +314,48 @@ class IAinter extends IA {
             }
         }
  
-        // Fork : deux routes opposées sans Suédois bloquant
-        boolean forkNS = routeLibre[0] && routeLibre[1];
-        boolean forkEO = routeLibre[2] && routeLibre[3];
-        if (forkNS || forkEO)
-            score -= 4000;
+        // // Fork : deux routes opposées sans Suédois bloquant
+        // boolean forkNS = routeLibre[0] && routeLibre[1];
+        // boolean forkEO = routeLibre[2] && routeLibre[3];
+        // if (forkNS || forkEO)
+        //     score -= 4000;
 
-        // ── 7. Pre-fork : roi à 1 case d'une position de fork ───────────────
-        // [nouveau] Si le roi peut se déplacer vers une case depuis laquelle
-        // il aurait deux routes opposées libres, c'est presque aussi bon.
-        outerLoop:
-        for (int dir2 = 0; dir2 < 4; dir2++) {
-            int nl = king.l + dirVec[dir2][0];
-            int nc = king.c + dirVec[dir2][1];
-            if (!inBounds(nl, nc) || jeu.grille[nl][nc] != 0) continue;
-            // Simuler le roi ici et vérifier fork
-            boolean[] testRoutes = new boolean[4];
-            for (int d3 = 0; d3 < 4; d3++) {
-                int l2 = nl + dirVec[d3][0], c2 = nc + dirVec[d3][1];
-                boolean libre = true;
-                while (inBounds(l2, c2)) {
-                    int v = jeu.grille[l2][c2];
-                    if (v == 3) { l2 += dirVec[d3][0]; c2 += dirVec[d3][1]; continue; } // ignore roi source
-                    if (v != 0 && v != 4) { libre = false; break; }
-                    l2 += dirVec[d3][0]; c2 += dirVec[d3][1];
-                }
-                testRoutes[d3] = libre;
-            }
-            if ((testRoutes[0] && testRoutes[1]) || (testRoutes[2] && testRoutes[3])) {
-                score -= 1500;  // pre-fork : Blanc peut créer un fork au prochain coup
-                break outerLoop;
-            }
-        }
+        // // ── 7. Pre-fork : roi à 1 case d'une position de fork ───────────────
+        // // Si le roi peut se déplacer vers une case depuis laquelle
+        // // il aurait deux routes opposées libres, c'est presque aussi bon.
+        // outerLoop:
+        // for (int dir2 = 0; dir2 < 4; dir2++) {
+        //     int nl = king.l + dirVec[dir2][0];
+        //     int nc = king.c + dirVec[dir2][1];
+        //     if (!inBounds(nl, nc) || jeu.grille[nl][nc] != 0) continue;
+        //     // Simuler le roi ici et vérifier fork
+        //     boolean[] testRoutes = new boolean[4];
+        //     for (int d3 = 0; d3 < 4; d3++) {
+        //         int l2 = nl + dirVec[d3][0], c2 = nc + dirVec[d3][1];
+        //         boolean libre = true;
+        //         while (inBounds(l2, c2)) {
+        //             int v = jeu.grille[l2][c2];
+        //             if (v == 3) { l2 += dirVec[d3][0]; c2 += dirVec[d3][1]; continue; } // ignore roi source
+        //             if (v != 0 && v != 4) { libre = false; break; }
+        //             l2 += dirVec[d3][0]; c2 += dirVec[d3][1];
+        //         }
+        //         testRoutes[d3] = libre;
+        //     }
+        //     if ((testRoutes[0] && testRoutes[1]) || (testRoutes[2] && testRoutes[3])) {
+        //         score -= 1500;  // pre-fork : Blanc peut créer un fork au prochain coup
+        //         break outerLoop;
+        //     }
+        // }
 
         // ── 8. Menace sur le roi (Noirs ou trône adjacents) ─────────────────
-        int menace = 0;
-        for (int i = 0; i < 4; i++) {
-            int nl = king.l + dl[i], nc = king.c + dc[i];
-            if (!inBounds(nl, nc)) continue;
-            int v = jeu.grille[nl][nc];
-            if (v == 1 || v == 4) menace++;
-        }
-        score += new int[]{0, 80, 350, 8000}[Math.min(menace, 3)];
+        // int menace = 0;
+        // for (int i = 0; i < 4; i++) {
+        //     int nl = king.l + dl[i], nc = king.c + dc[i];
+        //     if (!inBounds(nl, nc)) continue;
+        //     int v = jeu.grille[nl][nc];
+        //     if (v == 1 || v == 4) menace++;
+        // }
+        // score += new int[]{0, 80, 350, 8000}[Math.min(menace, 3)];
  
         // ── 9. Protection du roi (Blancs adjacents = bouclier) ───────────────
         int protection = 0;
@@ -423,7 +366,7 @@ class IAinter extends IA {
         score -= protection * 15;
 
         // ── 10. Pression globale Noirs → roi (distance de Manhattan) ─────────
-        // [nouveau] Plus les Noirs sont proches du roi globalement, plus la menace est forte
+        // Plus les Noirs sont proches du roi globalement, plus la menace est forte
         // Remplace partiellement la mobilité (coûteuse) par une mesure positionnelle rapide
         int sommeDist = 0;
         int nbNoirs = 0;
@@ -441,22 +384,6 @@ class IAinter extends IA {
             score += (8 - moyDist) * 15; // 0 à +120 selon la proximité moyenne
         }
 
-        // // ── 7. Routes d'évasion ─────────────────────────────────────────────
-        // boolean routeN = openN >= 0, routeS = openS >= 0, routeE = openE >= 0, routeO = openO >= 0;
-
-        // // Fork : deux routes opposées libres → Blanc ne peut pas être bloqué
-        // if ((routeN && routeS) || (routeE && routeO))
-        //     score -= 4000;
-        // else {
-        //     if (routeN) score -= 200;
-        //     if (routeS) score -= 200;
-        //     if (routeE) score -= 200;
-        //     if (routeO) score -= 200;
-        // }
-
-        // ── 8. Mobilité globale ─────────────────────────────────────────────
-        //score += (jeu.CoupJouable(1).Liste.size()
-        //        - jeu.CoupJouable(2).Liste.size()) * 2;
 
         return score;
     }
