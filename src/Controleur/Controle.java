@@ -70,18 +70,15 @@ public class Controle extends ControleAbstract{
         iaBlancActive = active;
     }
 
-//    public BaseJeu getJeu() {
-//        return Jeu;
-//    }
     public void setNiveauIANoir(int niveau) {
         levelIANoir = niveau;
-        IaNoir = IA.creer(((Model.Jeu)Jeu), levelIANoir, 1);
+        IaNoir = IA.creer(jeu, levelIANoir, 1);
         dernierLevelNoir = levelIANoir;
     }
 
     public void setNiveauIABlanc(int niveau) {
         levelIABlanc = niveau;
-        IaBlanc = IA.creer(((Model.Jeu)Jeu), levelIABlanc, 2);
+        IaBlanc = IA.creer(jeu, levelIABlanc, 2);
         dernierLevelBlanc = levelIABlanc;
     }
 
