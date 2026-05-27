@@ -129,8 +129,8 @@ class IAhard extends IA {
         }
 
         //int joueur = estmax ? 1 : 2; // PQ ?? ON A DEJA LA COULEUR DE LIA DANS IA.JAVA
-//        List<Coup> coups = trierCoups(jeu.CoupJouable(joueur).Liste, jeu, estmax);
-        List<Coup> coups = jeu.CoupJouable(jeu.Joueur_actif).Liste;
+        List<Coup> coups = trierCoups(jeu.CoupJouable(jeu.Joueur_actif).Liste, jeu, estmax);
+        //List<Coup> coups = jeu.CoupJouable(jeu.Joueur_actif).Liste;
 
         if (coups.isEmpty())
             return heuristique(jeu);

@@ -35,15 +35,6 @@ class IAeasy extends IA {
             || (l == 8 && c == 0) || (l == 8 && c == 8);
     }
 
-        // Utilisé pour détecter les vrais sandwichs
-    private boolean estHostilePour(Jeu jeu, int nl, int nc, int piece) {
-        if (!inBounds(nl, nc)) return false;
-        int v = jeu.grille[nl][nc];
-        if (piece == 1) // Noir : ennemi = Blanc(2), Roi(3), Trône(4), coins
-            return v == 2 || v == 3 || v == 4 || estHostile(nl, nc);
-        else            // Blanc/Roi : ennemi = Noir(1), Trône(4), coins
-            return v == 1 || v == 4 || estHostile(nl, nc);
-    }
 
 
     private boolean estMonCoup(Jeu jeu, Coup c) {
@@ -229,12 +220,16 @@ class IAeasy extends IA {
         // ── 1. États terminaux ──────────────────────────────────────────────
         if (king == null){
             // IA facile donc ajout d'un random pour parfois ne pas faire un coup gagnant, laisser une chance
-            if(Math.random() < 0.33) {
-                return +100000; // 33% de chance de ne pas voir la victoire immédiate
+            // On a 1 chance sur 3 de voir la victoire immédiate, sinon on continue à évaluer le coup comme s'il n'était pas gagnant
+            if(Math.random() > 0.33) {
+                //System.out.println("VICTOIRE IMMEDIATE DETECTEE");
+                return 100000; // victoire immédiate pour Noir
+                // 33% de chance de ne pas voir la victoire immédiate
             }
         }
         if (king.l==0||king.l==8||king.c==0||king.c==8){
             if(Math.random() < 0.33){
+                //System.out.println("VICTOIRE IMMEDIATE DETECTEE");
                 return -100000; // 33% de chance de ne pas voir la défaite immédiate
             }
         }     
@@ -243,52 +238,6 @@ class IAeasy extends IA {
         int[] dl = {-1, 1, 0, 0};
         int[] dc = {0, 0, -1, 1};
 
-        // // ── 2. Matériel ─────────────────────────────────────────────────────
-        // score += (jeu.ListePointN.totale - jeu.ListePointB.totale) * 500;
-
-        // // ── 3 & 4. Pièces réellement en danger (demi-sandwich) ──────────────
-        // // On détecte maintenant un vrai demi-sandwich : ennemi sur UN côté
-        // // ET ennemi/hostile sur le côté OPPOSÉ → capture possible au prochain coup
-        // //
-        // // Axes à vérifier : N-S et E-O
-        // int[][] axes = {{-1,0, 1,0}, {0,-1, 0,1}};
- 
-        // int suedoisMenaces = 0, noirsMenaces = 0;
- 
-        // for (int l = 0; l < 9; l++) {
-        //     for (int c = 0; c < 9; c++) {
-        //         int piece = jeu.grille[l][c];
-        //         if (piece != 1 && piece != 2) continue; // Noirs et Suédois seulement
- 
-        //         for (int[] ax : axes) {
-        //             int l1 = l + ax[0], c1 = c + ax[1]; // côté A
-        //             int l2 = l + ax[2], c2 = c + ax[3]; // côté B
- 
-        //             boolean coteA = estHostilePour(jeu, l1, c1, piece);
-        //             boolean coteB = estHostilePour(jeu, l2, c2, piece);
- 
-        //             if (coteA && coteB) {
-        //                 // Sandwich complet : pièce déjà capturée (ne devrait pas arriver)
-        //                 if (piece == 2) suedoisMenaces += 3;
-        //                 else            noirsMenaces  += 3;
-        //             } else if (coteA || coteB) {
-        //                 // Demi-sandwich : un adversaire peut compléter la capture
-        //                 if (piece == 2) suedoisMenaces++;
-        //                 else            noirsMenaces++;
-        //             }
-        //         }
-        //     }
-        // }
- 
-        // score += suedoisMenaces * 35;   // bon pour Noir  (Suédois menacés)
-        // score -= noirsMenaces  * 35;    // bon pour Blanc (Noirs menacés)
-
-        // ── 4. Distance roi au bord ─────────────────────────────────────────
-        // int distBord = Math.min(
-        //     Math.min(king.l, 8 - king.l),
-        //     Math.min(king.c, 8 - king.c)
-        // );
-        // score -= (8 - distBord) * 40;
 
 
         // ── 6. Couloirs d'évasion du roi ─────────────────────────────────────
@@ -323,48 +272,7 @@ class IAeasy extends IA {
             }
         }
  
-        // // Fork : deux routes opposées sans Suédois bloquant
-        // boolean forkNS = routeLibre[0] && routeLibre[1];
-        // boolean forkEO = routeLibre[2] && routeLibre[3];
-        // if (forkNS || forkEO)
-        //     score -= 4000;
-
-        // // ── 7. Pre-fork : roi à 1 case d'une position de fork ───────────────
-        // // Si le roi peut se déplacer vers une case depuis laquelle
-        // // il aurait deux routes opposées libres, c'est presque aussi bon.
-        // outerLoop:
-        // for (int dir2 = 0; dir2 < 4; dir2++) {
-        //     int nl = king.l + dirVec[dir2][0];
-        //     int nc = king.c + dirVec[dir2][1];
-        //     if (!inBounds(nl, nc) || jeu.grille[nl][nc] != 0) continue;
-        //     // Simuler le roi ici et vérifier fork
-        //     boolean[] testRoutes = new boolean[4];
-        //     for (int d3 = 0; d3 < 4; d3++) {
-        //         int l2 = nl + dirVec[d3][0], c2 = nc + dirVec[d3][1];
-        //         boolean libre = true;
-        //         while (inBounds(l2, c2)) {
-        //             int v = jeu.grille[l2][c2];
-        //             if (v == 3) { l2 += dirVec[d3][0]; c2 += dirVec[d3][1]; continue; } // ignore roi source
-        //             if (v != 0 && v != 4) { libre = false; break; }
-        //             l2 += dirVec[d3][0]; c2 += dirVec[d3][1];
-        //         }
-        //         testRoutes[d3] = libre;
-        //     }
-        //     if ((testRoutes[0] && testRoutes[1]) || (testRoutes[2] && testRoutes[3])) {
-        //         score -= 1500;  // pre-fork : Blanc peut créer un fork au prochain coup
-        //         break outerLoop;
-        //     }
-        // }
-
-        // ── 8. Menace sur le roi (Noirs ou trône adjacents) ─────────────────
-        // int menace = 0;
-        // for (int i = 0; i < 4; i++) {
-        //     int nl = king.l + dl[i], nc = king.c + dc[i];
-        //     if (!inBounds(nl, nc)) continue;
-        //     int v = jeu.grille[nl][nc];
-        //     if (v == 1 || v == 4) menace++;
-        // }
-        // score += new int[]{0, 80, 350, 8000}[Math.min(menace, 3)];
+        
  
         // ── 9. Protection du roi (Blancs adjacents = bouclier) ───────────────
         int protection = 0;
