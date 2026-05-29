@@ -210,7 +210,9 @@ public class ServerTablut{
                 
             }
             catch(IOException e){
-                System.err.println("Error IO socket : " + e.getMessage());
+                if (!"Connexion fermée".equals(e.getMessage())) {
+                    System.err.println("Error IO socket : " + e.getMessage());
+                }
             }
         }
 
