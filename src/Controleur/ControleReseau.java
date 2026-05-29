@@ -22,7 +22,6 @@ public class ControleReseau extends ControleAbstract{
     @Override
     public void undo() {
         client.demanderAnnulation();
-        refreshGrid();
     }
     
     public void abandonne(){

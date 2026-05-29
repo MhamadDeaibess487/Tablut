@@ -90,16 +90,22 @@ public class ServerTablut{
         /*Traite une request r et envoie une reponse aux clients*/
         public void traitementReq(Request r) throws IOException{
             synchronized(j){
-                Reponse jMoi = new Reponse(-1,null);
-                if ((joueur + 1 != j.getJoueur() && r.reqType == Communication.REQ_JOUE)
-                        || (joueur + 1 == j.getJoueur() && r.reqType == comIO[joueur].REQ_ANNULE)){ // ou Si joueur (est actif) alors peut pas annuler
-                    comIO[joueur].sndRep(jMoi); 
+                if (r == null) {
+                    comIO[joueur].sndRep(new Reponse(Communication.ERROR, null));
                     return;
                 }
-                Reponse jAdvrs = new Reponse(-1,null);
+
+                Reponse jMoi = new Reponse(Communication.ERROR, null);
+                Reponse jAdvrs = new Reponse(Communication.ERROR, null);
+
+                if ((joueur + 1 != j.getJoueur() && r.reqType == Communication.REQ_JOUE)
+                        || (joueur + 1 == j.getJoueur() && r.reqType == Communication.REQ_ANNULE)) {
+                    comIO[joueur].sndRep(jMoi);
+                    return;
+                }
 
                 switch(r.reqType){
-                    case 1: //Joue un coup
+                    case Communication.REQ_JOUE:
                         if(r.coup != null){
                             if(j.deplacer(r.coup.a, r.coup.b) != null){ 
                                 TableauBit g = j.transformerGrilleEnLong();
@@ -118,30 +124,71 @@ public class ServerTablut{
                                 );
                                 comIO[0].sndRep(turn);
                                 comIO[1].sndRep(turn);
+
+                                if (j.estFini()) {
+                                    envoyerFinDePartie(determinerGagnantApresCoup(r.coup.joueur));
+                                }
                                 return;
                             }
                         }
                         System.err.println("Coup invalid from client");
                         break;
-                    case 2: //Annule un coup
+                    case Communication.REQ_ANNULE:
+                        if (j.getUndo().isEmpty()) {
+                            jAdvrs.repType = Communication.ACK;
+                            jAdvrs.grille = null;
+                            jMoi.repType = Communication.ERROR;
+                            break;
+                        }
                         jAdvrs.repType = Communication.REP_ANNULE;
                         comIO[jAdverse].sndRep(jAdvrs);
                         int repAdvrs = comIO[jAdverse].rcvInt();
-                        if(repAdvrs == comIO[joueur].ACK){//Accept annulation
-                            j.annuler();
+                        if(repAdvrs == Communication.ACK){
+                            if (!j.annuler()) {
+                                jAdvrs.repType = Communication.ACK;
+                                jAdvrs.grille = null;
+                                jMoi.repType = Communication.ERROR;
+                                break;
+                            }
                             TableauBit g = j.transformerGrilleEnLong();
                             jAdvrs.repType = Communication.REP_BOARD_UPDATE;
                             jAdvrs.grille = g;
                             jMoi.repType = Communication.REP_BOARD_UPDATE;
                             jMoi.grille = g;
+                            comIO[jAdverse].sndRep(jAdvrs);
+                            comIO[joueur].sndRep(jMoi);
+
+                            Reponse turn = new Reponse(
+                                Communication.REP_TURN_UPDATE,
+                                new TableauBit(j.getJoueur(), 0, 0, 0, 0, 0)
+                            );
+                            comIO[0].sndRep(turn);
+                            comIO[1].sndRep(turn);
+                            return;
                         }
                         else{
+                            jAdvrs.repType = Communication.ACK;
+                            jAdvrs.grille = null;
                             jMoi.repType = Communication.ERROR; // Pas d'annulation
                         }
                         break;
-                    case 3: //Quit
-                        jAdvrs.repType = Communication.REP_GAME_OVER; // send victory to jAdverse
-                        jAdvrs.grille = new TableauBit(j.getJoueur(),0,0,0,0,0);
+                    case Communication.REQ_QUIT:
+                    case Communication.REQ_ABANDONNE:
+                        j.terminerPartie();
+                        envoyerFinDePartie(jAdverse + 1);
+                        return;
+                    case Communication.REQ_NUL:
+                        jAdvrs.repType = Communication.REP_NUL;
+                        comIO[jAdverse].sndRep(jAdvrs);
+                        int repNul = comIO[jAdverse].rcvInt();
+                        if (repNul == Communication.ACK) {
+                            j.terminerPartie();
+                            envoyerFinDePartie(0);
+                            return;
+                        }
+                        jAdvrs.repType = Communication.ACK;
+                        jAdvrs.grille = null;
+                        jMoi.repType = Communication.ERROR;
                         break;
                     default:
                         System.err.println("Unknown request");
@@ -160,14 +207,42 @@ public class ServerTablut{
                     Request r = comIO[joueur].rcvReq();
                     traitementReq(r);
                 }
-                TableauBit tab = new TableauBit(j.getJoueur(),0,0,0,0,0);
-                Reponse result = new Reponse(Communication.REP_GAME_OVER,tab);
-                comIO[joueur].sndRep(result);
                 
             }
             catch(IOException e){
                 System.err.println("Error IO socket : " + e.getMessage());
             }
-        }  
-    }
+        }
+
+        private int determinerGagnantApresCoup(int joueurQuiAJoue) {
+            int[][] grille = j.getGrille();
+            boolean roiPresent = false;
+
+            for (int l = 0; l < grille.length; l++) {
+                for (int c = 0; c < grille[l].length; c++) {
+                    if (grille[l][c] == 3) {
+                        roiPresent = true;
+                        if (l == 0 || l == grille.length - 1 || c == 0 || c == grille[l].length - 1) {
+                            return 2;
+                        }
+                    }
+                }
+            }
+
+            if (!roiPresent) {
+                return 1;
+            }
+
+            return joueurQuiAJoue;
+        }
+
+        private void envoyerFinDePartie(int resultat) {
+            Reponse fin = new Reponse(
+                Communication.REP_GAME_OVER,
+                new TableauBit(resultat, 0, 0, 0, 0, 0)
+            );
+            comIO[0].sndRep(fin);
+            comIO[1].sndRep(fin);
+        }
+    }  
 }

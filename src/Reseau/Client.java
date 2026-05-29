@@ -85,6 +85,9 @@ public class Client {
             case Communication.REP_ANNULE:
                 traiterDemandeAnnulation();
                 break;
+            case Communication.REP_NUL:
+                traiterDemandeNul();
+                break;
             case Communication.REP_ASSIGN_PLAYER:
                 joueur = (int) rep.grille.noir1;
                 System.out.println("ASSIGN joueur = " + joueur);
@@ -99,8 +102,9 @@ public class Client {
                         + ", monTour = " + monTour);
                 break;
             case Communication.REP_GAME_OVER:
-                /*Lecture r.grille.n1*/
                 gameOver = true;
+                monTour = false;
+                traiterFinDePartie(rep);
                 break;
             default:
                 System.err.println("Réponse inconnue : " + rep.repType);
@@ -118,6 +122,10 @@ public class Client {
     }
 
     public void envoyerCoup(Coup coup) {
+        if (gameOver) {
+            System.out.println("La partie est terminée.");
+            return;
+        }
         if (!monTour) {
             System.out.println("Ce n'est pas ton tour.");
             return;
@@ -136,6 +144,21 @@ public class Client {
                 null,
                 "L'autre joueur demande une annulation. Accepter ?",
                 "Demande d'annulation",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (choix == JOptionPane.YES_OPTION) {
+            communication.sndInt(Communication.ACK);
+        } else {
+            communication.sndInt(Communication.ERROR);
+        }
+    }
+
+    private void traiterDemandeNul() {
+        int choix = JOptionPane.showConfirmDialog(
+                null,
+                "L'autre joueur propose une nulle. Accepter ?",
+                "Proposition de nulle",
                 JOptionPane.YES_NO_OPTION
         );
 
@@ -167,6 +190,28 @@ public class Client {
         } catch (IOException e) {
             System.err.println("Erreur pendant la déconnexion.");
         }
+    }
+
+    private void traiterFinDePartie(Reponse rep) {
+        int resultat = rep.grille == null ? -1 : (int) rep.grille.noir1;
+        String message;
+
+        if (resultat == 0) {
+            message = "La partie se termine sur une nulle.";
+        } else if (resultat == joueur) {
+            message = "La partie est terminée. Vous avez gagné.";
+        } else if (resultat == 1 || resultat == 2) {
+            message = "La partie est terminée. Vous avez perdu.";
+        } else {
+            message = "La partie est terminée.";
+        }
+
+        JOptionPane.showMessageDialog(
+                null,
+                message,
+                "Fin de partie",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     // private void terminerPartie(String message) {

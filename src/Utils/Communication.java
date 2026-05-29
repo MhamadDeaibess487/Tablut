@@ -24,6 +24,7 @@ public class Communication {
     public static final int REP_GAME_OVER = 12;
     public static final int REP_ASSIGN_PLAYER = 13;
     public static final int REP_ANNULE = 14;
+    public static final int REP_NUL = 15;
 
 
     public Communication(BufferedReader in, PrintWriter out) {
@@ -161,7 +162,8 @@ public class Communication {
             || type == REP_TURN_UPDATE
             || type == REP_GAME_OVER
             || type == REP_ASSIGN_PLAYER
-            || type == REP_ANNULE;
+            || type == REP_ANNULE
+            || type == REP_NUL;
     }
 
     public void sndRep(Reponse r) {

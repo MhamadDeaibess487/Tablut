@@ -208,6 +208,7 @@ public class Jeu extends BaseJeu {
             TableauBit last = undo.pop();
             redo.push(transformerGrilleEnLong());
             transformeLongEnGrille(last);
+            fini = false;
             changerJoueur();
             return true;
         }
@@ -219,6 +220,7 @@ public class Jeu extends BaseJeu {
             TableauBit last = redo.pop();
             undo.push(transformerGrilleEnLong());
             transformeLongEnGrille(last);
+            fini = false;
             changerJoueur();
             return true;
         }

@@ -1,57 +1,89 @@
 package Vue;
 
-import Controleur.*;
+import Controleur.ControleReseau;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
 
 public class GrilleButtonsReseau extends JPanel {
-    private JButton undo,abandonne,nulle;
-    
-    private ControleReseau controle;
-    private GrilleGraphique grilleGraphique;
+    private static final Color PANEL_BG = new Color(18, 22, 32);
+    private static final Color BUTTON_BG = new Color(28, 34, 52);
+    private static final Color BUTTON_HOVER = new Color(42, 50, 73);
+    private static final Color GOLD = new Color(200, 160, 80);
+    private static final Color TEXT = new Color(240, 225, 185);
 
+    private final JButton undo;
+    private final JButton abandonne;
+    private final JButton nulle;
+    private final ControleReseau controle;
+    private final GrilleGraphique grilleGraphique;
 
-    public GrilleButtonsReseau(GrilleGraphique grille,ControleReseau controle) {
+    public GrilleButtonsReseau(GrilleGraphique grille, ControleReseau controle) {
         this.controle = controle;
-        grilleGraphique = grille;
+        this.grilleGraphique = grille;
 
         setOpaque(false);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(180, 0));
-        setBorder(BorderFactory.createEmptyBorder(40, 15, 40, 25));
+        setPreferredSize(new Dimension(220, 0));
+        setBorder(BorderFactory.createEmptyBorder(32, 16, 32, 24));
 
-        undo = new JButton("Undo");
-        abandonne = new JButton("Surrend");
-        nulle = new JButton("Draw");
-        
-        JButton[] boutons = {undo,abandonne,nulle};
+        JPanel menuPanel = new JPanel();
+        menuPanel.setBackground(PANEL_BG);
+        menuPanel.setBorder(BorderFactory.createLineBorder(GOLD, 3));
+        menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
+        menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        menuPanel.setMaximumSize(new Dimension(180, 310));
 
-        for (JButton b : boutons) {
-            styleButton(b, new Dimension(150, 55));
-            add(b);
-            add(Box.createVerticalStrut(15));
-        }
-        if (getComponentCount() > 0) {
-            remove(getComponentCount() - 1);
-        }
-        
-        /*Passe par le controle qui redirige vers une fonction de
-            creation de request dans client.java*/
+        JLabel title = new JLabel("ONLINE");
+        title.setFont(new Font("Serif", Font.BOLD, 34));
+        title.setForeground(TEXT);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        undo = createActionButton("Undo");
+        abandonne = createActionButton("Surrender");
+        nulle = createActionButton("Draw");
+
+        menuPanel.add(Box.createVerticalStrut(24));
+        menuPanel.add(title);
+        menuPanel.add(Box.createVerticalStrut(24));
+        menuPanel.add(undo);
+        menuPanel.add(Box.createVerticalStrut(15));
+        menuPanel.add(abandonne);
+        menuPanel.add(Box.createVerticalStrut(15));
+        menuPanel.add(nulle);
+        menuPanel.add(Box.createVerticalStrut(24));
+
+        add(menuPanel);
+        add(Box.createVerticalGlue());
+
         undo.addActionListener((ActionEvent e) -> {
-            controle.undo();
+            if (confirmAction(
+                    "Send an undo request to the other player?",
+                    "Request undo"
+            )) {
+                controle.undo();
+            }
         });
-        
+
         abandonne.addActionListener((ActionEvent e) -> {
-           controle.abandonne(); 
+            if (confirmAction(
+                    "Surrender the current online game?",
+                    "Surrender"
+            )) {
+                controle.abandonne();
+            }
         });
-        
+
         nulle.addActionListener((ActionEvent e) -> {
-           controle.demandeNul(); 
+            if (confirmAction(
+                    "Propose a draw to the other player?",
+                    "Propose draw"
+            )) {
+                controle.demandeNul();
+            }
         });
-        
 
         grilleGraphique.addMouseListener(new MouseAdapter() {
             @Override
@@ -71,13 +103,40 @@ public class GrilleButtonsReseau extends JPanel {
         });
     }
 
-    private void styleButton(JButton button, Dimension size) {
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setPreferredSize(size);
-        button.setMaximumSize(size);
-        button.setMinimumSize(size);
+    private JButton createActionButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Serif", Font.BOLD, 22));
+        button.setForeground(TEXT);
+        button.setBackground(BUTTON_BG);
         button.setFocusPainted(false);
-        button.setFont(new Font("SansSerif", Font.BOLD, 16));
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorder(BorderFactory.createLineBorder(GOLD, 2));
+        button.setMaximumSize(new Dimension(260, 55));
+        button.setPreferredSize(new Dimension(260, 55));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(BUTTON_HOVER);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(BUTTON_BG);
+            }
+        });
+        return button;
     }
 
+    private boolean confirmAction(String message, String title) {
+        return JOptionPane.showConfirmDialog(
+                SwingUtilities.getWindowAncestor(this),
+                message,
+                title,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        ) == JOptionPane.YES_OPTION;
+    }
 }
