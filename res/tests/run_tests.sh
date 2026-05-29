@@ -25,6 +25,9 @@ java -cp out Tests.TestModel
 java -cp out Tests.TestTableauBit
 java -cp out Tests.TestCommunication
 java -cp out Tests.TestReseauLocal
+java -cp out Tests.TestAIEasy
+java -cp out Tests.TestAIInter
+java -cp out Tests.TestAIHard
 
 echo "Tests automatiques OK"
 

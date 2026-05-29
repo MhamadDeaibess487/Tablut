@@ -442,6 +442,5 @@ public abstract class BaseJeu {
 
     public void setJouerActif(int joueur){
         this.Joueur_actif = joueur;
-        System.out.println("Joueur actif de base: " + Joueur_actif);
     }
 }

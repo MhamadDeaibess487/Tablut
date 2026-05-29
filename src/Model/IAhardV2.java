@@ -165,9 +165,6 @@ class IAhardV2 extends IA {
             for (Coup c : coups) {
                 Jeu copie = copieAvecJoueur(jeu, 2); // Blanc joue
                 copie.deplacer(c.a, c.b);            // → changerJoueur() → Noir
-                if (copie.getFini()) {
-                    System.out.println("FIN DETECTEE");
-                }
                 best = Math.min(best, alphabeta(copie, prof-1, alpha, beta, true));
                 beta = Math.min(beta, best);
                 if (beta <= alpha) break;             // coupure α

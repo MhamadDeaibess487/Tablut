@@ -28,7 +28,30 @@ public abstract class IA{
     abstract Coup calculCoup();
     
     public void joue(){
+        TableauBit snapshot = j.transformerGrilleEnLong();
+        int joueurAvant = j.getJoueur();
+        boolean finiAvant = j.getFini();
+
         Coup c = calculCoup();
+        restaurerEtatSiCalculAModifieLaPartie(snapshot, joueurAvant, finiAvant);
+
+        if (c == null) {
+            return;
+        }
+
         j.deplacer(c.a,c.b);
+    }
+
+    private void restaurerEtatSiCalculAModifieLaPartie(TableauBit snapshot, int joueurAvant, boolean finiAvant) {
+        TableauBit apresCalcul = j.transformerGrilleEnLong();
+        if (apresCalcul.compareTo(snapshot) == 0
+                && j.getJoueur() == joueurAvant
+                && j.getFini() == finiAvant) {
+            return;
+        }
+
+        j.transformeLongEnGrille(snapshot);
+        j.setJouerActif(joueurAvant);
+        j.fini = finiAvant;
     }
 }
