@@ -34,7 +34,8 @@ public class FenetreJeuReseau extends JFrame {
             Config.CHEMIN_IMAGES + "/nap_on.png",
             Config.CHEMIN_IMAGES + "/julien.png",
             Config.CHEMIN_IMAGES + "/julien.png",
-            controle
+            controle,
+            false
         );
 
         client = new Client(ip, 2121, jeu, grille, joueurActifPanel);

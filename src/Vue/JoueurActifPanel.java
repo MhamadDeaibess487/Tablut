@@ -55,6 +55,7 @@ public class JoueurActifPanel extends JPanel {
     private JButton joueur2Button;
     private boolean joueur1_IA;
     private boolean joueur2_IA;
+    private final boolean showAIControls;
     private int joueur_actif;
     ControleAbstract controle;
     private Random r;
@@ -62,7 +63,14 @@ public class JoueurActifPanel extends JPanel {
     public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
                              String j2NormalPath, String j2HighlightPath,
                             ControleAbstract controle) {
+        this(j1NormalPath, j1HighlightPath, j2NormalPath, j2HighlightPath, controle, true);
+    }
+
+    public JoueurActifPanel(String j1NormalPath, String j1HighlightPath,
+                             String j2NormalPath, String j2HighlightPath,
+                            ControleAbstract controle, boolean showAIControls) {
         this.controle = controle;
+        this.showAIControls = showAIControls;
         this.j1NormalPath = j1NormalPath;
         this.j1HighlightPath = j1HighlightPath;
         this.j2NormalPath = j2NormalPath;
@@ -139,58 +147,60 @@ public class JoueurActifPanel extends JPanel {
         joueur2Pion  = findPion(joueur2Card);
         joueur_actif= (controle.getJeu()).getJoueur();
 
-        slider1.addChangeListener(e -> {
-            if (!slider1.getValueIsAdjusting()) {
-                int niveau = slider1.getValue(); // 0, 1 ou 2
-                controle.setNiveauIANoir(niveau);
-                System.out.println("Niveau IA Noir changé : " + niveau);
-            }
-        });
-        slider2.addChangeListener(e -> {
-            if (!slider2.getValueIsAdjusting()) {
-                int niveau = slider2.getValue(); // 0, 1 ou 2
-                controle.setNiveauIABlanc(niveau);
-                System.out.println("Niveau IA Blanc changé : " + niveau);
-            }
-        });
-        joueur1Button.addActionListener(e -> {
-            joueur1_IA = !joueur1_IA;
+        if (showAIControls) {
+            slider1.addChangeListener(e -> {
+                if (!slider1.getValueIsAdjusting()) {
+                    int niveau = slider1.getValue();
+                    controle.setNiveauIANoir(niveau);
+                    System.out.println("Niveau IA Noir changé : " + niveau);
+                }
+            });
+            slider2.addChangeListener(e -> {
+                if (!slider2.getValueIsAdjusting()) {
+                    int niveau = slider2.getValue();
+                    controle.setNiveauIABlanc(niveau);
+                    System.out.println("Niveau IA Blanc changé : " + niveau);
+                }
+            });
+            joueur1Button.addActionListener(e -> {
+                joueur1_IA = !joueur1_IA;
 
-            if (joueur1_IA) {
-                joueur1Button.setText("IA/ON");
-                joueur1Button.setBackground(IA_ON);
-                joueur1Button.setForeground(IA_ON_TEXT);
-                slider1.setVisible(true);
-            } else {
-                joueur1Button.setText("IA/OFF");
-                joueur1Button.setBackground(IA_OFF);
-                joueur1Button.setForeground(IA_OFF_TEXT);
-                slider1.setVisible(false);
-            }
-            joueur1Card.revalidate();
-            joueur1Card.repaint();
+                if (joueur1_IA) {
+                    joueur1Button.setText("IA/ON");
+                    joueur1Button.setBackground(IA_ON);
+                    joueur1Button.setForeground(IA_ON_TEXT);
+                    slider1.setVisible(true);
+                } else {
+                    joueur1Button.setText("IA/OFF");
+                    joueur1Button.setBackground(IA_OFF);
+                    joueur1Button.setForeground(IA_OFF_TEXT);
+                    slider1.setVisible(false);
+                }
+                joueur1Card.revalidate();
+                joueur1Card.repaint();
 
-            controle.setIaNoir(joueur1_IA);
-        });
-        joueur2Button.addActionListener(e -> {
-            joueur2_IA = !joueur2_IA;
+                controle.setIaNoir(joueur1_IA);
+            });
+            joueur2Button.addActionListener(e -> {
+                joueur2_IA = !joueur2_IA;
 
-            if (joueur2_IA) {
-                joueur2Button.setText("IA/ON");
-                joueur2Button.setBackground(IA_ON);
-                joueur2Button.setForeground(IA_ON_TEXT);
-                slider2.setVisible(true);
-            } else {
-                joueur2Button.setText("IA/OFF");
-                joueur2Button.setBackground(IA_OFF);
-                joueur2Button.setForeground(IA_OFF_TEXT);
-                slider2.setVisible(false);
-            }
-            joueur2Card.revalidate();
-            joueur2Card.repaint();
+                if (joueur2_IA) {
+                    joueur2Button.setText("IA/ON");
+                    joueur2Button.setBackground(IA_ON);
+                    joueur2Button.setForeground(IA_ON_TEXT);
+                    slider2.setVisible(true);
+                } else {
+                    joueur2Button.setText("IA/OFF");
+                    joueur2Button.setBackground(IA_OFF);
+                    joueur2Button.setForeground(IA_OFF_TEXT);
+                    slider2.setVisible(false);
+                }
+                joueur2Card.revalidate();
+                joueur2Card.repaint();
 
-            controle.setIaBlanc(joueur2_IA);
-        });
+                controle.setIaBlanc(joueur2_IA);
+            });
+        }
 
         activeHeader1.setVisible(true);
         activeHeader2.setVisible(false);
@@ -273,19 +283,21 @@ public class JoueurActifPanel extends JPanel {
         card.setMinimumSize(new Dimension(272, 165));
         card.setMaximumSize(new Dimension(272, 190));
         card.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JButton IA_button = IA;
-        IA_button.setBackground(Ia_active ? IA_ON : IA_OFF);
-        IA_button.setForeground(Ia_active ? IA_ON_TEXT : IA_OFF_TEXT);
-        IA_button.setFont(new Font("SansSerif", Font.BOLD, 12));
-        IA_button.setOpaque(true);
-        IA_button.setContentAreaFilled(true);  // ajouter juste après setFont
-        IA_button.setPreferredSize(new Dimension(100, 28));
-        IA_button.setMaximumSize(new Dimension(200, 28));
-        IA_button.setMinimumSize(new Dimension(80, 28));
-        IA.setAlignmentX(Component.LEFT_ALIGNMENT);  // aligne à gauche comme les labels
-        textPanel.add(Box.createVerticalStrut(6));    // petit espace avant le bouton
-        textPanel.add(IA);
-        textPanel.add(slider1);
+        if (showAIControls) {
+            JButton IA_button = IA;
+            IA_button.setBackground(Ia_active ? IA_ON : IA_OFF);
+            IA_button.setForeground(Ia_active ? IA_ON_TEXT : IA_OFF_TEXT);
+            IA_button.setFont(new Font("SansSerif", Font.BOLD, 12));
+            IA_button.setOpaque(true);
+            IA_button.setContentAreaFilled(true);
+            IA_button.setPreferredSize(new Dimension(100, 28));
+            IA_button.setMaximumSize(new Dimension(200, 28));
+            IA_button.setMinimumSize(new Dimension(80, 28));
+            IA.setAlignmentX(Component.LEFT_ALIGNMENT);
+            textPanel.add(Box.createVerticalStrut(6));
+            textPanel.add(IA);
+            textPanel.add(slider1);
+        }
 
         JPanel imgPad = new JPanel(new GridBagLayout());
         imgPad.setOpaque(false);
@@ -483,13 +495,17 @@ public class JoueurActifPanel extends JPanel {
         resizePlayerImage(joueur1Card, circleSize);
         resizePlayerImage(joueur2Card, circleSize);
 
-        resizeButton(joueur1Button, (int) drawnWidth, (int) drawnHeight);
-        resizeButton(joueur2Button, (int) drawnWidth, (int) drawnHeight);
+        if (showAIControls) {
+            resizeButton(joueur1Button, (int) drawnWidth, (int) drawnHeight);
+            resizeButton(joueur2Button, (int) drawnWidth, (int) drawnHeight);
+        }
 
         resizeLabels((int) drawnHeight);
 
-        resizeSlider(slider1, (int) drawnWidth, (int) drawnHeight);
-        resizeSlider(slider2, (int) drawnWidth, (int) drawnHeight);
+        if (showAIControls) {
+            resizeSlider(slider1, (int) drawnWidth, (int) drawnHeight);
+            resizeSlider(slider2, (int) drawnWidth, (int) drawnHeight);
+        }
 
         revalidate();
         //repaint();
