@@ -152,6 +152,19 @@ public class MenuGraphique extends JFrame {
         JButton changerTheme = textButton("Changer thème");
         JButton retour = textButton("Retour");
 
+        modeTuto.addActionListener(e -> {
+            JDialog dialog = new JDialog(this, "Tutoriel", true);
+
+            TutorielPanel tutoriel = new TutorielPanel(() -> {
+                dialog.dispose();
+            });
+
+            dialog.setContentPane(tutoriel);
+            dialog.setSize(1700, 1000);
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+        });
+
         retour.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, "MENU");

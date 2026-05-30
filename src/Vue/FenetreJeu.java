@@ -212,6 +212,7 @@ public class FenetreJeu extends JFrame {
             victoryVoirPlateau.setVisible(false);
             victoryVoirImage.setVisible(true);
             resizeVictoryButtons();
+            repaint();
         });
 
         victoryVoirImage.addActionListener(e -> {
@@ -219,6 +220,7 @@ public class FenetreJeu extends JFrame {
             victoryVoirImage.setVisible(false);
             victoryVoirPlateau.setVisible(true);
             resizeVictoryButtons();
+            repaint();
         });
 
         victoryQuitter.addActionListener(e -> {

@@ -10,6 +10,7 @@ public final class Config {
     public static final String THEME_STAR_WARS = "res/images/Theme_starwars";
 
     public static String CHEMIN_IMAGES = THEME_PRINCIPAL;
+    public static String CHEMIN_TUTO = "res/images/tuto";
 
     public static final String CHEMIN_SAUVEGARDES = "res/saves/";
 

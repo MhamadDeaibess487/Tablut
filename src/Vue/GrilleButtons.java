@@ -97,10 +97,21 @@ public class GrilleButtons extends JPanel {
         });
 
         tutorial.addActionListener(e -> {
-            dialog.dispose();
-            System.out.println("Tutorial requested");
-        });
+            JDialog tutoDialog = new JDialog(
+                    SwingUtilities.getWindowAncestor(this),
+                    "Tutoriel",
+                    Dialog.ModalityType.APPLICATION_MODAL
+            );
 
+            TutorielPanel tutoriel = new TutorielPanel(() -> {
+                tutoDialog.dispose();
+            });
+
+            tutoDialog.setContentPane(tutoriel);
+            tutoDialog.setSize(1700, 1000);
+            tutoDialog.setLocationRelativeTo(this);
+            tutoDialog.setVisible(true);
+        });
         quitter.addActionListener(e -> {
             dialog.dispose();
             controle.demanderSauvegardeEtQuitter();
