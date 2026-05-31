@@ -209,6 +209,7 @@ public class Jeu extends BaseJeu {
             redo.push(transformerGrilleEnLong());
             transformeLongEnGrille(last);
             fini = false;
+            resultatPartie = RESULTAT_AUCUN;
             changerJoueur();
             return true;
         }
@@ -221,6 +222,7 @@ public class Jeu extends BaseJeu {
             undo.push(transformerGrilleEnLong());
             transformeLongEnGrille(last);
             fini = false;
+            resultatPartie = RESULTAT_AUCUN;
             changerJoueur();
             return true;
         }
@@ -246,6 +248,7 @@ public class Jeu extends BaseJeu {
     public void nouvellePartie() {
         this.Joueur_actif = 1;
         this.fini = false;
+        this.resultatPartie = RESULTAT_AUCUN;
         transformeLongEnGrille(grilleInit);
         this.redo.clear();
         this.undo.clear();
@@ -262,6 +265,7 @@ public class Jeu extends BaseJeu {
                 nb++;
             }
             if (nb == 2) {
+                resultatPartie = RESULTAT_NULLE;
                 terminerPartie();
                 return true;
             }

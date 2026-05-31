@@ -104,6 +104,7 @@ public class Client {
             case Communication.REP_GAME_OVER:
                 gameOver = true;
                 monTour = false;
+                appliquerFinDePartie(rep);
                 traiterFinDePartie(rep);
                 break;
             default:
@@ -212,6 +213,23 @@ public class Client {
                 "Fin de partie",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    private void appliquerFinDePartie(Reponse rep) {
+        int resultat = rep.grille == null ? -1 : (int) rep.grille.noir1;
+
+        if (resultat == 1) {
+            jeu.setResultatPartie(BaseJeu.RESULTAT_NOIRS);
+        } else if (resultat == 2) {
+            jeu.setResultatPartie(BaseJeu.RESULTAT_BLANCS);
+        } else if (resultat == 0) {
+            jeu.setResultatPartie(BaseJeu.RESULTAT_NULLE);
+        } else {
+            jeu.setResultatPartie(BaseJeu.RESULTAT_AUCUN);
+        }
+
+        jeu.terminerPartie();
+        grilleGraphique.repaint();
     }
 
     // private void terminerPartie(String message) {

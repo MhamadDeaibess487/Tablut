@@ -29,8 +29,9 @@ public class ServerTablut{
 
             Jeu jeu = new Jeu();
             int couleur = r.nextInt(2) + 1; // 1 noir, 2 blanc
-            Thread j1 = new hndlJoueur(comIO,jeu,couleur);
-            Thread j2 = new hndlJoueur(comIO,jeu,(couleur % 2) + 1);
+            AttenteReponse attenteReponse = new AttenteReponse();
+            Thread j1 = new hndlJoueur(comIO,jeu,couleur, attenteReponse);
+            Thread j2 = new hndlJoueur(comIO,jeu,(couleur % 2) + 1, attenteReponse);
             
             j1.start();
             j2.start();
@@ -62,12 +63,14 @@ public class ServerTablut{
         private final Communication[] comIO;
         private final int joueur;
         private final int jAdverse;
+        private final AttenteReponse attenteReponse;
         
-        public hndlJoueur(Communication[] io,Jeu j,int couleur){
+        public hndlJoueur(Communication[] io,Jeu j,int couleur, AttenteReponse attenteReponse){
             comIO = io;
             this.j = j;
             joueur = couleur - 1;
             jAdverse = (joueur + 1) % 2;
+            this.attenteReponse = attenteReponse;
         }
         
         public void initJoueur() {
@@ -141,8 +144,9 @@ public class ServerTablut{
                             break;
                         }
                         jAdvrs.repType = Communication.REP_ANNULE;
+                        attenteReponse.demarrerAttente(jAdverse);
                         comIO[jAdverse].sndRep(jAdvrs);
-                        int repAdvrs = comIO[jAdverse].rcvInt();
+                        int repAdvrs = attenteReponse.attendreReponse(jAdverse);
                         if(repAdvrs == Communication.ACK){
                             if (!j.annuler()) {
                                 jAdvrs.repType = Communication.ACK;
@@ -179,8 +183,9 @@ public class ServerTablut{
                         return;
                     case Communication.REQ_NUL:
                         jAdvrs.repType = Communication.REP_NUL;
+                        attenteReponse.demarrerAttente(jAdverse);
                         comIO[jAdverse].sndRep(jAdvrs);
-                        int repNul = comIO[jAdverse].rcvInt();
+                        int repNul = attenteReponse.attendreReponse(jAdverse);
                         if (repNul == Communication.ACK) {
                             j.terminerPartie();
                             envoyerFinDePartie(0);
@@ -204,7 +209,10 @@ public class ServerTablut{
             try{
                 initJoueur();
                 while(!j.estFini()){
-                    Request r = comIO[joueur].rcvReq();
+                    Request r = lireMessage();
+                    if (r == null) {
+                        continue;
+                    }
                     traitementReq(r);
                 }
                 
@@ -214,6 +222,26 @@ public class ServerTablut{
                     System.err.println("Error IO socket : " + e.getMessage());
                 }
             }
+        }
+
+        private Request lireMessage() throws IOException {
+            int type = comIO[joueur].rcvInt();
+
+            if (type == Communication.ACK || type == Communication.ERROR) {
+                if (attenteReponse.enAttentePour(joueur)) {
+                    attenteReponse.enregistrerReponse(joueur, type);
+                    return null;
+                }
+                return null;
+            }
+
+            if (type < Communication.REQ_JOUE || type > Communication.REQ_NUL) {
+                System.err.println("Bad request");
+                return null;
+            }
+
+            int coupSerialise = comIO[joueur].rcvInt();
+            return new Request(type, comIO[joueur].deserializeCoup(coupSerialise));
         }
 
         private int determinerGagnantApresCoup(int joueurQuiAJoue) {
@@ -245,6 +273,44 @@ public class ServerTablut{
             );
             comIO[0].sndRep(fin);
             comIO[1].sndRep(fin);
+        }
+    }
+
+    private static class AttenteReponse {
+        private int joueurAttendu = -1;
+        private Integer reponse = null;
+
+        public synchronized void demarrerAttente(int joueur) {
+            joueurAttendu = joueur;
+            reponse = null;
+        }
+
+        public synchronized boolean enAttentePour(int joueur) {
+            return joueurAttendu == joueur && reponse == null;
+        }
+
+        public synchronized void enregistrerReponse(int joueur, int valeur) {
+            if (joueurAttendu != joueur || reponse != null) {
+                return;
+            }
+            reponse = valeur;
+            notifyAll();
+        }
+
+        public synchronized int attendreReponse(int joueur) {
+            while (joueurAttendu == joueur && reponse == null) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return Communication.ERROR;
+                }
+            }
+
+            int resultat = reponse == null ? Communication.ERROR : reponse;
+            joueurAttendu = -1;
+            reponse = null;
+            return resultat;
         }
     }  
 }

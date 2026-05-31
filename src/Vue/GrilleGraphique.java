@@ -160,7 +160,13 @@ public class GrilleGraphique extends JPanel {
         int tailleVict = (int) (taillePlateau * pourcentage);
         int joueur_actif = jeu.getJoueur();
         if (jeu.getFini() && afficherVictoire) {
-            if (jeu.jeuRedondant()) {
+            if (jeu.getResultatPartie() == BaseJeu.RESULTAT_NULLE) {
+                ImageVictoire = drawImage;
+            } else if (jeu.getResultatPartie() == BaseJeu.RESULTAT_NOIRS) {
+                ImageVictoire = blackWinImage;
+            } else if (jeu.getResultatPartie() == BaseJeu.RESULTAT_BLANCS) {
+                ImageVictoire = whiteWinImage;
+            } else if (jeu.jeuRedondant()) {
                 ImageVictoire = drawImage;
             } else if (joueur_actif == 2) {
                 ImageVictoire = blackWinImage;

@@ -148,21 +148,12 @@ public class MenuGraphique extends JFrame {
         titre.setForeground(new Color(240, 225, 185));
         titre.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton modeTuto = textButton("Mode Tutoriel On/Off");
+        JButton modeTuto = textButton("Show Tutorial");
         JButton changerTheme = textButton("Changer thème");
         JButton retour = textButton("Retour");
 
         modeTuto.addActionListener(e -> {
-            JDialog dialog = new JDialog(this, "Tutoriel", true);
-
-            TutorielPanel tutoriel = new TutorielPanel(() -> {
-                dialog.dispose();
-            });
-
-            dialog.setContentPane(tutoriel);
-            dialog.setSize(1700, 1000);
-            dialog.setLocationRelativeTo(this);
-            dialog.setVisible(true);
+            TutorielPanel.ouvrirDialog(this);
         });
 
         retour.addActionListener(new ActionListener() {

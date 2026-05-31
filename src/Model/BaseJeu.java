@@ -10,12 +10,18 @@ import java.util.ArrayList;
 //Condition null:
 // Répétition 3 coups identiques.
 public abstract class BaseJeu {
+    public static final int RESULTAT_AUCUN = 0;
+    public static final int RESULTAT_NOIRS = 1;
+    public static final int RESULTAT_BLANCS = 2;
+    public static final int RESULTAT_NULLE = 3;
+
     protected int[][] grille; // 0 vide, 1 noir, 2 blanc, 3 roi, 4 trone
     protected final TableauBit grilleInit; // Grille initiale serializé
     protected int Joueur_actif; // joueur 1(Noir) ou 2(Blanc)
     protected final int Taille_plateau;
     protected Point trone;
     protected boolean fini = false; // à voir si les blanc ou noir gagnent
+    protected int resultatPartie = RESULTAT_AUCUN;
     protected ListePoint ListePointB;
     protected ListePoint ListePointN;
 
@@ -51,6 +57,14 @@ public abstract class BaseJeu {
 
     public void terminerPartie() {
         fini = true;
+    }
+
+    public int getResultatPartie() {
+        return resultatPartie;
+    }
+
+    public void setResultatPartie(int resultatPartie) {
+        this.resultatPartie = resultatPartie;
     }
 
     public void changerJoueur() {
@@ -151,6 +165,7 @@ public abstract class BaseJeu {
 
         if (grille[b.l][b.c] == 3) { // si le roi s'échappe
             if (b.l == 0 || b.l == 8 || b.c == 0 || b.c == 8) {
+                resultatPartie = RESULTAT_BLANCS;
                 fini = true;
 //                System.out.println("blanc ganger");
             }
@@ -163,6 +178,7 @@ public abstract class BaseJeu {
             for (Pion p : Liste.LP) {
                 Point P = p.p;
                 if (grille[P.l][P.c] == 3) { // si mange roi gagner
+                    resultatPartie = RESULTAT_NOIRS;
                     fini = true;
 //                    System.out.println("noir ganger");
                 }
@@ -180,6 +196,7 @@ public abstract class BaseJeu {
                 grille[P.l][P.c] = 0;
                 ListePointN.SupprimeListePoint(P);
                 if (ListePointN.totale == 0) {
+                    resultatPartie = RESULTAT_BLANCS;
                     fini = true;
                 }
             }
