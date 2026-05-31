@@ -188,20 +188,10 @@ public class Controle extends ControleAbstract{
             return;
         }
 
+        int contenu = grille_case[row][column];
+
         if(ligneSelectee == -1  && colonneSelectee == -1) {
-            int contenu = grille_case[row][column];
-
-            if (contenu == 0 || contenu == 4 || jeu.getFini()) {
-                return;
-            }
-
-            // joueur 1 = noir, il ne peut sélectionner que les noirs
-            if (jeu.getJoueur() == 1 && contenu != 1) {
-                return;
-            }
-
-            // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (jeu.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (!estPieceSelectionnable(contenu)) {
                 return;
             }
             ligneSelectee = row;
@@ -213,6 +203,12 @@ public class Controle extends ControleAbstract{
             ligneSelectee = -1;
             colonneSelectee = -1;
             Grille.effacerCasesValides();
+            refreshGrid();
+        }else if (estPieceSelectionnable(contenu)) {
+            ligneSelectee = row;
+            colonneSelectee = column;
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            Grille.dessiner_valide(liste);
             refreshGrid();
         }else{
             Point p = new Point(ligneSelectee,colonneSelectee);
@@ -226,6 +222,18 @@ public class Controle extends ControleAbstract{
             ligneSelectee=-1;
             finaliserApresCoup();
         }
+    }
+
+    private boolean estPieceSelectionnable(int contenu) {
+        if (contenu == 0 || contenu == 4 || jeu.getFini()) {
+            return false;
+        }
+
+        if (jeu.getJoueur() == 1) {
+            return contenu == 1;
+        }
+
+        return contenu == 2 || contenu == 3;
     }
     
     public boolean choisir_nom(){

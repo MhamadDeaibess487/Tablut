@@ -35,17 +35,11 @@ public class ControleReseau extends ControleAbstract{
     @Override
     public void handleGridClick(int row, int column) {
         int [][]grille_case = jeu.getGrille();
+        int contenu = grille_case[row][column];
 
 
         if(ligneSelectee == -1  && colonneSelectee == -1) {
-            int contenu = grille_case[row][column];
-
-            if (contenu == 0 || contenu == 4 || (client.getJoueur() == 1 && contenu != 1)) {
-                return;
-            }
-            
-            // joueur 2 = blanc, il peut sélectionner blancs + roi
-            if (client.getJoueur() == 2 && contenu != 2 && contenu != 3) {
+            if (!estPieceSelectionnable(contenu)) {
                 return;
             }
             ligneSelectee = row;
@@ -57,6 +51,12 @@ public class ControleReseau extends ControleAbstract{
             ligneSelectee = -1;
             colonneSelectee = -1;
             Grille.effacerCasesValides();
+            refreshGrid();
+        }else if (estPieceSelectionnable(contenu)) {
+            ligneSelectee = row;
+            colonneSelectee = column;
+            ArrayList<Point> liste = jeu.listeCasesValides(ligneSelectee, colonneSelectee);
+            Grille.dessiner_valide(liste);
             refreshGrid();
         }else{  
             Point p = new Point(ligneSelectee,colonneSelectee);
@@ -72,5 +72,17 @@ public class ControleReseau extends ControleAbstract{
     
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    private boolean estPieceSelectionnable(int contenu) {
+        if (contenu == 0 || contenu == 4) {
+            return false;
+        }
+
+        if (client.getJoueur() == 1) {
+            return contenu == 1;
+        }
+
+        return contenu == 2 || contenu == 3;
     }
 }
