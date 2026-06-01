@@ -163,6 +163,26 @@ public class TutorielPanel extends JPanel {
         List<TutorialSlide> data = new ArrayList<>();
 
         ajouterSlide(
+                data,
+                "Deplacements",
+                "Toutes les pieces se deplacent en ligne droite, horizontalement ou verticalement, "
+                        + "sur autant de cases libres que voulu. Aucune piece ne saute par-dessus une autre.",
+                Config.CHEMIN_TUTO + "/tuto4.png",
+                Config.CHEMIN_IMAGES + "/selected.png"
+        );
+
+        ajouterSlide(
+                data,
+                "LA capture",
+                "Un pion normal est capturé lorsqu’il est coincé entre deux pions adverses sur une même ligne ou une même colonne."
+
+                        +"La capture se fait après le déplacement d’un pion ennemi",
+                Config.CHEMIN_TUTO + "/tuto3.png",
+                Config.CHEMIN_TUTO + "/tuto9.png"
+        );
+
+
+        ajouterSlide(
             data,
             "Objectif Des Blancs",
             "Les Blancs gagnent lorsque le roi atteint n'importe quelle case du bord. "
@@ -181,28 +201,60 @@ public class TutorielPanel extends JPanel {
         );
 
         ajouterSlide(
-            data,
-            "Deplacements",
-            "Toutes les pieces se deplacent en ligne droite, horizontalement ou verticalement, "
-                + "sur autant de cases libres que voulu. Aucune piece ne saute par-dessus une autre.",
-            Config.CHEMIN_TUTO + "/tuto3.png",
-            Config.CHEMIN_IMAGES + "/selected.png"
+                data,
+                "Le Trone Et Les Cases",
+                "Le trone reste une case speciale au centre. Il influence les captures et la circulation "
+                        + "autour du roi. Les coins et certaines cases speciales sont decisifs pour la victoire.",
+                Config.CHEMIN_IMAGES + "/throne.png",
+                Config.CHEMIN_IMAGES + "/centrale.png"
         );
 
         ajouterSlide(
-            data,
-            "Le Trone Et Les Cases",
-            "Le trone reste une case speciale au centre. Il influence les captures et la circulation "
-                + "autour du roi. Les coins et certaines cases speciales sont decisifs pour la victoire.",
-            Config.CHEMIN_IMAGES + "/throne.png",
-            Config.CHEMIN_IMAGES + "/centrale.png"
+                data,
+                "Capture du roi on throne",
+                "Lorsque le roi se trouve sur le trône, il bénéficie d’une protection particulière.\n"
+                        + "Pour le capturer, les Noirs doivent l’encercler sur ses quatre côtés :",
+                Config.CHEMIN_TUTO + "/tuto5.png",null
+        );
+
+
+        ajouterSlide(
+                data,
+                "Capture du roi adjacent au throne",
+                "il est capturé s’il est entouré sur 3 côtés"+" le trône comptant comme le 4ᵉ côté.",
+                Config.CHEMIN_TUTO + "/tuto6.png",null
+        );
+
+        ajouterSlide(
+                data,
+                "Capture d'un pion avec throne",
+                "        Le trône peut participer à la capture d’un pion normal." +
+                        "Un pion est capturé lorsqu’il se retrouve coincé entre un pion adverse et le trône, sur une même ligne ou une même colonne",
+                Config.CHEMIN_TUTO + "/tuto7.png",null
+        );
+
+        ajouterSlide(
+                data,
+                "Draw",
+                "Si la même position de jeu se répète trois fois, la partie est déclarée nulle (draw)"
+                ,
+                Config.CHEMIN_IMAGES + "/draw.png",
+                null
+        );
+        ajouterSlide(
+                data,
+                "roi hors throne",
+                "Une fois que le roi a quitté le trône, il ne peut plus y revenir pendant la partie."
+                ,
+                Config.CHEMIN_TUTO + "/tuto8.png",
+                null
         );
 
         ajouterSlide(
             data,
             "Fin De Partie",
-            "Une partie peut se terminer par victoire des Noirs, victoire des Blancs ou nulle "
-                + "si une repetition detectee est atteinte.",
+            "Une partie peut se terminer par victoire des Noirs, victoire des Blancs ou nulle(draw) "
+                + "si une repetition detectee est atteinte(une configuration de jeu est repetee 3 fois).",
             Config.CHEMIN_IMAGES + "/blackWin.png",
             Config.CHEMIN_IMAGES + "/whiteWin.png"
         );
