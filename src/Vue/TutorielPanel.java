@@ -313,13 +313,8 @@ public class TutorielPanel extends JPanel {
             texte.setBorder(null);
             texte.setFocusable(false);
 
-            JLabel aide = new JLabel("Ajoutez ou modifiez une page via ajouterSlide(...)", SwingConstants.CENTER);
-            aide.setFont(new Font("Serif", Font.PLAIN, 18));
-            aide.setForeground(TEXT_MUTED);
-
             texteZone.add(titre, BorderLayout.NORTH);
             texteZone.add(texte, BorderLayout.CENTER);
-            texteZone.add(aide, BorderLayout.SOUTH);
 
             add(imageZone, BorderLayout.CENTER);
             add(texteZone, BorderLayout.SOUTH);
