@@ -1,3 +1,27 @@
-.vscode
-.class
+# Java build products
+*.class
+/build/
+/out/
+/target/
+*.log
+hs_err_pid*
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
 .DS_Store
+Thumbs.db
+*~
+*.swp
+
+# Local saves; the already tracked university examples remain versioned.
+/res/saves/*
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
